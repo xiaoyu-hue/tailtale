@@ -7,9 +7,9 @@
 - 无支付、无商业化：金币只能靠阅读赚取，不可购买
 - PWA：可"添加到主屏幕"，离线可用
 
-## 当前进度（M2 进行中）
+## 当前进度（v1.0.0 · M2 已完成）
 
-M1（地基）已交付，M2（阅读核心）架构迁移与游戏化已启动：
+v1.0.0（2026-10-20 发布）：M1 地基 + M2 阅读核心全部完成，首个正式版。已交付：
 
 - [x] 项目脚手架：React 18 + TypeScript + Vite + PWA
 - [x] 书架：本地导入 TXT、删除、三种状态（想读 / 在读 / 读完）
@@ -45,13 +45,16 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 ## 仓库结构
 
 ```
+├── CHANGELOG.md           版本演进记录（Keep a Changelog 风格）
 ├── LICENSE                 Apache-2.0 全文（覆盖自有源代码）
 ├── THIRD_PARTY_NOTICES.md   第三方组件版权与许可证声明
 ├── README.md               本文件（Apache-2.0）
-├── docs/                   项目文档（CC BY-NC 4.0）
+├── docs/                   项目文档（CC BY-NC 4.0，全文见 docs/LICENSE）
+│   ├── LICENSE              CC BY-NC 4.0 官方法律文本（文档许可）
 │   ├── 书时-PRD.md          产品需求文档
 │   ├── 书时-技术栈.md        技术选型与架构
 │   ├── 书时-架构设计.md      目标架构、模块边界与迁移路径
+│   ├── 书时-版本管理规范.md  版本号规则、发版流程与 CHANGELOG 约定
 │   └── 书时-开源组件与合规.md 组件致谢、许可证义务与合规台账
 ├── index.html
 ├── vite.config.ts          Vite + PWA 配置
@@ -74,7 +77,7 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 |---|---|
 | 书时自有源代码 | [Apache-2.0](LICENSE)，Copyright © 2026 xiaoyu-hue |
 | 第三方组件 | 各自原许可证，见 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md) |
-| docs/ 目录项目文档 | CC BY-NC 4.0（署名 + 非商用） |
+| docs/ 目录项目文档 | CC BY-NC 4.0（署名 + 非商用），[全文见 docs/LICENSE](docs/LICENSE) |
 
 完整组件致谢、许可证义务与禁用组件记录见 [docs/书时-开源组件与合规.md](docs/书时-开源组件与合规.md)，应用内「我的 → 关于」页同步展示致谢清单。
 
