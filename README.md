@@ -34,14 +34,14 @@
 
 ## 在线体验
 
-**内部预览地址：<https://tailtale-520.pages.dev/>**
+**主站地址：<https://tailtale-520.pages.dev/>**
 
 - 当前部署内容为 `main` 分支最新构建（**v1.0.0 · M2 阅读核心**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
 
-> 部署策略：开发期使用 Cloudflare Pages 免费 `*.pages.dev` 二级域名内部预览；自定义域名与公开上架待可用版本完成后启动。
+> 站点定位：**https://tailtale-520.pages.dev/** 为当前主站（Cloudflare Pages 托管，`main` 分支构建自动发布）。后续如启用自定义域名将平滑迁移，并保留本地址可访问。
 
 ---
 
