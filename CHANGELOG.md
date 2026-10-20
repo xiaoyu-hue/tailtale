@@ -3,9 +3,9 @@
 本文件遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 规范，版本号规则见 [docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)。
 本文件随源代码采用 [Apache-2.0](LICENSE) 许可；docs/ 目录下的文档采用 CC BY-NC 4.0。
 
-## [未发布]
+## [1.2.1] - 2026-10-20
 
-（下一个版本的变更记录写在这里，发布时改为正式版本号与日期）
+继续阅读卡片可读性优化：间距拉开、进度条加粗。
 
 ### 优化
 
@@ -86,3 +86,4 @@
 [1.0.0]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.0.0
 [1.1.0]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.1.0
 [1.2.0]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.2.0
+[1.2.1]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.2.1

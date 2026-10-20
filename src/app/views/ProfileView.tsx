@@ -67,7 +67,7 @@ export default function Profile() {
       </div>
 
       <p className="muted" style={{ textAlign: 'center', marginTop: 20 }}>
-        书时 TailTale v1.2.0 · 滑动翻页
+        书时 TailTale v1.2.1 · 体验优化
       </p>
     </>
   );

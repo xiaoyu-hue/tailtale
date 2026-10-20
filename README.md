@@ -1,6 +1,6 @@
 # 书时 TailTale
 
-[![Version](https://img.shields.io/badge/version-v1.2.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.2.0)
+[![Version](https://img.shields.io/badge/version-v1.2.1-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.2.1)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](docs/LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.2.0 · 滑动翻页**）
+- 当前部署内容为 `main` 分支最新构建（**v1.2.1 · 体验优化**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -241,7 +241,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 
 ## 版本与发布
 
-- **当前版本：v1.2.0**（2026-10-20 发布，滑动翻页：三个阅读器统一手势，左滑/上滑 = 下一页，右滑/下滑 = 上一页；v1.1.0 为多格式阅读，v1.0.0 为首个正式版）
+- **当前版本：v1.2.1**（2026-10-20 发布，继续阅读卡片可读性优化：间距拉开、进度条加粗；v1.2.0 为滑动翻页，v1.1.0 为多格式阅读，v1.0.0 为首个正式版）
 - [Releases](https://github.com/xiaoyu-hue/tailtale/releases) · [CHANGELOG](CHANGELOG.md)
 - 版本号规则与发版流程：[docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
   - 主版本号（X.0.0）= 架构级变更；次版本号（1.X.0）= 新功能上线；修订号（1.1.X）= 优化、修复、文档同步
