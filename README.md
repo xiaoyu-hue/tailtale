@@ -46,6 +46,7 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 ├── docs/                   项目文档（CC BY-NC 4.0）
 │   ├── 书时-PRD.md          产品需求文档
 │   ├── 书时-技术栈.md        技术选型与架构
+│   ├── 书时-架构设计.md      目标架构、模块边界与迁移路径
 │   └── 书时-开源组件与合规.md 组件致谢、许可证义务与合规台账
 ├── index.html
 ├── vite.config.ts          Vite + PWA 配置
