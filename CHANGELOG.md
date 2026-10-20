@@ -3,6 +3,14 @@
 本文件遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 规范，版本号规则见 [docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)。
 本文件随源代码采用 [Apache-2.0](LICENSE) 许可；docs/ 目录下的文档采用 CC BY-NC 4.0。
 
+## [未发布]
+
+（下一个版本的变更记录写在这里，发布时改为正式版本号与日期）
+
+### 修复
+
+- **iOS 端滑动翻页失效**（真机测试发现，Safari 下三个阅读器滑动均无响应）：根因是 iOS Safari 的规矩——手指一动系统即开始判定「这是滚动吧」，一旦进入滚动模式，`touchend`（松手）不再派发、改派 `touchcancel`，翻页判定等不到松手；而原实现中 TXT / PDF 走 React 合成事件（touchmove 固定 passive）、EPUB 走 passive 原生监听，两条路都无法阻止系统滚动。修复：三个阅读器统一改为原生 `addEventListener` + `passive: false`，手指移动超过 10px 定型后立即 `preventDefault()` 扼杀滚动（TXT 只拦横向、竖滑放行原生滚动；EPUB / PDF 横竖全拦）；`touchcancel` 仅重置状态不误触发翻页；另补 CSS `touch-action`（TXT pan-y / PDF 与 EPUB iframe none）作 iOS 13+ 渐进增强。安卓与桌面行为不变
+
 ## [1.2.1] - 2026-10-20
 
 继续阅读卡片可读性优化：间距拉开、进度条加粗。
