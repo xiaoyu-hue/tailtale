@@ -7,6 +7,16 @@
 
 （下一个版本的变更记录写在这里，发布时改为正式版本号与日期）
 
+### 新增
+
+- **滑动翻页**：三个阅读器统一支持手势翻页——左滑 / 上滑 = 下一页，右滑 / 下滑 = 上一页；EPUB / PDF 横竖滑均可翻页，TXT 左右横滑快速切章（竖滑保持原生滚动）
+- **自研手势 hook**：`src/shared/hooks/useSwipe.ts`（shared/hooks 目录首个真实文件），零新依赖；含防误触设计——小位移视为点击不翻页，滑动后 400ms 内吞掉浏览器合成的尾随 click（不误触控件栏显隐）
+
+### 技术内部
+
+- 修复 EPUB 阅读器遗留死代码：原「rendered」回调把 click 监听绑在不含 `addEventListener` 方法的 IframeView 实例上，点击正文切换控件栏实际从未生效；改绑 iframe 的 `contentDocument` 后恢复
+- 以捕获阶段监听 + `stopImmediatePropagation` 禁用 epub.js 内置滑动（snap_Snap），避免与自研手势双翻页；iframe `documentElement` 设 `touch-action: none` 禁原生平移
+
 ## [1.1.0] - 2026-10-20
 
 多格式阅读：EPUB / PDF 双格式导入与渲染上线，书架与阅读器全链路适配。里程碑与版本号解耦——本次为 M2 之后的独立功能版本，M3 宠物系统顺延至下一版本。

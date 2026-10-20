@@ -55,9 +55,10 @@
 
 ### 阅读器
 
-- TXT：章节自动拆分与章节导航，滚动阅读
-- EPUB：流式分页渲染（epub.js），目录跳转，CFI 精确位置续读
-- PDF：按页渲染（pdf.js），大文件懒加载不卡顿
+- TXT：章节自动拆分与章节导航，滚动阅读，左右横滑快速切章
+- EPUB：流式分页渲染（epub.js），目录跳转，CFI 精确位置续读，横竖滑翻页
+- PDF：按页渲染（pdf.js），大文件懒加载不卡顿，横竖滑翻页
+- **滑动翻页**：三个阅读器统一手势——左滑 / 上滑 = 下一页，右滑 / 下滑 = 上一页；TXT 竖滑保持原生滚动，横滑切章
 - 正文字号四档调节（小 / 默认 / 大 / 特大），全局记忆（TXT / EPUB 生效）
 - 进度记忆：切到后台、刷新页面都不丢
 
@@ -233,7 +234,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
     │   ├── gamification/     游戏化：model（经济数值 + 纯函数）/ service（计时 + 持久化）/ store / ui
     │   └── settings/         全局偏好：model（字号档位 + 主题）/ service（localStorage）/ store / ui
     ├── platform/             平台能力：db（IndexedDB + 迁移）/ store（状态工厂）/ events（事件总线）/ hash（内容指纹）
-    └── shared/               跨模块共享：ui（TopBar / BottomNav 等）
+    └── shared/               跨模块共享：ui（TopBar / BottomNav 等）/ hooks（useSwipe 手势）/ utils
 ```
 
 ---
