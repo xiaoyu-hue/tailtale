@@ -12,7 +12,7 @@ export function ContinueReading({ onOpenBook }: ContinueReadingProps) {
   return (
     <>
       <h2 className="section-title">继续阅读</h2>
-      <div className="card">
+      <div className="card continue-card">
         <div className="book-row-head">
           <span className="book-title">{recentBook.title}</span>
           <span className="book-meta">{Math.round(recentBook.progress * 100)}%</span>

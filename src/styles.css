@@ -531,6 +531,17 @@ button {
   transition: width 0.2s ease;
 }
 
+/* 继续阅读卡片：书名 / 进度条 / 按钮拉开间距，进度条加粗到 10px 保证可见 */
+.continue-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.continue-card .progress-track {
+  height: 10px;
+}
+
 /* ========== 功能网格（4×3） ========== */
 .feature-grid {
   display: grid;
