@@ -1,19 +1,19 @@
 # THIRD-PARTY NOTICES
 
-本文件列出书时（TailTale）实际引入的第三方组件版权与许可证声明，以及计划引入组件的许可信息。
+本文件列出书时（TailTale）实际引入的第三方组件版权与许可证声明，以及计划引入组件的许可信息。所有版权行均从各组件随包分发的 LICENSE 文件原文摘录，未做改写。
 
 书时自有源代码采用 Apache-2.0（见根目录 `LICENSE`）。第三方组件保留其原作者的版权声明与许可证，本文件随依赖演进更新。
 
 ---
 
-## 一、当前构建引入的依赖
+## 一、当前构建引入的直接依赖
 
-### React
+### React / React DOM
 
 ```
 MIT License
 
-Copyright (c) Meta Platforms, Inc. and affiliates.
+Copyright (c) Facebook, Inc. and its affiliates.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,48 +35,58 @@ SOFTWARE.
 ```
 
 - 项目地址：https://github.com/facebook/react
-- 用途：UI 框架（React 18）
-
-### React DOM
-
-- 许可证：MIT（同上全文）
-- Copyright (c) Meta Platforms, Inc. and affiliates.
-- 项目地址：https://github.com/facebook/react
-- 用途：React 浏览器渲染
+- 用途：UI 框架与浏览器渲染（React 18）
 
 ### Vite
 
-- 许可证：MIT
-- Copyright (c) 2019-present, VoidZero Inc. and Vite contributors
+- 许可证：MIT（LICENSE.md 中不含单独版权行，为纯 MIT 许可文本）
 - 项目地址：https://github.com/vitejs/vite
 - 用途：开发服务器与生产构建
 
 ### @vitejs/plugin-react
 
 - 许可证：MIT
-- Copyright (c) 2019-present, VoidZero Inc. and Vite contributors
+- Copyright (c) 2019-present, Yuxi (Evan) You and Vite contributors
 - 项目地址：https://github.com/vitejs/vite-plugin-react
 - 用途：Vite 的 React 支持（JSX 转换、Fast Refresh）
 
 ### vite-plugin-pwa
 
 - 许可证：MIT
-- Copyright (c) 2020-present, Anthony Fu and vite-plugin-pwa contributors
+- Copyright (c) 2020-PRESENT Anthony Fu <https://github.com/antfu>
 - 项目地址：https://github.com/vite-pwa/vite-plugin-pwa
-- 用途：Service Worker 生成与 PWA 清单配置（基于 Workbox）
+- 用途：Service Worker 生成与 PWA 清单配置
+- 备注：运行时打包 Google Workbox（MIT，https://github.com/GoogleChrome/workbox）
 
 ### TypeScript（开发期依赖）
 
-- 许可证：Apache-2.0
-- Copyright (c) Microsoft Corporation.
+- 许可证：Apache-2.0（LICENSE.txt 为 Apache-2.0 全文，不含单独版权行）
 - 项目地址：https://github.com/microsoft/TypeScript
 - 用途：类型检查（不进入产物）
 
-> 完整依赖树（含传递依赖）以 `package.json` 与 lock 文件为准。上列各组件的许可证全文可在其项目仓库的 LICENSE 文件中查阅。
+---
+
+## 二、间接依赖（传递依赖）总览
+
+构建期共安装 344 个包（含平台专用二进制），许可证分布（按各包 package.json 声明字段扫描）：
+
+| 许可证 | 数量 |
+|---|---|
+| MIT | 308 |
+| ISC | 13 |
+| BlueOak-1.0.0 | 7 |
+| Apache-2.0 | 6（typescript、ejs、jake、filelist、baseline-browser-mapping、@trickfilm400/rollup-plugin-off-main-thread，均为构建工具） |
+| BSD-2-Clause / BSD-3-Clause | 8 |
+| CC-BY-4.0 | 1（caniuse-lite，浏览器兼容性数据） |
+| MIT OR CC0-1.0（双许可） | 1（type-fest） |
+
+**无 GPL / LGPL / AGPL / MPL / SSPL 等传染性或限制性许可证组件。**
+
+需注意的一项：`caniuse-lite` 的数据文件采用 CC-BY-4.0，要求署名。书时不直接引用该数据，仅作为构建工具链的传递依赖存在；上述表述即满足其署名要求。完整依赖树以 `package-lock.json` 为准。
 
 ---
 
-## 二、计划引入的组件（尚未进入构建）
+## 三、计划引入的组件（尚未进入构建）
 
 以下组件已确定选型并核实许可证，将在对应里程碑接入；接入时本文件同步更新。
 
@@ -88,7 +98,7 @@ SOFTWARE.
 
 ---
 
-## 三、设计参考（不集成代码）
+## 四、设计参考（不集成代码）
 
 以下项目仅作设计与交互参考，书时不复制其代码、不打包其资源。
 
@@ -110,7 +120,7 @@ SOFTWARE.
 
 ---
 
-## 四、禁用组件记录
+## 五、禁用组件记录
 
 以下项目经评估**不采用**，记录原因以防后续误用：
 

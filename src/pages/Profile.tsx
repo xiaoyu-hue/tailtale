@@ -12,7 +12,7 @@ const CREDITS: Credit[] = [
   { name: 'pdf.js', detail: 'Apache-2.0 · Mozilla · PDF 渲染（M2 接入）' },
   { name: 'foliate-js', detail: 'MIT · johnfactotum · 备选渲染引擎' },
   { name: 'shiki-toolbox', detail: 'MIT · Elari39 · 设计系统思路参考' },
-  { name: 'React / Vite / vite-plugin-pwa', detail: 'MIT · Meta / Vite 团队' },
+  { name: 'React / Vite / vite-plugin-pwa', detail: 'MIT · Facebook / Vite 团队' },
 ];
 
 export default function Profile() {
@@ -37,7 +37,7 @@ export default function Profile() {
           </div>
         ))}
         <p className="muted" style={{ marginBottom: 0 }}>
-          完整版权与许可证声明见仓库 THIRD_PARTY_NOTICES 与
+          完整版权与许可证声明见仓库 THIRD_PARTY_NOTICES.md 与
           docs/书时-开源组件与合规.md。
         </p>
       </div>

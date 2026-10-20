@@ -41,7 +41,7 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 
 ```
 ├── LICENSE                 Apache-2.0 全文（覆盖自有源代码）
-├── THIRD_PARTY_NOTICES     第三方组件版权与许可证声明
+├── THIRD_PARTY_NOTICES.md   第三方组件版权与许可证声明
 ├── README.md               本文件（Apache-2.0）
 ├── docs/                   项目文档（CC BY-NC 4.0）
 │   ├── 书时-PRD.md          产品需求文档
@@ -67,7 +67,7 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 | 对象 | 许可证 |
 |---|---|
 | 书时自有源代码 | [Apache-2.0](LICENSE)，Copyright © 2026 xiaoyu-hue |
-| 第三方组件 | 各自原许可证，见 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) |
+| 第三方组件 | 各自原许可证，见 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md) |
 | docs/ 目录项目文档 | CC BY-NC 4.0（署名 + 非商用） |
 
 完整组件致谢、许可证义务与禁用组件记录见 [docs/书时-开源组件与合规.md](docs/书时-开源组件与合规.md)，应用内「我的 → 关于」页同步展示致谢清单。
@@ -80,6 +80,6 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 
 ## 致谢
 
-书时站在开源项目肩膀上，主要参考与依赖（完整声明见 THIRD_PARTY_NOTICES）：
+书时站在开源项目肩膀上，主要参考与依赖（完整声明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)）：
 
 [MindSpace](https://github.com/jabez0701/MindSpace)（MIT）· [kit](https://github.com/aafnnp/kit)（MIT）· [Tamagochi](https://github.com/Tech-aficionado/Tamagochi---Open-Source-Game)（MIT）· [NextChat](https://github.com/ChatGPTNextWeb/NextChat)（MIT）· [epub.js](https://github.com/futurepress/epub.js)（MIT）· [pdf.js](https://github.com/mozilla/pdf.js)（Apache-2.0）· [foliate-js](https://github.com/johnfactotum/foliate-js)（MIT）· [shiki-toolbox](https://github.com/Elari39/shiki-toolbox)（MIT）· React / Vite / vite-plugin-pwa（MIT）
