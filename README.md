@@ -66,7 +66,7 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 
 | 对象 | 许可证 |
 |---|---|
-| 书时自有源代码 | [Apache-2.0](LICENSE) |
+| 书时自有源代码 | [Apache-2.0](LICENSE)，Copyright © 2026 xiaoyu-hue |
 | 第三方组件 | 各自原许可证，见 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) |
 | docs/ 目录项目文档 | CC BY-NC 4.0（署名 + 非商用） |
 
