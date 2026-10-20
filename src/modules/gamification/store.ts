@@ -17,6 +17,8 @@ interface GamificationState {
   todayCheckin: { date: string; streak: number; bonus: number } | null;
   /** 连续打卡天数（今天未打卡则显示截至昨天的连续值） */
   streak: number;
+  /** 全部打卡日期键（统计卡与打卡日历消费） */
+  checkinDates: string[];
   loaded: boolean;
 }
 
@@ -27,6 +29,7 @@ const store = createStore<GamificationState>({
   todayMinutes: 0,
   todayCheckin: null,
   streak: 0,
+  checkinDates: [],
   loaded: false,
 });
 
@@ -37,7 +40,12 @@ on('wallet:changed', ({ coins, xp, todayMinutes }) => {
 });
 
 on('checkin:done', ({ date, streak, bonus }) => {
-  store.setState((s) => ({ ...s, todayCheckin: { date, streak, bonus }, streak }));
+  store.setState((s) => ({
+    ...s,
+    todayCheckin: { date, streak, bonus },
+    streak,
+    checkinDates: s.checkinDates.includes(date) ? s.checkinDates : [...s.checkinDates, date],
+  }));
 });
 
 /** 读完一本书：一次性金币奖励。会话内防重（跨会话由书籍 finished 状态天然阻止）。 */
@@ -70,6 +78,11 @@ export function useTodayCheckin(): GamificationState['todayCheckin'] {
   return useStore(store, (s) => s.todayCheckin);
 }
 
+/** 全部打卡日期键（数组引用存于 state，引用稳定）。 */
+export function useCheckinDates(): string[] {
+  return useStore(store, (s) => s.checkinDates);
+}
+
 // ---- 状态动作 ----
 
 /** 应用启动时加载游戏化状态（与 refreshBooks 并列由 App 调用）。 */
@@ -98,6 +111,7 @@ export async function refreshGamification(): Promise<void> {
         ? { date: todayCheckin.date, streak: todayCheckin.streak, bonus: todayCheckin.bonus }
         : null,
       streak: computeStreak(dates, today),
+      checkinDates: dates,
       loaded: true,
     });
   } catch (error) {

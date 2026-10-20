@@ -1,3 +1,7 @@
+import { SettingsPanel } from '../../modules/settings';
+import { StatsCard } from './StatsCard';
+import { CheckinCalendar } from './CheckinCalendar';
+
 interface Credit {
   name: string;
   detail: string;
@@ -19,6 +23,10 @@ export default function Profile() {
   return (
     <>
       <h1 className="page-title">我的</h1>
+
+      <StatsCard />
+      <CheckinCalendar />
+      <SettingsPanel />
 
       <div className="card">
         <h2 style={{ margin: '0 0 8px', fontSize: 17 }}>关于书时</h2>
@@ -59,7 +67,7 @@ export default function Profile() {
       </div>
 
       <p className="muted" style={{ textAlign: 'center', marginTop: 20 }}>
-        书时 TailTale v0.1.0 · M1 地基
+        书时 TailTale v0.2.0 · M2 阅读核心
       </p>
     </>
   );

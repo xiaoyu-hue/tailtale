@@ -5,6 +5,7 @@ export {
   useTodayMinutes,
   useStreak,
   useTodayCheckin,
+  useCheckinDates,
   refreshGamification,
 } from './store';
 export { startReading, stopReading } from './service';

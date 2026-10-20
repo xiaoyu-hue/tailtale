@@ -14,7 +14,7 @@ interface Feature {
   icon: JSX.Element;
   /** 里程碑编号，缺省表示已可用 */
   milestone?: string;
-  action?: 'recent' | 'profile';
+  action?: 'recent' | 'profile' | 'stats' | 'calendar';
 }
 
 const FEATURES: Feature[] = [
@@ -63,22 +63,22 @@ const FEATURES: Feature[] = [
   },
   {
     label: '打卡日历',
-    milestone: 'M2',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <rect x="3.5" y="5" width="17" height="16" rx="2" />
         <path d="M3.5 9.5h17M8 3v4M16 3v4" />
       </svg>
     ),
+    action: 'calendar',
   },
   {
     label: '阅读统计',
-    milestone: 'M2',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M4 20V12M10 20V6M16 20v-6M22 20H2" />
       </svg>
     ),
+    action: 'stats',
   },
   {
     label: '数据备份',
@@ -164,6 +164,15 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
     if (feature.action === 'recent') {
       if (recentBook) onOpenBook(recentBook.id);
       else showToast('还没有在读的书，先导入一本吧');
+      return;
+    }
+    // 统计/日历在"我的"页：先切 Tab，再滚动到对应卡片（等视图渲染后定位）
+    if (feature.action === 'stats' || feature.action === 'calendar') {
+      onNavigateTab('profile');
+      const sectionId = feature.action === 'stats' ? 'stats' : 'checkin-calendar';
+      window.setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+      }, 120);
       return;
     }
     if (feature.label === '书架') {

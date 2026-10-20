@@ -20,7 +20,7 @@ M1（地基）已交付，M2（阅读核心）架构迁移与游戏化已启动�
 - [x] 金币与经验：阅读每 30 分钟 +10 金币，每阅读 1 分钟 +1 XP，顶栏实时显示金币
 - [x] 每日打卡：当日阅读满 1 分钟可打卡，+5 金币起，连续打卡第 3 天起每天 +2（上限 +10）
 - [x] 读完奖励：读完一本书 +100 金币
-- [ ] M2 收尾：设置模块（字号全局记忆、主题开关）、阅读统计页
+- [x] M2 收尾：settings 模块（正文字号全局记忆、主题三选：跟随系统/浅色/深色）；我的页阅读统计与打卡日历（当月热力图）
 - [ ] M3 宠物：喂食 / 玩耍 / 好感度 / 成长阶段、金币闭环
 - [ ] M4 工具箱：番茄钟 / 白噪音 / 统计日历 / 文本统计 / 书摘导出 / 今日一书
 - [ ] M5 AI 解读书：BYOK 设置、DeepSeek 直连
@@ -62,7 +62,8 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
     ├── modules/             领域模块（自治，只经各自 index.ts 暴露公开 API）
     │   ├── books/           书架：model（类型+状态机）/ store（状态）/ service（持久化）/ ui
     │   ├── reader/          阅读器：model（章节拆分）/ ui（ReaderPage）
-    │   └── gamification/    游戏化：model（经济数值+纯函数）/ service（计时+持久化）/ store / ui（今日阅读卡片）
+    │   ├── gamification/    游戏化：model（经济数值+纯函数）/ service（计时+持久化）/ store / ui（今日阅读卡片）
+    │   └── settings/        全局偏好：model（字号档位+主题）/ service（localStorage）/ store / ui（设置面板）
     ├── platform/            平台能力：db（IndexedDB+迁移）/ store（状态工厂）/ events（事件总线）/ hash（内容指纹）
     └── shared/              跨模块共享：ui（TopBar / BottomNav 等）
 ```

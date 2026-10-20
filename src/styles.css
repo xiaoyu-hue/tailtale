@@ -1,4 +1,5 @@
 /* ========== 设计变量：暖色主题 + 深色模式 ========== */
+/* 主题优先级：显式 data-theme（settings 模块写入 <html>）> 系统偏好（auto 时的默认行为） */
 :root {
   --bg: #faf6ef;
   --surface: #ffffff;
@@ -21,8 +22,25 @@
   --nav-h: 56px;
 }
 
+/* 显式深色：与系统深色同值，属性选择器特异性高于媒体查询内的 :root */
+:root[data-theme='dark'] {
+  --bg: #1b1613;
+  --surface: #272019;
+  --surface-soft: #322a22;
+  --text: #ece3d8;
+  --text-secondary: #a29383;
+  --primary: #e88a4e;
+  --primary-strong: #f09a62;
+  --primary-soft: #3d2d1f;
+  --border: #3b3229;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  --shadow-float: 0 6px 24px rgba(0, 0, 0, 0.45);
+  --danger: #d9705e;
+}
+
+/* auto（无 data-theme 或值为 auto）时跟随系统；显式 light/dark 时不匹配本条 */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
     --bg: #1b1613;
     --surface: #272019;
     --surface-soft: #322a22;
@@ -212,6 +230,160 @@ button {
   padding: 9px 14px;
   font-size: 13px;
   white-space: nowrap;
+}
+
+/* ========== 设置面板（settings 模块） ========== */
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.settings-row + .settings-row {
+  border-top: 1px solid var(--border);
+}
+
+.settings-label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  background: var(--surface-soft);
+  border-radius: 10px;
+}
+
+.segmented-item {
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.segmented-item.active {
+  background: var(--surface);
+  color: var(--primary-strong);
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+
+/* ========== 我的页：阅读统计 ========== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.stat-cell {
+  background: var(--surface-soft);
+  border-radius: 12px;
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+/* ========== 我的页：打卡日历 ========== */
+.calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.calendar-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.calendar-title {
+  min-width: 88px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-weekday {
+  padding-bottom: 2px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.calendar-cell {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.calendar-cell.blank {
+  background: transparent;
+}
+
+.calendar-cell.checked {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+}
+
+.calendar-cell.today {
+  box-shadow: inset 0 0 0 1.5px var(--primary-strong);
+}
+
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.calendar-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.calendar-swatch.checked {
+  background: var(--primary);
+}
+
+.calendar-swatch.today-swatch {
+  box-shadow: inset 0 0 0 1.5px var(--primary-strong);
 }
 
 /* ========== 按钮 ========== */

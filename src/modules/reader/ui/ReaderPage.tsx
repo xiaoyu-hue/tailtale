@@ -2,6 +2,7 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { Book } from '../../books';
 import { markFinished, readBookContent, reportProgress } from '../../books';
 import { startReading, stopReading } from '../../gamification';
+import { MAX_FONT_SIZE_INDEX, fontSizeAt, setFontSizeIndex, useFontSizeIndex } from '../../settings';
 import { splitChapters } from '../model';
 
 interface ReaderPageProps {
@@ -9,8 +10,6 @@ interface ReaderPageProps {
   onBack: () => void;
 }
 
-const FONT_SIZES = [16, 18, 20, 23];
-const FONT_SIZE_KEY = 'tailtale:fontSize';
 const SAVE_DEBOUNCE_MS = 400;
 const FINISH_THRESHOLD = 0.98;
 
@@ -42,11 +41,9 @@ export function ReaderPage({ book, onBack }: ReaderPageProps) {
   const [scrollRatio, setScrollRatio] = useState(book.scrollRatio);
   const [chromeVisible, setChromeVisible] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [fontSize, setFontSize] = useState(() => {
-    const saved = Number(window.localStorage.getItem(FONT_SIZE_KEY));
-    const index = FONT_SIZES.indexOf(saved);
-    return index >= 0 ? index : 1;
-  });
+  // 正文字号为全局偏好（settings 模块），跨书籍记忆、在我的页亦可调
+  const fontSizeIndex = useFontSizeIndex();
+  const fontSize = fontSizeAt(fontSizeIndex);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const saveTimerRef = useRef<number>(0);
@@ -107,11 +104,6 @@ export function ReaderPage({ book, onBack }: ReaderPageProps) {
     targetRatioRef.current = null;
     element.scrollTop = ratio * (element.scrollHeight - element.clientHeight);
   }, [chapterIndex]);
-
-  // 字号持久化
-  useEffect(() => {
-    window.localStorage.setItem(FONT_SIZE_KEY, String(FONT_SIZES[fontSize]));
-  }, [fontSize]);
 
   useEffect(
     () => () => {
@@ -207,7 +199,7 @@ export function ReaderPage({ book, onBack }: ReaderPageProps) {
         onClick={() => setChromeVisible((visible) => !visible)}
       >
         <h2 className="reader-chapter-title">{chapter.title}</h2>
-        <ChapterBody lines={chapterBody} fontSize={FONT_SIZES[fontSize]} />
+        <ChapterBody lines={chapterBody} fontSize={fontSize} />
       </div>
 
       <div className="reader-bar reader-bar-bottom" hidden={!chromeVisible}>
@@ -224,8 +216,8 @@ export function ReaderPage({ book, onBack }: ReaderPageProps) {
           <button
             type="button"
             className="icon-btn"
-            disabled={fontSize === 0}
-            onClick={() => setFontSize((size) => Math.max(0, size - 1))}
+            disabled={fontSizeIndex === 0}
+            onClick={() => setFontSizeIndex(fontSizeIndex - 1)}
             aria-label="减小字号"
           >
             A−
@@ -233,8 +225,8 @@ export function ReaderPage({ book, onBack }: ReaderPageProps) {
           <button
             type="button"
             className="icon-btn"
-            disabled={fontSize === FONT_SIZES.length - 1}
-            onClick={() => setFontSize((size) => Math.min(FONT_SIZES.length - 1, size + 1))}
+            disabled={fontSizeIndex === MAX_FONT_SIZE_INDEX}
+            onClick={() => setFontSizeIndex(fontSizeIndex + 1)}
             aria-label="增大字号"
           >
             A＋
