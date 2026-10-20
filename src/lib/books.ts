@@ -7,8 +7,8 @@ import {
   getContent,
   putBook,
   putContent,
-} from './db';
-import { hashText } from './hash';
+} from '../platform/db';
+import { hashText } from '../platform/hash';
 
 function normalizeText(raw: string): string {
   return raw.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');

@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import TopBar from './components/TopBar';
-import BottomNav, { type TabKey } from './components/BottomNav';
-import Home from './pages/Home';
-import Reader from './pages/Reader';
-import Pet from './pages/Pet';
-import Shop from './pages/Shop';
-import Profile from './pages/Profile';
-import { loadBooks, saveProgress } from './lib/books';
-import type { Book } from './types';
+import TopBar from '../components/TopBar';
+import BottomNav, { type TabKey } from '../components/BottomNav';
+import Home from '../pages/Home';
+import Reader from '../pages/Reader';
+import Pet from '../pages/Pet';
+import Shop from '../pages/Shop';
+import Profile from '../pages/Profile';
+import { loadBooks, saveProgress } from '../lib/books';
+import type { Book } from '../types';
 
 type Route =
   | { name: 'home' }
