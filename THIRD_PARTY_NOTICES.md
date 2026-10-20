@@ -37,6 +37,47 @@ SOFTWARE.
 - 项目地址：https://github.com/facebook/react
 - 用途：UI 框架与浏览器渲染（React 18）
 
+### epub.js（1.1.0 引入，EPUB 渲染引擎）
+
+```
+Copyright (c) 2013, FuturePress
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+```
+
+- 许可证：BSD-2-Clause（包 `epubjs`，随包 `license` 文件原文摘录）
+- 项目地址：https://github.com/futurepress/epub.js
+- 用途：EPUB 解析与流式分页渲染（按需动态加载，仅打开 EPUB 时下载）
+- 备注：**修正记录**：1.1.0 实际引入时核实，本组件为 BSD-2-Clause（此前规划文档中误记为 MIT，特此更正）；BSD-2-Clause 与 Apache-2.0 兼容
+
+### pdf.js（1.1.0 引入，PDF 渲染引擎）
+
+- 许可证：Apache-2.0（`node_modules/pdfjs-dist/LICENSE` 为 Apache-2.0 全文，不含单独版权行）
+- 项目地址：https://github.com/mozilla/pdf.js
+- 用途：PDF 解析与 canvas 按页渲染（引擎与 worker 按需动态加载）
+- 备注：npm 包名为 `pdfjs-dist`
+
 ### Vite
 
 - 许可证：MIT（LICENSE.md 中不含单独版权行，为纯 MIT 许可文本）
@@ -68,19 +109,21 @@ SOFTWARE.
 
 ## 二、间接依赖（传递依赖）总览
 
-构建期共安装 344 个包（含平台专用二进制），许可证分布（按各包 package.json 声明字段扫描）：
+构建期共安装 443 个包（含平台专用二进制），许可证分布（按各包 package.json 声明字段扫描）：
 
 | 许可证 | 数量 |
 |---|---|
-| MIT | 308 |
-| ISC | 13 |
+| MIT | 338 |
+| ISC | 22 |
 | BlueOak-1.0.0 | 7 |
-| Apache-2.0 | 6（typescript、ejs、jake、filelist、baseline-browser-mapping、@trickfilm400/rollup-plugin-off-main-thread，均为构建工具） |
-| BSD-2-Clause / BSD-3-Clause | 8 |
+| Apache-2.0 | 7（typescript、ejs、jake、filelist、baseline-browser-mapping、@trickfilm400/rollup-plugin-off-main-thread、pdfjs-dist） |
+| BSD-2-Clause / BSD-3-Clause | 9（含 epubjs 及其依赖） |
 | CC-BY-4.0 | 1（caniuse-lite，浏览器兼容性数据） |
 | MIT OR CC0-1.0（双许可） | 1（type-fest） |
+| MIT OR GPL-3.0-or-later（双许可） | 1（jszip，epubjs 的依赖；**选用 MIT 分支**，无传染性） |
+| 未声明 license 字段 | 55（@babel/* 构建期工具链为主，Babel 项目整体 MIT，不进入运行产物） |
 
-**无 GPL / LGPL / AGPL / MPL / SSPL 等传染性或限制性许可证组件。**
+**无 GPL / LGPL / AGPL / MPL / SSPL 等单一传染性或限制性许可证组件。** 唯一涉及 GPL 字样的 jszip 为「MIT 或 GPL-3.0 二选一」双许可，按宽松分支 MIT 使用。
 
 需注意的一项：`caniuse-lite` 的数据文件采用 CC-BY-4.0，要求署名。书时不直接引用该数据，仅作为构建工具链的传递依赖存在；上述表述即满足其署名要求。完整依赖树以 `package-lock.json` 为准。
 
@@ -92,8 +135,6 @@ SOFTWARE.
 
 | 组件 | 作者/组织 | 许可证 | 用途 | 计划接入 |
 |---|---|---|---|---|
-| epub.js | FuturePress | MIT | EPUB 解析与渲染 | M2 |
-| pdf.js | Mozilla | Apache-2.0 | PDF 渲染 | M2 |
 | foliate-js | johnfactotum | MIT | 备选渲染引擎（MOBI/AZW3/FB2/CBZ） | 备用 |
 
 ---

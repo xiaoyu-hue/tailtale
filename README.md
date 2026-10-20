@@ -1,6 +1,6 @@
 # 书时 TailTale
 
-[![Version](https://img.shields.io/badge/version-v1.0.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.0.0)
+[![Version](https://img.shields.io/badge/version-v1.1.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.1.0)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](docs/LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.0.0 · M2 阅读核心**）
+- 当前部署内容为 `main` 分支最新构建（**v1.1.0 · 多格式阅读**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -49,14 +49,16 @@
 
 ### 书架
 
-- 本地导入 TXT 电子书（点击导入或拖拽到书架区域）
+- 本地导入 **TXT / EPUB / PDF** 电子书（点击导入或拖拽到书架区域）
 - 三种阅读状态：想读 / 在读 / 读完，一键切换
 - 删除与续读：按**文件内容指纹**记忆进度，同一文件换设备可续读
 
 ### 阅读器
 
-- 章节自动拆分与章节导航
-- 正文字号四档调节（小 / 默认 / 大 / 特大），全局记忆
+- TXT：章节自动拆分与章节导航，滚动阅读
+- EPUB：流式分页渲染（epub.js），目录跳转，CFI 精确位置续读
+- PDF：按页渲染（pdf.js），大文件懒加载不卡顿
+- 正文字号四档调节（小 / 默认 / 大 / 特大），全局记忆（TXT / EPUB 生效）
 - 进度记忆：切到后台、刷新页面都不丢
 
 ### 游戏化
@@ -99,7 +101,7 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 | `npm run preview` | 本地预览生产构建（验证 PWA 需用此模式） |
 | `npm run typecheck` | 仅跑 TypeScript 类型检查 |
 
-导入书籍：首页点击「导入 TXT 书籍」或把 .txt 文件拖入书架区域。EPUB / PDF 渲染在后续里程碑接入。
+导入书籍：首页点击「导入 TXT 书籍」或把 .txt / .epub / .pdf 文件拖入书架区域。
 
 ---
 
@@ -112,10 +114,12 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 | 构建工具 | Vite | 5.4.21 | 秒级冷启动的 dev server，产物体积小 |
 | React 支持 | @vitejs/plugin-react | 4.7.0 | JSX 转换 + Fast Refresh |
 | PWA | vite-plugin-pwa | 0.21.2 | 自动生成 Service Worker（底层 Workbox，MIT）与 Web Manifest |
+| EPUB 引擎 | epub.js（npm 包 epubjs） | 0.3.93 | EPUB 解析与流式分页，BSD-2-Clause；按需动态加载 |
+| PDF 引擎 | pdf.js（npm 包 pdfjs-dist） | 4.10.38 | PDF 解析与 canvas 按页渲染，Apache-2.0；按需动态加载 |
 | 状态管理 | 自研零依赖 store | — | 基于 `useSyncExternalStore`，无 Redux/MobX 类依赖，包体与认知负担双低 |
 | 本地存储 | IndexedDB + localStorage | — | 结构化数据用 IndexedDB（含版本迁移），偏好设置用 localStorage |
 
-设计原则：**能自己写的绝不引依赖**。当前运行时直接依赖仅 React / React DOM 两个，其余全部为开发期工具。
+设计原则：**能自己写的绝不引依赖**。运行时核心依赖仅 React / React DOM；EPUB / PDF 渲染引擎（epubjs / pdfjs-dist）按格式动态加载，TXT 用户不会下载它们。
 
 ---
 
@@ -164,6 +168,8 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 |---|---|---|---|
 | [React](https://github.com/facebook/react) | Facebook, Inc. and its affiliates | MIT | UI 框架与浏览器渲染（React 18） |
 | [React DOM](https://github.com/facebook/react) | Facebook, Inc. and its affiliates | MIT | React 的 DOM 渲染器 |
+| [epub.js](https://github.com/futurepress/epub.js) | FuturePress | BSD-2-Clause | EPUB 解析与流式分页渲染（npm 包 `epubjs`，按需加载） |
+| [pdf.js](https://github.com/mozilla/pdf.js) | Mozilla | Apache-2.0 | PDF 解析与 canvas 按页渲染（npm 包 `pdfjs-dist`，按需加载） |
 | [Vite](https://github.com/vitejs/vite) | Vite 团队（Yuxi (Evan) You and contributors） | MIT | 开发服务器与生产构建 |
 | [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react) | Yuxi (Evan) You and Vite contributors | MIT | Vite 的 React 支持（JSX 转换、Fast Refresh） |
 | [vite-plugin-pwa](https://github.com/vite-pwa/vite-plugin-pwa) | Anthony Fu | MIT | Service Worker 生成与 PWA 清单配置（运行时打包 Workbox，MIT） |
@@ -178,8 +184,6 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 
 | 组件 | 作者 / 组织 | 许可证 | 用途 | 计划接入 |
 |---|---|---|---|---|
-| [epub.js](https://github.com/futurepress/epub.js) | FuturePress | MIT | EPUB 解析与渲染 | 阅读器扩展 |
-| [pdf.js](https://github.com/mozilla/pdf.js) | Mozilla | Apache-2.0 | PDF 渲染 | 阅读器扩展 |
 | [foliate-js](https://github.com/johnfactotum/foliate-js) | johnfactotum | MIT | 备选渲染引擎（MOBI / AWZ3 / FB2 / CBZ） | 备用 |
 
 ### 设计参考（不集成代码，仅参考思路）
@@ -219,11 +223,13 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 ├── vite.config.ts            Vite + PWA 配置
 └── src/
     ├── main.tsx              入口
+    ├── vite-env.d.ts         Vite 客户端类型引用（?url 资源导入声明）
+    ├── types/                第三方库最小类型声明（epubjs 等）
     ├── styles.css            设计变量（暖色主题 + 深色模式适配）
     ├── app/                  应用外壳：App.tsx（导航 + 装配）/ views/（路由级视图）
     ├── modules/              领域模块（自治，只经各自 index.ts 暴露公开 API）
-    │   ├── books/            书架：model（类型 + 状态机）/ store / service / ui
-    │   ├── reader/           阅读器：model（章节拆分）/ ui（ReaderPage）
+    │   ├── books/            书架：model（类型 + 状态机 + 多格式）/ store / service / ui
+    │   ├── reader/           阅读器：model（TXT 章节拆分）/ ui（TxtReader / EpubReader / PdfReader 按格式分流）
     │   ├── gamification/     游戏化：model（经济数值 + 纯函数）/ service（计时 + 持久化）/ store / ui
     │   └── settings/         全局偏好：model（字号档位 + 主题）/ service（localStorage）/ store / ui
     ├── platform/             平台能力：db（IndexedDB + 迁移）/ store（状态工厂）/ events（事件总线）/ hash（内容指纹）
@@ -234,7 +240,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 
 ## 版本与发布
 
-- **当前版本：v1.0.0**（2026-10-20 发布，首个正式版，M1 地基 + M2 阅读核心全部完成）
+- **当前版本：v1.1.0**（2026-10-20 发布，多格式阅读：EPUB / PDF 导入与渲染上线；v1.0.0 为首个正式版，M1 地基 + M2 阅读核心全部完成）
 - [Releases](https://github.com/xiaoyu-hue/tailtale/releases) · [CHANGELOG](CHANGELOG.md)
 - 版本号规则与发版流程：[docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
   - 主版本号（X.0.0）= 架构级变更；次版本号（1.X.0）= 新功能上线；修订号（1.1.X）= 优化、修复、文档同步
@@ -247,6 +253,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 |---|---|---|
 | M1 地基 | 脚手架、书架、TXT 阅读器 | ✅ 已完成 |
 | M2 阅读核心 | 四层架构迁移、阅读计时、金币 / XP / 打卡 / 读完奖励、设置、统计与日历 | ✅ 已完成（v1.0.0） |
+| 多格式阅读 | EPUB / PDF 导入与渲染、格式角标、CFI 精确续读 | ✅ 已完成（v1.1.0） |
 | M3 宠物 | 喂食 / 玩耍 / 好感度 / 成长阶段、金币闭环 | ⬜ 计划中 |
 | M4 工具箱 | 番茄钟 / 白噪音 / 文本统计 / 书摘导出 / 今日一书 | ⬜ 计划中 |
 | M5 AI 解读书 | BYOK 设置、DeepSeek 直连 | ⬜ 计划中 |
