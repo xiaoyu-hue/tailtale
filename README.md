@@ -51,16 +51,14 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 ├── index.html
 ├── vite.config.ts          Vite + PWA 配置
 └── src/
-    ├── main.tsx / App.tsx   入口与路由（无路由库，页面级状态切换）
+    ├── main.tsx             入口
     ├── styles.css           设计变量（暖色主题 + 深色模式适配）
-    ├── types.ts             Book / BookContent 数据模型
-    ├── lib/
-    │   ├── db.ts            IndexedDB 封装（书籍元信息 + 全文）
-    │   ├── hash.ts          文本内容指纹（进度跨设备续读的定位依据）
-    │   ├── chapters.ts      TXT 章节拆分
-    │   └── books.ts         导入 / 读取 / 删除 / 进度保存
-    ├── components/          TopBar（日期时间）/ BottomNav（四 Tab）
-    └── pages/               Home（书架）/ Reader / Pet / Shop / Profile
+    ├── app/                 应用外壳：App.tsx（导航+装配）/ views/（路由级视图）
+    ├── modules/             领域模块（自治，只经各自 index.ts 暴露公开 API）
+    │   ├── books/           书架：model（类型+状态机）/ store（状态）/ service（持久化）/ ui
+    │   └── reader/          阅读器：model（章节拆分）/ ui（ReaderPage）
+    ├── platform/            平台能力：db（IndexedDB）/ store（状态工厂）/ hash（内容指纹）
+    └── shared/              跨模块共享：ui（TopBar / BottomNav 等）
 ```
 
 ## 许可证（分层）
