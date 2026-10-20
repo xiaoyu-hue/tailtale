@@ -18,6 +18,7 @@ const SAVE_DEBOUNCE_MS = 400;
  */
 export function PdfReader({ book, onBack }: PdfReaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const docRef = useRef<import('pdfjs-dist').PDFDocumentProxy | null>(null);
   const pageRef = useRef(1);
   const finishedRef = useRef(false);
@@ -149,12 +150,16 @@ export function PdfReader({ book, onBack }: PdfReaderProps) {
   };
 
   // 横向 / 竖向滑动翻页：左滑、上滑 = 下一页；右滑、下滑 = 上一页
-  const { handlers: swipeHandlers, consumeSwipe } = useSwipe({
+  const { bind: bindSwipe, consumeSwipe } = useSwipe({
     onSwipe: (direction) => {
       if (direction === 'left' || direction === 'up') goPage(currentPage + 1);
       else goPage(currentPage - 1);
     },
   });
+
+  // 原生绑定舞台元素（passive: false）：iOS Safari 下不阻止系统滚动就收不到 touchend，
+  // 这是 iOS 真机滑动失效的根因（React 合成事件的 touchmove 是 passive 的，拦不住滚动）
+  useEffect(() => bindSwipe(stageRef.current), [bindSwipe]);
 
   const topBar = (
     <div className="reader-bar reader-bar-top" hidden={!chromeVisible}>
@@ -187,7 +192,7 @@ export function PdfReader({ book, onBack }: PdfReaderProps) {
 
       <div
         className="pdf-stage"
-        {...swipeHandlers}
+        ref={stageRef}
         onClick={() => {
           // 滑动尾随的 click 要吞掉，否则翻页同时会误切控件栏显隐
           if (consumeSwipe()) return;

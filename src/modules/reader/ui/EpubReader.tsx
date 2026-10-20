@@ -3,7 +3,7 @@ import type { NavItem, Rendition, EpubBook } from 'epubjs';
 import type { Book } from '../../books';
 import { markFinished, readBookBinary, reportProgress } from '../../books';
 import { MAX_FONT_SIZE_INDEX, fontSizeAt, setFontSizeIndex, useFontSizeIndex } from '../../settings';
-import { useSwipe, type SwipeTouchEventLike } from '../../../shared/hooks/useSwipe';
+import { useSwipe } from '../../../shared/hooks/useSwipe';
 
 interface EpubReaderProps {
   book: Book;
@@ -39,7 +39,7 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
   const fontSize = fontSizeAt(fontSizeIndex);
 
   // 横向 / 竖向滑动翻页：左滑、上滑 = 下一页；右滑、下滑 = 上一页
-  const { handlers: swipeHandlers, consumeSwipe } = useSwipe({
+  const { bind: bindSwipe, consumeSwipe } = useSwipe({
     onSwipe: (direction) => {
       if (direction === 'left' || direction === 'up') renditionRef.current?.next();
       else renditionRef.current?.prev();
@@ -113,18 +113,10 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
           // 禁掉 iframe 内原生平移/缩放手势（分页内容由我们的滑动接管，防止拖动时内容被平移）
           doc.documentElement.style.touchAction = 'none';
 
-          // 捕获阶段拦截并 stopImmediatePropagation：
-          // 禁用 epub.js 内置滑动（有速度门槛且仅横向，与另两个阅读器体验不一致），
-          // 同时避免内置 snap 与统一手势双翻页。
-          const capture =
-            (handler: (event: SwipeTouchEventLike) => void) =>
-            (event: SwipeTouchEventLike & { stopImmediatePropagation?: () => void }) => {
-              event.stopImmediatePropagation?.();
-              handler(event);
-            };
-          doc.addEventListener('touchstart', capture(swipeHandlers.onTouchStart), { passive: true, capture: true });
-          doc.addEventListener('touchmove', capture(swipeHandlers.onTouchMove), { passive: true, capture: true });
-          doc.addEventListener('touchend', capture(swipeHandlers.onTouchEnd), { passive: true, capture: true });
+          // 原生绑定 + 非被动监听（iOS 兼容：不阻止系统滚动就收不到 touchend）；
+          // 捕获阶段 + stopImmediatePropagation：禁用 epub.js 内置滑动（snap_Snap 有速度门槛
+          // 且仅横向，与另两个阅读器体验不一致），避免内置 snap 与统一手势双翻页。
+          bindSwipe(doc, { capture: true, stopImmediate: true });
 
           // 点击正文区域切换顶/底栏显隐（滑动尾随的 click 要吞掉）
           doc.addEventListener('click', () => {

@@ -661,6 +661,9 @@ button {
   overflow-y: auto;
   padding: 20px 20px 96px;
   -webkit-overflow-scrolling: touch;
+  /* 渐进增强：允许竖向滚动（TXT 章内滚动阅读），禁掉横向平移手势。
+   * iOS 13 以下不认此属性，靠 JS 的 preventDefault 兜底 */
+  touch-action: pan-y;
 }
 
 /* EPUB 阅读舞台：epub.js rendition 挂载容器（内部 iframe 全屏） */
@@ -685,6 +688,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* 分页内容由滑动手势接管，禁掉全部原生平移/缩放手势（iOS 13+ 渐进增强） */
+  touch-action: none;
 }
 
 .pdf-canvas {

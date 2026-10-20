@@ -137,13 +137,18 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
   };
 
   // 横向滑动切章（左滑下一章 / 右滑上一章）；竖向交还原生滚动，axis 只认横向
-  const { handlers: swipeHandlers, consumeSwipe } = useSwipe({
+  const { bind: bindSwipe, consumeSwipe } = useSwipe({
     axis: 'horizontal',
     onSwipe: (direction) => {
       if (direction === 'left') goChapter(chapterIndex + 1);
       else goChapter(chapterIndex - 1);
     },
   });
+
+  // 原生绑定舞台元素（passive: false）：iOS Safari 下必须阻止系统滚动才能收到 touchend，
+  // React 合成事件的 touchmove 是 passive 的，拦不住滚动——这是 iOS 真机滑动失效的根因。
+  // deps 带 chapter：书籍内容异步加载，章节就绪前舞台未渲染，加载后需重新绑定。
+  useEffect(() => bindSwipe(stageRef.current), [bindSwipe, chapter]);
 
   const chapterBody = useMemo(() => {
     if (!text || !chapter) return [];
@@ -197,7 +202,6 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
         className="reader-stage"
         ref={stageRef}
         onScroll={handleScroll}
-        {...swipeHandlers}
         onClick={() => {
           // 滑动尾随的 click 要吞掉，否则翻页同时会误切控件栏显隐
           if (consumeSwipe()) return;
