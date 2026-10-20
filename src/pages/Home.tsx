@@ -312,8 +312,7 @@ export default function Home({
           <button
             key={feature.label}
             type="button"
-            className="feature-cell"
-            disabled={Boolean(feature.milestone)}
+            className={`feature-cell${feature.milestone ? ' planned' : ''}`}
             onClick={() => handleFeature(feature)}
           >
             <span className="feature-icon">{feature.icon}</span>

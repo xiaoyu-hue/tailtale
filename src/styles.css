@@ -305,7 +305,7 @@ button {
   transform: scale(0.96);
 }
 
-.feature-cell:disabled {
+.feature-cell.planned {
   color: var(--text-secondary);
   cursor: default;
 }
@@ -320,7 +320,7 @@ button {
   color: var(--primary-strong);
 }
 
-.feature-cell:disabled .feature-icon {
+.feature-cell.planned .feature-icon {
   background: var(--surface-soft);
   color: var(--text-secondary);
 }
