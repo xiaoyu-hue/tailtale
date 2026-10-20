@@ -3,9 +3,9 @@
 本文件遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 规范，版本号规则见 [docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)。
 本文件随源代码采用 [Apache-2.0](LICENSE) 许可；docs/ 目录下的文档采用 CC BY-NC 4.0。
 
-## [未发布]
+## [1.2.0] - 2026-10-20
 
-（下一个版本的变更记录写在这里，发布时改为正式版本号与日期）
+滑动翻页：三个阅读器统一支持手势翻页，自研零依赖 hook，不引任何新依赖。M3 宠物系统顺延至下一版本。
 
 ### 新增
 
@@ -77,3 +77,4 @@
 
 [1.0.0]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.0.0
 [1.1.0]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.1.0
+[1.2.0]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.2.0
