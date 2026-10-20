@@ -1,9 +1,12 @@
-import type { Book, BookContent } from '../types';
-
 const DB_NAME = 'tailtale';
 const DB_VERSION = 1;
-const STORE_BOOKS = 'books';
-const STORE_CONTENTS = 'contents';
+
+/**
+ * 存储 schema：store 名集中登记在平台层。
+ * S3 起新增 store（金币/宠物等）时在此扩展，并登记版本迁移。
+ */
+export const STORE_BOOKS = 'books';
+export const STORE_CONTENTS = 'contents';
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -27,7 +30,11 @@ function openDb(): Promise<IDBDatabase> {
   return dbPromise;
 }
 
-function run<T>(
+/**
+ * 通用事务执行器。平台层不感知任何业务类型（T 由调用方给出），
+ * 业务封装（Book / BookContent 等）放在各自模块的 service 层。
+ */
+export function run<T>(
   store: string,
   mode: IDBTransactionMode,
   action: (objectStore: IDBObjectStore) => IDBRequest
@@ -41,32 +48,4 @@ function run<T>(
         request.onerror = () => reject(request.error);
       })
   );
-}
-
-export async function putBook(book: Book): Promise<void> {
-  await run(STORE_BOOKS, 'readwrite', (s) => s.put(book));
-}
-
-export async function getBook(id: string): Promise<Book | undefined> {
-  return run<Book | undefined>(STORE_BOOKS, 'readonly', (s) => s.get(id));
-}
-
-export async function getAllBooks(): Promise<Book[]> {
-  return run<Book[]>(STORE_BOOKS, 'readonly', (s) => s.getAll());
-}
-
-export async function deleteBook(id: string): Promise<void> {
-  await run(STORE_BOOKS, 'readwrite', (s) => s.delete(id));
-}
-
-export async function putContent(content: BookContent): Promise<void> {
-  await run(STORE_CONTENTS, 'readwrite', (s) => s.put(content));
-}
-
-export async function getContent(id: string): Promise<BookContent | undefined> {
-  return run<BookContent | undefined>(STORE_CONTENTS, 'readonly', (s) => s.get(id));
-}
-
-export async function deleteContent(id: string): Promise<void> {
-  await run(STORE_CONTENTS, 'readwrite', (s) => s.delete(id));
 }

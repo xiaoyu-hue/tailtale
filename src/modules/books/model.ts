@@ -22,3 +22,16 @@ export interface BookContent {
   id: string;
   text: string;
 }
+
+export const STATUS_LABEL: Record<BookStatus, string> = {
+  want: '想读',
+  reading: '在读',
+  finished: '读完',
+};
+
+const STATUS_ORDER: BookStatus[] = ['want', 'reading', 'finished'];
+
+/** 状态循环：想读 → 在读 → 读完 → 想读 */
+export function nextStatus(status: BookStatus): BookStatus {
+  return STATUS_ORDER[(STATUS_ORDER.indexOf(status) + 1) % STATUS_ORDER.length];
+}

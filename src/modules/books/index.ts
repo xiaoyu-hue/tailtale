@@ -1,0 +1,18 @@
+// books 模块公开 API：其他模块与应用层只准经此文件依赖 books
+export {
+  useBooks,
+  useRecentBook,
+  refreshBooks,
+  importFiles,
+  deleteBookById,
+  changeStatus,
+  reportProgress,
+  markFinished,
+} from './store';
+export { readBookContent } from './service';
+export type { ImportResult } from './store';
+export type { Book, BookStatus, BookContent } from './model';
+export { STATUS_LABEL, nextStatus } from './model';
+export { ImportZone } from './ui/ImportZone';
+export { ContinueReading } from './ui/ContinueReading';
+export { BookList } from './ui/BookList';

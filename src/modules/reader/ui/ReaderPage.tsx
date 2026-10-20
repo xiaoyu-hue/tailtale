@@ -1,13 +1,11 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import type { Book } from '../types';
-import { readBookContent } from '../lib/books';
-import { splitChapters } from '../lib/chapters';
+import type { Book } from '../../books';
+import { markFinished, readBookContent, reportProgress } from '../../books';
+import { splitChapters } from '../model';
 
-interface ReaderProps {
+interface ReaderPageProps {
   book: Book;
   onBack: () => void;
-  onProgress: (book: Book, chapterIndex: number, scrollRatio: number, progress: number) => void;
-  onFinish: (book: Book) => void;
 }
 
 const FONT_SIZES = [16, 18, 20, 23];
@@ -36,7 +34,7 @@ const ChapterBody = memo(function ChapterBody({
   );
 });
 
-export default function Reader({ book, onBack, onProgress, onFinish }: ReaderProps) {
+export function ReaderPage({ book, onBack }: ReaderPageProps) {
   const [text, setText] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [chapterIndex, setChapterIndex] = useState(0);
@@ -114,7 +112,7 @@ export default function Reader({ book, onBack, onProgress, onFinish }: ReaderPro
 
   const persist = (index: number, ratio: number) => {
     const overall = chapters.length > 0 ? (index + ratio) / chapters.length : 0;
-    onProgress(book, index, ratio, overall);
+    void reportProgress(book, index, ratio, overall);
   };
 
   const handleScroll = () => {
@@ -130,7 +128,7 @@ export default function Reader({ book, onBack, onProgress, onFinish }: ReaderPro
       const isLast = chapterIndex === chapters.length - 1;
       if (isLast && ratio >= FINISH_THRESHOLD && !finishedRef.current && book.status !== 'finished') {
         finishedRef.current = true;
-        onFinish(book);
+        void markFinished(book);
       }
     }, SAVE_DEBOUNCE_MS);
   };

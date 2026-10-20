@@ -1,24 +1,12 @@
 import { useRef, useState } from 'react';
-import type { Book, BookStatus } from '../types';
-import type { TabKey } from '../components/BottomNav';
-import { importTxtFile, removeBook } from '../lib/books';
+import type { JSX } from 'react';
+import type { TabKey } from '../../shared/ui/BottomNav';
+import { ImportZone, ContinueReading, BookList, useRecentBook } from '../../modules/books';
 
-interface HomeProps {
-  books: Book[];
-  onImported: () => void;
-  onRemoved: () => void;
+interface HomeViewProps {
   onOpenBook: (bookId: string) => void;
-  onStatusChange: (book: Book, status: BookStatus) => void;
   onNavigateTab: (tab: TabKey) => void;
 }
-
-const STATUS_LABEL: Record<BookStatus, string> = {
-  want: '想读',
-  reading: '在读',
-  finished: '读完',
-};
-
-const STATUS_ORDER: BookStatus[] = ['want', 'reading', 'finished'];
 
 interface Feature {
   label: string;
@@ -155,74 +143,16 @@ function BagIcon() {
   );
 }
 
-function formatSize(chars: number): string {
-  if (chars >= 10000) return `${(chars / 10000).toFixed(1)} 万字`;
-  return `${chars} 字`;
-}
-
-function formatDate(timestamp: number): string {
-  if (!timestamp) return '未读';
-  const date = new Date(timestamp);
-  return `${date.getMonth() + 1}月${date.getDate()}日`;
-}
-
-export default function Home({
-  books,
-  onImported,
-  onRemoved,
-  onOpenBook,
-  onStatusChange,
-  onNavigateTab,
-}: HomeProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+/** 首页视图：导入 → 继续阅读 → 功能网格 → 全部书籍。书籍相关 UI 全部来自 books 模块。 */
+export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
   const toastTimerRef = useRef<number>(0);
-  const [dragging, setDragging] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const recentBook = useRecentBook();
 
   const showToast = (message: string) => {
     setToast(message);
     window.clearTimeout(toastTimerRef.current);
     toastTimerRef.current = window.setTimeout(() => setToast(null), 2200);
-  };
-
-  const recentBook = books.find((book) => book.lastReadAt > 0);
-
-  const handleFiles = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-    const txtFiles = Array.from(files).filter((file) => /\.txt$/i.test(file.name));
-    if (txtFiles.length === 0) {
-      showToast('目前仅支持 TXT（EPUB / PDF 将于 M2 接入）');
-      return;
-    }
-    let success = 0;
-    for (const file of txtFiles) {
-      try {
-        await importTxtFile(file);
-        success += 1;
-      } catch (error) {
-        console.error('导入失败', file.name, error);
-        showToast(`《${file.name}》导入失败`);
-      }
-    }
-    if (success > 0) {
-      onImported();
-      showToast(success === 1 ? '导入成功，开始阅读吧' : `已导入 ${success} 本书`);
-    }
-  };
-
-  const handleDelete = async (book: Book) => {
-    const confirmed = window.confirm(
-      `删除《${book.title}》？书籍文件与阅读进度将一并移除。`
-    );
-    if (!confirmed) return;
-    try {
-      await removeBook(book.id);
-      onRemoved();
-      showToast('已删除');
-    } catch (error) {
-      console.error('删除失败', error);
-      showToast('删除失败，请重试');
-    }
   };
 
   const handleFeature = (feature: Feature) => {
@@ -246,65 +176,8 @@ export default function Home({
     <>
       <h1 className="page-title">书架</h1>
 
-      <div
-        className={`import-zone${dragging ? ' dragging' : ''}`}
-        role="button"
-        tabIndex={0}
-        onClick={() => fileInputRef.current?.click()}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') fileInputRef.current?.click();
-        }}
-        onDragOver={(event) => {
-          event.preventDefault();
-          setDragging(true);
-        }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={(event) => {
-          event.preventDefault();
-          setDragging(false);
-          void handleFiles(event.dataTransfer.files);
-        }}
-      >
-        点击此处或拖入 .txt 文件
-        <br />
-        书籍仅保存在本机浏览器，不会上传
-      </div>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".txt,text/plain"
-        multiple
-        hidden
-        onChange={(event) => {
-          void handleFiles(event.target.files);
-          event.target.value = '';
-        }}
-      />
-
-      {recentBook && (
-        <>
-          <h2 className="section-title">继续阅读</h2>
-          <div className="card">
-            <div className="book-row-head">
-              <span className="book-title">{recentBook.title}</span>
-              <span className="book-meta">{Math.round(recentBook.progress * 100)}%</span>
-            </div>
-            <div className="progress-track">
-              <div
-                className="progress-fill"
-                style={{ width: `${Math.max(recentBook.progress * 100, 2)}%` }}
-              />
-            </div>
-            <button
-              type="button"
-              className="btn btn-primary btn-block"
-              onClick={() => onOpenBook(recentBook.id)}
-            >
-              继续阅读
-            </button>
-          </div>
-        </>
-      )}
+      <ImportZone onToast={showToast} />
+      <ContinueReading onOpenBook={onOpenBook} />
 
       <h2 className="section-title">功能</h2>
       <div className="feature-grid">
@@ -322,71 +195,7 @@ export default function Home({
         ))}
       </div>
 
-      <h2 className="section-title" id="bookshelf">
-        全部书籍（{books.length}）
-      </h2>
-      {books.length === 0 ? (
-        <div className="empty-state">
-          书架空空如也
-          <br />
-          导入一本 TXT，开始你的第一段阅读时光
-        </div>
-      ) : (
-        books.map((book) => (
-          <div className="card" key={book.id}>
-            <div className="book-row">
-              <div className="book-row-head">
-                <span className="book-title">{book.title}</span>
-                <span
-                  className={`chip${
-                    book.status === 'reading'
-                      ? ' chip-reading'
-                      : book.status === 'finished'
-                        ? ' chip-finished'
-                        : ''
-                  }`}
-                >
-                  {STATUS_LABEL[book.status]}
-                </span>
-              </div>
-              <div className="progress-track">
-                <div
-                  className="progress-fill"
-                  style={{ width: `${Math.max(book.progress * 100, book.progress > 0 ? 2 : 0)}%` }}
-                />
-              </div>
-              <div className="book-meta">
-                {formatSize(book.size)} · 进度 {Math.round(book.progress * 100)}% ·{' '}
-                {book.lastReadAt ? `最近阅读 ${formatDate(book.lastReadAt)}` : `导入于 ${formatDate(book.addedAt)}`}
-              </div>
-              <div className="btn-row">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => onOpenBook(book.id)}
-                >
-                  {book.progress > 0 ? '继续阅读' : '开始阅读'}
-                </button>
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => {
-                    const next =
-                      STATUS_ORDER[(STATUS_ORDER.indexOf(book.status) + 1) % STATUS_ORDER.length];
-                    onStatusChange(book, next);
-                    showToast(`已标记为「${STATUS_LABEL[next]}」`);
-                  }}
-                >
-                  状态：{STATUS_LABEL[book.status]}
-                </button>
-                <button type="button" className="btn btn-danger" onClick={() => void handleDelete(book)}>
-                  删除
-                </button>
-              </div>
-            </div>
-          </div>
-        ))
-      )}
+      <BookList onOpenBook={onOpenBook} onToast={showToast} />
 
       {toast && <div className="toast">{toast}</div>}
     </>

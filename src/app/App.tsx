@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
-import TopBar from '../components/TopBar';
-import BottomNav, { type TabKey } from '../components/BottomNav';
-import Home from '../pages/Home';
-import Reader from '../pages/Reader';
-import Pet from '../pages/Pet';
-import Shop from '../pages/Shop';
-import Profile from '../pages/Profile';
-import { loadBooks, saveProgress } from '../lib/books';
-import type { Book } from '../types';
+import TopBar from '../shared/ui/TopBar';
+import BottomNav, { type TabKey } from '../shared/ui/BottomNav';
+import { refreshBooks, useBooks } from '../modules/books';
+import { ReaderPage } from '../modules/reader';
+import HomeView from './views/HomeView';
+import PetView from './views/PetView';
+import ShopView from './views/ShopView';
+import ProfileView from './views/ProfileView';
 
 type Route =
   | { name: 'home' }
@@ -24,52 +23,17 @@ const TAB_OF_ROUTE: Record<Route['name'], TabKey> = {
   profile: 'profile',
 };
 
+/** 应用外壳：只负责导航与全局装配，业务状态归各模块。 */
 export default function App() {
-  const [books, setBooks] = useState<Book[]>([]);
+  const books = useBooks();
   const [route, setRoute] = useState<Route>({ name: 'home' });
 
   useEffect(() => {
-    loadBooks()
-      .then(setBooks)
-      .catch((error: unknown) => {
-        console.error('加载书架失败', error);
-      });
+    void refreshBooks();
   }, []);
-
-  const reloadBooks = () => {
-    loadBooks()
-      .then(setBooks)
-      .catch((error: unknown) => {
-        console.error('加载书架失败', error);
-      });
-  };
-
-  const patchBook = (updated: Book) => {
-    setBooks((prev) => prev.map((book) => (book.id === updated.id ? updated : book)));
-  };
 
   const currentBook =
     route.name === 'reader' ? books.find((book) => book.id === route.bookId) : undefined;
-
-  const handleProgress = (
-    book: Book,
-    chapterIndex: number,
-    scrollRatio: number,
-    progress: number
-  ) => {
-    void saveProgress(book, chapterIndex, scrollRatio, progress).then(patchBook);
-  };
-
-  const handleFinish = (book: Book) => {
-    patchBook({ ...book, status: 'finished' });
-    void saveProgress(book, book.chapterIndex, book.scrollRatio, 1);
-  };
-
-  const handleStatusChange = (book: Book, status: Book['status']) => {
-    const updated = { ...book, status };
-    patchBook(updated);
-    void saveProgress(updated, updated.chapterIndex, updated.scrollRatio, updated.progress);
-  };
 
   const goTab = (tab: TabKey) => {
     if (tab === 'home') setRoute({ name: 'home' });
@@ -80,14 +44,7 @@ export default function App() {
 
   // 阅读页为全屏沉浸形态：不显示顶栏与底部导航
   if (route.name === 'reader' && currentBook) {
-    return (
-      <Reader
-        book={currentBook}
-        onBack={() => setRoute({ name: 'home' })}
-        onProgress={handleProgress}
-        onFinish={handleFinish}
-      />
-    );
+    return <ReaderPage book={currentBook} onBack={() => setRoute({ name: 'home' })} />;
   }
 
   return (
@@ -95,18 +52,14 @@ export default function App() {
       <TopBar />
       <main className="page">
         {route.name === 'home' && (
-          <Home
-            books={books}
-            onImported={reloadBooks}
-            onRemoved={reloadBooks}
+          <HomeView
             onOpenBook={(bookId) => setRoute({ name: 'reader', bookId })}
-            onStatusChange={handleStatusChange}
             onNavigateTab={goTab}
           />
         )}
-        {route.name === 'pet' && <Pet />}
-        {route.name === 'shop' && <Shop />}
-        {route.name === 'profile' && <Profile />}
+        {route.name === 'pet' && <PetView />}
+        {route.name === 'shop' && <ShopView />}
+        {route.name === 'profile' && <ProfileView />}
       </main>
       <BottomNav active={TAB_OF_ROUTE[route.name]} onChange={goTab} />
     </div>

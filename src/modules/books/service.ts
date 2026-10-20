@@ -1,14 +1,38 @@
-import type { Book, BookContent } from '../types';
-import {
-  deleteBook,
-  deleteContent,
-  getAllBooks,
-  getBook,
-  getContent,
-  putBook,
-  putContent,
-} from '../platform/db';
-import { hashText } from '../platform/hash';
+import type { Book, BookContent, BookStatus } from './model';
+import { STORE_BOOKS, STORE_CONTENTS, run } from '../../platform/db';
+import { hashText } from '../../platform/hash';
+
+// ---- IndexedDB 读写（books 模块自有 store 的类型化封装） ----
+
+async function putBook(book: Book): Promise<void> {
+  await run(STORE_BOOKS, 'readwrite', (s) => s.put(book));
+}
+
+async function getBook(id: string): Promise<Book | undefined> {
+  return run<Book | undefined>(STORE_BOOKS, 'readonly', (s) => s.get(id));
+}
+
+async function getAllBooks(): Promise<Book[]> {
+  return run<Book[]>(STORE_BOOKS, 'readonly', (s) => s.getAll());
+}
+
+async function deleteBook(id: string): Promise<void> {
+  await run(STORE_BOOKS, 'readwrite', (s) => s.delete(id));
+}
+
+async function putContent(content: BookContent): Promise<void> {
+  await run(STORE_CONTENTS, 'readwrite', (s) => s.put(content));
+}
+
+async function getContent(id: string): Promise<BookContent | undefined> {
+  return run<BookContent | undefined>(STORE_CONTENTS, 'readonly', (s) => s.get(id));
+}
+
+async function deleteContent(id: string): Promise<void> {
+  await run(STORE_CONTENTS, 'readwrite', (s) => s.delete(id));
+}
+
+// ---- 文本预处理 ----
 
 function normalizeText(raw: string): string {
   return raw.replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
@@ -18,6 +42,8 @@ function titleFromFilename(name: string): string {
   const title = name.replace(/\.txt$/i, '').trim();
   return title || '未命名书籍';
 }
+
+// ---- 模块对外能力（经 index.ts 暴露） ----
 
 /** 导入本地 TXT：写入内容与元信息；重复导入同一文件时保留原阅读进度。 */
 export async function importTxtFile(file: File): Promise<Book> {
@@ -66,6 +92,7 @@ export async function removeBook(id: string): Promise<void> {
   await deleteContent(id);
 }
 
+/** 读取书籍全文（reader 模块经 books 公开 API 调用）。 */
 export async function readBookContent(id: string): Promise<string> {
   const content: BookContent | undefined = await getContent(id);
   if (!content) {
@@ -89,6 +116,13 @@ export async function saveProgress(
     lastReadAt: Date.now(),
     status: book.status === 'want' ? 'reading' : book.status,
   };
+  await putBook(updated);
+  return updated;
+}
+
+/** 显式设置阅读状态（书架页的状态循环按钮）。 */
+export async function setBookStatus(book: Book, status: BookStatus): Promise<Book> {
+  const updated: Book = { ...book, status };
   await putBook(updated);
   return updated;
 }
