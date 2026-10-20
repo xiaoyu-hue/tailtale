@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Book } from '../../books';
 import { markFinished, readBookBinary, reportProgress } from '../../books';
+import { useSwipe } from '../../../shared/hooks/useSwipe';
 
 interface PdfReaderProps {
   book: Book;
@@ -147,6 +148,14 @@ export function PdfReader({ book, onBack }: PdfReaderProps) {
     void renderPage(clamped);
   };
 
+  // 横向 / 竖向滑动翻页：左滑、上滑 = 下一页；右滑、下滑 = 上一页
+  const { handlers: swipeHandlers, consumeSwipe } = useSwipe({
+    onSwipe: (direction) => {
+      if (direction === 'left' || direction === 'up') goPage(currentPage + 1);
+      else goPage(currentPage - 1);
+    },
+  });
+
   const topBar = (
     <div className="reader-bar reader-bar-top" hidden={!chromeVisible}>
       <button type="button" className="icon-btn" onClick={onBack}>
@@ -176,7 +185,15 @@ export function PdfReader({ book, onBack }: PdfReaderProps) {
     <div className="reader">
       {topBar}
 
-      <div className="pdf-stage" onClick={() => setChromeVisible((v) => !v)}>
+      <div
+        className="pdf-stage"
+        {...swipeHandlers}
+        onClick={() => {
+          // 滑动尾随的 click 要吞掉，否则翻页同时会误切控件栏显隐
+          if (consumeSwipe()) return;
+          setChromeVisible((v) => !v);
+        }}
+      >
         <canvas ref={canvasRef} className={rendering ? 'pdf-canvas rendering' : 'pdf-canvas'} />
         {rendering && <div className="pdf-rendering">渲染中…</div>}
       </div>

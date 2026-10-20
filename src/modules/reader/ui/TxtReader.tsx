@@ -2,6 +2,7 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { Book } from '../../books';
 import { markFinished, readBookContent, reportProgress } from '../../books';
 import { MAX_FONT_SIZE_INDEX, fontSizeAt, setFontSizeIndex, useFontSizeIndex } from '../../settings';
+import { useSwipe } from '../../../shared/hooks/useSwipe';
 import { splitChapters } from '../model';
 
 interface ReaderPageProps {
@@ -135,6 +136,15 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
     persist(clamped, 0);
   };
 
+  // 横向滑动切章（左滑下一章 / 右滑上一章）；竖向交还原生滚动，axis 只认横向
+  const { handlers: swipeHandlers, consumeSwipe } = useSwipe({
+    axis: 'horizontal',
+    onSwipe: (direction) => {
+      if (direction === 'left') goChapter(chapterIndex + 1);
+      else goChapter(chapterIndex - 1);
+    },
+  });
+
   const chapterBody = useMemo(() => {
     if (!text || !chapter) return [];
     return text.slice(chapter.start, chapter.end).split('\n').slice(1);
@@ -187,7 +197,12 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
         className="reader-stage"
         ref={stageRef}
         onScroll={handleScroll}
-        onClick={() => setChromeVisible((visible) => !visible)}
+        {...swipeHandlers}
+        onClick={() => {
+          // 滑动尾随的 click 要吞掉，否则翻页同时会误切控件栏显隐
+          if (consumeSwipe()) return;
+          setChromeVisible((visible) => !visible);
+        }}
       >
         <h2 className="reader-chapter-title">{chapter.title}</h2>
         <ChapterBody lines={chapterBody} fontSize={fontSize} />

@@ -3,6 +3,7 @@ import type { NavItem, Rendition, EpubBook } from 'epubjs';
 import type { Book } from '../../books';
 import { markFinished, readBookBinary, reportProgress } from '../../books';
 import { MAX_FONT_SIZE_INDEX, fontSizeAt, setFontSizeIndex, useFontSizeIndex } from '../../settings';
+import { useSwipe, type SwipeTouchEventLike } from '../../../shared/hooks/useSwipe';
 
 interface EpubReaderProps {
   book: Book;
@@ -30,10 +31,20 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
   const saveTimerRef = useRef<number>(0);
   const bookStatusRef = useRef(book.status);
   bookStatusRef.current = book.status;
+  // 已绑过手势的 iframe 文档（epub.js 视图复用，rendered 会重复触发，防监听器叠加双翻页）
+  const swipeBoundDocsRef = useRef(new WeakSet<Document>());
 
   // 正文字号为全局偏好（settings 模块）
   const fontSizeIndex = useFontSizeIndex();
   const fontSize = fontSizeAt(fontSizeIndex);
+
+  // 横向 / 竖向滑动翻页：左滑、上滑 = 下一页；右滑、下滑 = 上一页
+  const { handlers: swipeHandlers, consumeSwipe } = useSwipe({
+    onSwipe: (direction) => {
+      if (direction === 'left' || direction === 'up') renditionRef.current?.next();
+      else renditionRef.current?.prev();
+    },
+  });
 
   // ---- 载入 EPUB 并创建 rendition（仅一次） ----
   useEffect(() => {
@@ -92,12 +103,34 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
           }, SAVE_DEBOUNCE_MS);
         });
 
-        // 点击正文区域切换顶/底栏显隐（iframe 内点击冒泡到 iframe 元素）
+        // 触摸事件发生在 iframe 文档内，不会冒泡到外层 div，
+        // 必须绑到 view.document（IframeView 无 addEventListener，挂它本身是无效的）。
         rendition.on('rendered', (_section, view) => {
-          const element = view as unknown as
-            | { addEventListener?: (type: string, cb: () => void) => void }
-            | undefined;
-          element?.addEventListener?.('click', () => setChromeVisible((v) => !v));
+          const doc = (view as unknown as { document?: Document }).document;
+          if (!doc || swipeBoundDocsRef.current.has(doc)) return;
+          swipeBoundDocsRef.current.add(doc);
+
+          // 禁掉 iframe 内原生平移/缩放手势（分页内容由我们的滑动接管，防止拖动时内容被平移）
+          doc.documentElement.style.touchAction = 'none';
+
+          // 捕获阶段拦截并 stopImmediatePropagation：
+          // 禁用 epub.js 内置滑动（有速度门槛且仅横向，与另两个阅读器体验不一致），
+          // 同时避免内置 snap 与统一手势双翻页。
+          const capture =
+            (handler: (event: SwipeTouchEventLike) => void) =>
+            (event: SwipeTouchEventLike & { stopImmediatePropagation?: () => void }) => {
+              event.stopImmediatePropagation?.();
+              handler(event);
+            };
+          doc.addEventListener('touchstart', capture(swipeHandlers.onTouchStart), { passive: true, capture: true });
+          doc.addEventListener('touchmove', capture(swipeHandlers.onTouchMove), { passive: true, capture: true });
+          doc.addEventListener('touchend', capture(swipeHandlers.onTouchEnd), { passive: true, capture: true });
+
+          // 点击正文区域切换顶/底栏显隐（滑动尾随的 click 要吞掉）
+          doc.addEventListener('click', () => {
+            if (consumeSwipe()) return;
+            setChromeVisible((v) => !v);
+          });
         });
       } catch (error) {
         if (!cancelled) {
