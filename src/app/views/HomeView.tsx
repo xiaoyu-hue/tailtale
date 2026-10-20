@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import type { JSX } from 'react';
 import type { TabKey } from '../../shared/ui/BottomNav';
 import { ImportZone, ContinueReading, BookList, useRecentBook } from '../../modules/books';
+import { TodayCard } from '../../modules/gamification';
 
 interface HomeViewProps {
   onOpenBook: (bookId: string) => void;
@@ -178,6 +179,7 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
 
       <ImportZone onToast={showToast} />
       <ContinueReading onOpenBook={onOpenBook} />
+      <TodayCard onToast={showToast} />
 
       <h2 className="section-title">功能</h2>
       <div className="feature-grid">

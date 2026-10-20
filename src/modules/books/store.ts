@@ -1,3 +1,4 @@
+import { emit } from '../../platform/events';
 import { createStore, useStore } from '../../platform/store';
 import type { Book, BookStatus } from './model';
 import { importTxtFile, loadBooks, removeBook, saveProgress, setBookStatus } from './service';
@@ -100,4 +101,6 @@ export function markFinished(book: Book): void {
       console.error('读完状态保存失败', error);
     }
   );
+  // 广播完读事件：gamification 模块监听后发放一次性奖励（模块间只经事件总线交互）
+  emit('book:finished', { bookId: book.id });
 }

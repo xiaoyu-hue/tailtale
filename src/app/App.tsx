@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import TopBar from '../shared/ui/TopBar';
 import BottomNav, { type TabKey } from '../shared/ui/BottomNav';
 import { refreshBooks, useBooks } from '../modules/books';
+import { refreshGamification, useCoins } from '../modules/gamification';
 import { ReaderPage } from '../modules/reader';
 import HomeView from './views/HomeView';
 import PetView from './views/PetView';
@@ -26,10 +27,12 @@ const TAB_OF_ROUTE: Record<Route['name'], TabKey> = {
 /** 应用外壳：只负责导航与全局装配，业务状态归各模块。 */
 export default function App() {
   const books = useBooks();
+  const coins = useCoins();
   const [route, setRoute] = useState<Route>({ name: 'home' });
 
   useEffect(() => {
     void refreshBooks();
+    void refreshGamification();
   }, []);
 
   const currentBook =
@@ -49,7 +52,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <TopBar />
+      <TopBar coins={coins} />
       <main className="page">
         {route.name === 'home' && (
           <HomeView

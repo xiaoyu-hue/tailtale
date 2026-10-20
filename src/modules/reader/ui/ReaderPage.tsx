@@ -1,6 +1,7 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { Book } from '../../books';
 import { markFinished, readBookContent, reportProgress } from '../../books';
+import { startReading, stopReading } from '../../gamification';
 import { splitChapters } from '../model';
 
 interface ReaderPageProps {
@@ -69,6 +70,15 @@ export function ReaderPage({ book, onBack }: ReaderPageProps) {
     return () => {
       cancelled = true;
     };
+  }, [book.id]);
+
+  // 阅读计时：打开书籍即开始，离开阅读页（组件卸载）即停。
+  // 全屏沉浸页没有 Tab 栏，离开的唯一操作是返回书架，语义上等于"合上书"（见架构文档 S3）。
+  useEffect(() => {
+    void startReading(book.id).catch((error: unknown) => {
+      console.error('启动阅读计时失败', error);
+    });
+    return () => stopReading();
   }, [book.id]);
 
   // 首次加载：恢复上次阅读的章节与章内位置
