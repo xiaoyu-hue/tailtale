@@ -1,7 +1,7 @@
 {
   "name": "tailtale",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "书时 TailTale：游戏化阅读器 + 轻量工具箱",
   "type": "module",
   "license": "Apache-2.0",
