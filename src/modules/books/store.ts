@@ -1,7 +1,7 @@
 import { emit } from '../../platform/events';
 import { createStore, useStore } from '../../platform/store';
 import type { Book, BookStatus } from './model';
-import { importTxtFile, loadBooks, removeBook, saveProgress, setBookStatus } from './service';
+import { formatFromFilename, importBinaryFile, importTxtFile, loadBooks, removeBook, saveProgress, setBookStatus } from './service';
 
 interface BooksState {
   books: Book[];
@@ -44,18 +44,26 @@ export interface ImportResult {
   skipped: number;
 }
 
-/** 批量导入：目前仅支持 TXT（EPUB / PDF 于 M2 接入）。 */
+/** 批量导入：按扩展名分发到 TXT / EPUB / PDF 对应处理器。 */
 export async function importFiles(files: FileList | null): Promise<ImportResult> {
   if (!files || files.length === 0) return { ok: 0, failed: [], skipped: 0 };
   const all = Array.from(files);
-  const txtFiles = all.filter((file) => /\.txt$/i.test(file.name));
-  const skipped = all.length - txtFiles.length;
 
   const failed: string[] = [];
   let ok = 0;
-  for (const file of txtFiles) {
+  let skipped = 0;
+  for (const file of all) {
+    const format = formatFromFilename(file.name);
+    if (!format) {
+      skipped += 1;
+      continue;
+    }
     try {
-      await importTxtFile(file);
+      if (format === 'txt') {
+        await importTxtFile(file);
+      } else {
+        await importBinaryFile(file, format);
+      }
       ok += 1;
     } catch (error) {
       console.error('导入失败', file.name, error);
@@ -83,20 +91,23 @@ export function changeStatus(book: Book, status: BookStatus): void {
   });
 }
 
-/** 阅读器汇报进度（防抖后调用，fire-and-forget）。 */
+/** 阅读器汇报进度（防抖后调用，fire-and-forget）。cfi 为 EPUB 精确位置（可选）。 */
 export async function reportProgress(
   book: Book,
   chapterIndex: number,
   scrollRatio: number,
-  progress: number
+  progress: number,
+  cfi?: string
 ): Promise<void> {
-  patchBook(await saveProgress(book, chapterIndex, scrollRatio, progress));
+  patchBook(await saveProgress(book, chapterIndex, scrollRatio, progress, cfi));
 }
 
-/** 读完：立即置 finished 与 100% 进度，后台持久化（与 M1 行为一致的乐观更新）。 */
+/** 读完：立即置 finished 与 100% 进度，后台持久化（与 M1 行为一致的乐观更新）。
+ * 内部取 store 中最新状态，避免与并发的 reportProgress 补丁相互覆盖（竞态）。 */
 export function markFinished(book: Book): void {
-  patchBook({ ...book, status: 'finished', progress: 1 });
-  void saveProgress({ ...book, status: 'finished' }, book.chapterIndex, book.scrollRatio, 1).catch(
+  const latest = store.getState().books.find((b) => b.id === book.id) ?? book;
+  patchBook({ ...latest, status: 'finished', progress: 1 });
+  void saveProgress({ ...latest, status: 'finished' }, latest.chapterIndex, latest.scrollRatio, 1).catch(
     (error: unknown) => {
       console.error('读完状态保存失败', error);
     }

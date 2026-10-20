@@ -9,10 +9,10 @@ export {
   reportProgress,
   markFinished,
 } from './store';
-export { readBookContent } from './service';
+export { readBookContent, readBookBinary } from './service';
 export type { ImportResult } from './store';
-export type { Book, BookStatus, BookContent } from './model';
-export { STATUS_LABEL, nextStatus } from './model';
+export type { Book, BookStatus, BookContent, BookFormat } from './model';
+export { STATUS_LABEL, nextStatus, FORMAT_LABEL } from './model';
 export { ImportZone } from './ui/ImportZone';
 export { ContinueReading } from './ui/ContinueReading';
 export { BookList } from './ui/BookList';

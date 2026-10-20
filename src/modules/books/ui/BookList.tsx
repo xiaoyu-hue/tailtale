@@ -1,5 +1,5 @@
 import type { Book } from '../model';
-import { STATUS_LABEL, nextStatus } from '../model';
+import { FORMAT_LABEL, STATUS_LABEL, nextStatus } from '../model';
 import { changeStatus, deleteBookById, useBooks } from '../store';
 
 interface BookListProps {
@@ -7,9 +7,14 @@ interface BookListProps {
   onToast: (message: string) => void;
 }
 
-function formatSize(chars: number): string {
-  if (chars >= 10000) return `${(chars / 10000).toFixed(1)} 万字`;
-  return `${chars} 字`;
+/** TXT 按字数，EPUB / PDF 按体积 */
+function formatSize(book: Book): string {
+  if (book.format === 'txt') {
+    if (book.size >= 10000) return `${(book.size / 10000).toFixed(1)} 万字`;
+    return `${book.size} 字`;
+  }
+  if (book.size >= 1024 * 1024) return `${(book.size / 1024 / 1024).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(book.size / 1024))} KB`;
 }
 
 function formatDate(timestamp: number): string {
@@ -45,7 +50,7 @@ export function BookList({ onOpenBook, onToast }: BookListProps) {
         <div className="empty-state">
           书架空空如也
           <br />
-          导入一本 TXT，开始你的第一段阅读时光
+          导入一本 TXT / EPUB / PDF，开始你的第一段阅读时光
         </div>
       ) : (
         books.map((book) => (
@@ -53,6 +58,7 @@ export function BookList({ onOpenBook, onToast }: BookListProps) {
             <div className="book-row">
               <div className="book-row-head">
                 <span className="book-title">{book.title}</span>
+                <span className="chip chip-format">{FORMAT_LABEL[book.format]}</span>
                 <span
                   className={`chip${
                     book.status === 'reading'
@@ -72,7 +78,7 @@ export function BookList({ onOpenBook, onToast }: BookListProps) {
                 />
               </div>
               <div className="book-meta">
-                {formatSize(book.size)} · 进度 {Math.round(book.progress * 100)}% ·{' '}
+                {formatSize(book)} · 进度 {Math.round(book.progress * 100)}% ·{' '}
                 {book.lastReadAt ? `最近阅读 ${formatDate(book.lastReadAt)}` : `导入于 ${formatDate(book.addedAt)}`}
               </div>
               <div className="btn-row">

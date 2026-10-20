@@ -21,7 +21,7 @@ export function ImportZone({ onToast }: ImportZoneProps) {
           : `${result.failed.length} 个文件导入失败`
       );
     } else if (result.skipped > 0) {
-      onToast('目前仅支持 TXT（EPUB / PDF 将于 M2 接入）');
+      onToast('目前仅支持 TXT / EPUB / PDF');
     }
   };
 
@@ -46,14 +46,14 @@ export function ImportZone({ onToast }: ImportZoneProps) {
           void handleFiles(event.dataTransfer.files);
         }}
       >
-        点击此处或拖入 .txt 文件
+        点击此处或拖入 TXT / EPUB / PDF 文件
         <br />
         书籍仅保存在本机浏览器，不会上传
       </div>
       <input
         ref={fileInputRef}
         type="file"
-        accept=".txt,text/plain"
+        accept=".txt,.epub,.pdf,text/plain,application/epub+zip,application/pdf"
         multiple
         hidden
         onChange={(event) => {
