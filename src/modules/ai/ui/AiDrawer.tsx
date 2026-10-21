@@ -160,7 +160,11 @@ export function AiDrawer({ book, onClose }: AiDrawerProps) {
               </>
             )}
 
-            {phase === 'estimating' && <p className="muted">正在分析全书篇幅，估算费用…</p>}
+            {phase === 'estimating' && (
+              <p className="muted">
+                {book.format === 'epub' ? '正在读取 EPUB 全书文本…' : '正在分析全书篇幅，估算费用…'}
+              </p>
+            )}
 
             {phase === 'confirm' && prepare && (
               <CostDialog

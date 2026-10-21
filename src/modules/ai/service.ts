@@ -11,10 +11,13 @@ import {
   buildChunkSummaryPrompt,
   buildOutlinePrompt,
   chatCompletionsUrl,
+  describeAiError,
   estimateExplainCost,
   estimateTokens,
   groupText,
+  isAiConfigured,
   type AiConfig,
+  type AiErrorInfo,
   type CostEstimate,
 } from './model';
 
@@ -64,8 +67,28 @@ interface ChatCompletionResponse {
   choices?: Array<{ message?: { content?: string } }>;
 }
 
-/** 单次调用超时（PRD：60 秒，用户可取消）。 */
-const AI_TIMEOUT_MS = 60_000;
+/** 单次调用超时：浏览器直连第三方端点，25 秒足够判断连通性，避免用户干等。 */
+const AI_TIMEOUT_MS = 25_000;
+
+/** EPUB 全文提取超时：纯本地解析，超时即视为该书结构异常，避免永久卡死。 */
+const EPUB_EXTRACT_TIMEOUT_MS = 25_000;
+
+/** 让一个 Promise 在 ms 毫秒后按 onTimeout 指定的错误被拒绝（不阻止原 Promise 继续执行其收尾）。 */
+function withTimeout<T>(promise: Promise<T>, ms: number, onTimeout: () => AiError): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(onTimeout()), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error) => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
+  });
+}
 
 // ---- 串行队列：AI 调用全部排队执行，避免重复扣费与并发风暴 ----
 
@@ -95,7 +118,11 @@ export async function callChat(
   return serialize(async (): Promise<string> => {
     throwIfAborted(signal);
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, AI_TIMEOUT_MS);
     const onExternalAbort = (): void => controller.abort();
     signal?.addEventListener('abort', onExternalAbort);
     try {
@@ -124,6 +151,21 @@ export async function callChat(
       if (!content || !content.trim())
         throw new AiError('empty-response', '模型返回了空内容', '重试一次；频繁出现请更换模型');
       return content.trim();
+    } catch (err) {
+      // 超时机制触发的 abort：明确为「连接超时」，而非用户取消
+      if (timedOut) {
+        throw new AiError(
+          'timeout',
+          '连接超时',
+          '你的网络在限定时间内连不上该端点。请检查网络或代理，或改用其他可访问的 OpenAI 兼容端点'
+        );
+      }
+      // 用户主动取消（外部 signal 触发 abort）
+      if (err instanceof Error && err.name === 'AbortError') {
+        throw new AiError('aborted', '已取消', '你取消了本次解读');
+      }
+      // 其余（含网络层 TypeError: Failed to fetch）原样抛出，交由 describeAiError 归一
+      throw err;
     } finally {
       clearTimeout(timer);
       signal?.removeEventListener('abort', onExternalAbort);
@@ -206,8 +248,15 @@ export async function prepareExplain(book: Book): Promise<PrepareResult> {
   if (book.format === 'txt') {
     text = await readBookContent(book.id);
   } else if (book.format === 'epub') {
-    const { text: extracted, failedSections } = await extractEpubText(
-      await readBookBinary(book.id)
+    const { text: extracted, failedSections } = await withTimeout(
+      extractEpubText(await readBookBinary(book.id)),
+      EPUB_EXTRACT_TIMEOUT_MS,
+      () =>
+        new AiError(
+          'epub-extract-failed',
+          'EPUB 解析超时',
+          '这本书解析耗时过长，可能是结构异常。可先转换为 TXT 再解读'
+        )
     );
     text = extracted;
     if (failedSections > 0)
@@ -332,3 +381,31 @@ export async function askAboutBook(
 
 /** 输出 token 参考预估值（提问用，供 UI 展示）。 */
 export const ASK_OUTPUT_TOKENS = OUTPUT_TOKEN_ESTIMATE.answer;
+
+/**
+ * 连通性探测：用一次极小的对话请求验证「端点可达 + 密钥有效」。
+ * 设置页「测试连接」按钮调用，让用户在正式解读前就能发现网络/配置问题，
+ * 不必等到读完书点生成才知道失败（符合人类操作的提前反馈）。
+ */
+export async function testConnection(
+  config: AiConfig
+): Promise<{ ok: boolean; error?: AiErrorInfo }> {
+  if (!isAiConfigured(config))
+    return {
+      ok: false,
+      error: {
+        code: 'not-configured',
+        message: '请先填好三个字段',
+        hint: '接口地址、模型、API 密钥都需要填写完整',
+      },
+    };
+  try {
+    const reply = await callChat(config, [
+      { role: 'system', content: '你是连接测试助手，只回复一个字：OK' },
+      { role: 'user', content: '请回复 OK' },
+    ]);
+    return { ok: reply.trim().length > 0 };
+  } catch (e) {
+    return { ok: false, error: describeAiError(e) };
+  }
+}

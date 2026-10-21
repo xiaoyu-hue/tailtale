@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useAiConfig, useAiConfigured, patchAiConfig, resetAiConfig } from '../store';
-import { DEEPSEEK_PRESET } from '../model';
+import { useAiConfig, useAiConfigured, patchAiConfig, resetAiConfig, testConnection } from '../store';
+import { DEEPSEEK_PRESET, type AiErrorInfo } from '../model';
 
 type EndpointMode = 'preset' | 'custom';
 
@@ -16,6 +16,16 @@ export function AiSettingsSection() {
     config.baseUrl && config.baseUrl !== DEEPSEEK_PRESET.baseUrl ? 'custom' : 'preset'
   );
   const [showKey, setShowKey] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; error?: AiErrorInfo } | null>(null);
+
+  const runTest = async (): Promise<void> => {
+    setTesting(true);
+    setTestResult(null);
+    const result = await testConnection(config);
+    setTestResult(result);
+    setTesting(false);
+  };
 
   const switchMode = (next: EndpointMode): void => {
     setMode(next);
@@ -114,6 +124,28 @@ export function AiSettingsSection() {
         不要在公共电脑上填写密钥；密钥仅保存在本机浏览器，不会上传。支持任意 OpenAI
         兼容端点，切换即时保存。
       </p>
+
+      <div className="ai-test-row">
+        <button
+          type="button"
+          className="btn"
+          disabled={!configured || testing}
+          onClick={runTest}
+        >
+          {testing ? '测试中…' : '测试连接'}
+        </button>
+        {testResult &&
+          (testResult.ok ? (
+            <span className="ai-test-ok">✓ 连接成功，可以开始解读</span>
+          ) : (
+            <span className="ai-test-fail" title={testResult.error?.hint}>
+              ✕ {testResult.error?.message}
+            </span>
+          ))}
+      </div>
+      {testResult && !testResult.ok && testResult.error?.hint && (
+        <p className="ai-test-hint">{testResult.error.hint}</p>
+      )}
 
       {configured && (
         <button type="button" className="btn btn-danger" onClick={resetAiConfig}>

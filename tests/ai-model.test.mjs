@@ -196,7 +196,7 @@ test('describeAiError：AbortError → 超时', () => {
   aborted.name = 'AbortError';
   const info = describeAiError(aborted);
   assert.equal(info.code, 'timeout');
-  assert.match(info.hint, /稍后重试/);
+  assert.match(info.hint, /网络|代理|端点/);
 });
 
 test('describeAiError：TypeError → 网络或 CORS', () => {

@@ -6,6 +6,7 @@ import {
   prepareExplain,
   runExplain,
   saveAiConfig,
+  testConnection,
   type ExplainHooks,
 } from './service';
 import {
@@ -117,4 +118,4 @@ export async function ask(
 }
 
 /** 解读前准备（费用预估数据源），UI 弹窗确认后才调 runOutline。 */
-export { prepareExplain };
+export { prepareExplain, testConnection };

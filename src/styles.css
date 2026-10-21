@@ -1664,3 +1664,28 @@ button {
     font-size: 12px;
   }
 }
+
+/* AI 设置卡片：测试连接 */
+.ai-test-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.ai-test-ok {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--success, #1a9d5a);
+}
+.ai-test-fail {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--danger);
+  cursor: help;
+}
+.ai-test-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+}

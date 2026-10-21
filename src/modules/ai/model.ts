@@ -332,13 +332,13 @@ export function describeAiError(error: unknown): AiErrorInfo {
     return {
       code: 'timeout',
       message: '请求超时',
-      hint: '网络不稳定或内容较长，稍后重试；反复超时可换更短的书或更长超时预设的模型',
+      hint: '连接未在限定时间内完成，通常是网络不通或端点无响应。请检查网络/代理，或改用可访问的端点',
     };
   if (error instanceof TypeError)
     return {
       code: 'cors-or-network',
       message: '网络请求失败',
-      hint: '检查网络是否畅通；若使用自定义端点，可能是该端点不支持浏览器跨域（CORS），可改用 DeepSeek 预设',
+      hint: '浏览器无法连上该端点。请检查：①你的网络能否访问该地址；②国内网络可能需要代理；③若用自定义端点，确认它支持浏览器跨域（CORS）',
     };
   if (error instanceof Error && error.message)
     return { code: 'unknown', message: error.message, hint: '稍后重试；持续失败请检查配置' };
