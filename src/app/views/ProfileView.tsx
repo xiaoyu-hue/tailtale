@@ -87,7 +87,7 @@ export default function Profile() {
       </div>
 
       <p className="muted" style={{ textAlign: 'center', marginTop: 20 }}>
-        书时 TailTale v1.3.0 · 宠物系统上线
+        书时 TailTale v1.4.0 · AI 解读书上线
       </p>
     </>
   );
