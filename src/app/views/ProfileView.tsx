@@ -1,4 +1,4 @@
-import { SettingsPanel } from '../../modules/settings';
+import { SettingsPanel, BackupSection } from '../../modules/settings';
 import { AiSettingsSection } from '../../modules/ai';
 import { StatsCard } from './StatsCard';
 import { CheckinCalendar } from './CheckinCalendar';
@@ -28,6 +28,7 @@ export default function Profile() {
       <StatsCard />
       <CheckinCalendar />
       <SettingsPanel />
+      <BackupSection />
       <AiSettingsSection />
 
       <div className="card">
@@ -87,7 +88,7 @@ export default function Profile() {
       </div>
 
       <p className="muted" style={{ textAlign: 'center', marginTop: 20 }}>
-        书时 TailTale v1.4.0 · AI 解读书上线
+        书时 TailTale v1.4.0 · 主题皮肤与数据备份上线
       </p>
     </>
   );

@@ -10,7 +10,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "tsc src/modules/pet/model.ts src/modules/ai/model.ts --outDir .test-dist --rootDir src/modules --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022 && node --test tests/*.test.mjs"
+    "test": "tsc src/modules/pet/model.ts src/modules/ai/model.ts src/modules/settings/model.ts --outDir .test-dist --rootDir src/modules --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022 && node --test tests/*.test.mjs"
   },
   "dependencies": {
     "epubjs": "^0.3.93",

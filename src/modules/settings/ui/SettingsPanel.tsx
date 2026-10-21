@@ -1,12 +1,13 @@
-import { FONT_SIZES, THEME_CHOICES } from '../model';
-import { setFontSizeIndex, setTheme, useFontSizeIndex, useTheme } from '../store';
+import { FONT_SIZES, THEME_CHOICES, THEME_SKINS } from '../model';
+import { setFontSizeIndex, setSkin, setTheme, useFontSizeIndex, useSkin, useTheme } from '../store';
 
 const FONT_LABELS = ['小', '标准', '大', '特大'];
 
-/** 设置面板：正文字号 + 主题（我的页入口，全站生效）。 */
+/** 设置面板：正文字号 + 主题 + 界面皮肤（我的页入口，全站生效）。 */
 export function SettingsPanel() {
   const fontSizeIndex = useFontSizeIndex();
   const theme = useTheme();
+  const skin = useSkin();
 
   return (
     <section className="card settings-panel" id="settings">
@@ -41,6 +42,23 @@ export function SettingsPanel() {
               onClick={() => setTheme(choice.value)}
             >
               {choice.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="settings-row settings-row--skin">
+        <span className="settings-label">界面皮肤</span>
+        <div className="segmented" role="group" aria-label="界面皮肤">
+          {THEME_SKINS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              className={`segmented-item${option.value === skin ? ' active' : ''}`}
+              aria-pressed={option.value === skin}
+              onClick={() => setSkin(option.value)}
+            >
+              {option.label}
             </button>
           ))}
         </div>
