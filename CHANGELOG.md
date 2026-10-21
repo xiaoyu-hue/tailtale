@@ -5,6 +5,22 @@
 
 ## [未发布]
 
+## [1.5.0] - 2026-10-21
+
+M6 打磨（第一部分）：界面皮肤（液态玻璃 / 像素风）+ 本地数据备份。
+
+### 新增
+
+- **界面皮肤（M6 主题皮肤）**：「我的 → 设置」新增「界面皮肤」三选一——默认 / 液态玻璃 / 像素风。液态玻璃为毛玻璃质感（半透明表面 + 背景模糊 + 柔和渐变 + 大圆角），像素风为硬边直角 + 粗描边 + 硬阴影 + 等宽字体复古配色；两套皮肤均可叠加在浅色 / 深色 / 跟随系统之上，切换即时生效、刷新保留（落 `tailtale:settings`）。经用户决策，皮肤定位为**免费 UI 个性化**（非 PRD 原稿「阅读主题皮肤 300 币」的商品化形态），接入金币解锁待「商店」模块建成后
+- **数据备份（M6）**：「我的 → 数据备份」卡片支持一键导出 / 导入。导出把全部本地数据打包为 JSON（`tailtale-backup-YYYYMMDD.json`）：含 IndexedDB 六个 store（books / contents / wallet / checkins / reading_session / pet）全量行，以及 localStorage 中所有 `tailtale:*` 键（设置、AI 密钥等）；导入经格式校验后覆盖写回，并整页刷新重水合。用于换设备与清理缓存后的恢复
+
+### 技术内部
+
+- settings 模块扩展承载 M6 两块功能（路线图将「主题/字号/数据备份」归 settings 所有）：`model` 增 `UiSkin`/`THEME_SKINS` 与 `BackupBundle`/`parseBackupBundle` 纯函数；`store` 增 `useSkin`/`setSkin`/`applySkin`（`<html data-skin>` 镜像，与 `data-theme` 并列）；`service` 增 `collectBackup`/`restoreBackup`/`exportBackupToFile`/`importBackupFromFile`
+- 皮肤样式复用现有 `--bg/--surface/--border/--shadow/--primary` 等 CSS 变量，覆盖块写在 `data-theme` 区块之后并按浅/深/跟随系统三态分支，保证「浅深 × 玻璃/像素」四组合均成立，不引入新变量名
+- 备份导入为覆盖式（先清后写），导入前 `confirm` 提示，不做合并以免冲突
+- 新增 `tests/backup-model.test.mjs`（node:test，零新依赖）：非法 JSON / 来源错误 / 版本过高 / 字段缺失 / 正常包 6 项判定；`package.json` test 脚本把 `src/modules/settings/model.ts` 一并编译进 `.test-dist`
+
 ## [1.4.0] - 2026-10-21
 
 ### 新增
