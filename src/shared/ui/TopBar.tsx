@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-
-const WEEKDAYS = ['日', '一', '二', '三', '四', '五', '六'];
+import { formatDateLabel } from '../dates';
 
 function formatNow(date: Date): string {
   const hh = String(date.getHours()).padStart(2, '0');
   const mm = String(date.getMinutes()).padStart(2, '0');
-  return `${date.getMonth() + 1}月${date.getDate()}日 周${WEEKDAYS[date.getDay()]} ${hh}:${mm}`;
+  return `${formatDateLabel(date)} ${hh}:${mm}`;
 }
 
 function CoinIcon() {

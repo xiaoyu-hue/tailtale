@@ -3,6 +3,26 @@
 本文件遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 规范，版本号规则见 [docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)。
 本文件随源代码采用 [Apache-2.0](LICENSE) 许可；docs/ 目录下的文档采用 CC BY-NC 4.0。
 
+## [1.6.0] - 2026-10-22
+
+手动检查更新上线 + 版本号单点管理 + 首页日期格式升级。
+
+### 新增
+
+- **手动检查更新**：「我的 → 关于书时」卡片新增「检查更新」按钮。点击后强制 Service Worker 向服务器检查新版本，三态提示——「发现新版本，刷新即可使用」（附「立即刷新」按钮，一键加载最新版）/「当前已是最新版本」/「检查失败：网络异常，或当前环境未启用离线缓存」。PWA 底层的 autoUpdate 自动更新机制保持不变（手动检查是主动触达的补充，不替换兜底）
+- **版本号单点管理（工程）**：`package.json` 的 `version` 成为唯一版本号来源，构建时由 vite.config.ts 注入为全局常量 `__APP_VERSION__`，「我的」页版本脚注自动同步。发版时版本号手改位置从两处减为一处（package.json），阶段主题文案仍需手改。详见 docs/书时-版本管理规范.md v1.4
+
+### 变更
+
+- **首页顶栏日期格式升级**：由「10月22日 周三 07:10」升级为「2026年10月22日 周四 07:10」——补全年份，跨年场景（尤其翻看打卡日历历史月份时）语境更明确；展示逻辑收敛至 shared/dates.ts 的 `formatDateLabel`（新增，带单测）
+
+### 技术内部
+
+- 新增 `src/platform/update.ts`（零模块依赖，符合 platform 层规则）：`checkForUpdate` 经 `registration.update()` 强制检查 + `updatefound` 监听，10s 超时收敛；并发兜底（检查时已有 installing/waiting 中的新 SW）；`applyUpdate` 整页刷新由新 SW 接管
+- ProfileView「关于书时」卡片内联更新区：按钮三态（检查更新 / 检查中… / 发现新版本）+ available 时的「立即刷新」动作 + latest/failed 消息 5s 自动消失；样式走既有 `.btn` 体系（含像素皮肤适配）
+- `tests/dates.test.mjs` 新增 6 项用例（formatDateLabel 跨月/周末/前导零 + formatKey/todayKey/shiftDay 跨月跨年闰日边界）；package.json 的 test 脚本扩展为两段 tsc 编译（dates.ts 单独输出 `.test-dist/shared/`，不动既有三个 model 测试的导入路径）
+- 已知限制（借本次更新功能顺带记录，本次不修）：localStorage 中的设置键暂无迁移机制——IndexedDB 有 MIGRATIONS 登记制，若未来版本改设置键名，老用户设置会静默丢失；数据备份导出/导入的版本校验（parseBackupBundle）是现有兜底
+
 ## [1.5.2] - 2026-10-21
 
 开源致谢三处表面对齐补全（文档修订）。
