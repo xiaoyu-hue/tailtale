@@ -1,8 +1,15 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import pkg from './package.json';
 
+// 版本号单点管理：package.json 的 version 是唯一来源，构建时注入为全局常量
+// __APP_VERSION__（应用内版本脚注等运行时展示用）。发版只改 package.json 一处，
+// 杜绝「代码里六处手改版本号、漏改一处」的旧模式（见 docs/书时-版本管理规范.md 第 3 节）。
 export default defineConfig({
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+  },
   plugins: [
     react(),
     VitePWA({

@@ -1,5 +1,7 @@
+import { useRef, useState } from 'react';
 import { SettingsPanel, BackupSection } from '../../modules/settings';
 import { AiSettingsSection } from '../../modules/ai';
+import { applyUpdate, checkForUpdate, type UpdateCheckResult } from '../../platform/update';
 import { StatsCard } from './StatsCard';
 import { CheckinCalendar } from './CheckinCalendar';
 
@@ -43,6 +45,27 @@ const CREDIT_GROUPS: CreditGroup[] = [
 ];
 
 export default function Profile() {
+  const [updateState, setUpdateState] = useState<'idle' | 'checking' | UpdateCheckResult>('idle');
+  const [updateMessage, setUpdateMessage] = useState<string | null>(null);
+  const updateTimerRef = useRef(0);
+
+  const handleCheckUpdate = async () => {
+    if (updateState === 'checking') return;
+    window.clearTimeout(updateTimerRef.current);
+    setUpdateState('checking');
+    setUpdateMessage(null);
+    const result = await checkForUpdate();
+    setUpdateState(result);
+    if (result === 'latest') {
+      setUpdateMessage(`当前已是最新版本 v${__APP_VERSION__}`);
+      updateTimerRef.current = window.setTimeout(() => setUpdateMessage(null), 5000);
+    } else if (result === 'failed') {
+      setUpdateMessage('检查失败：网络异常，或当前环境未启用离线缓存');
+      updateTimerRef.current = window.setTimeout(() => setUpdateMessage(null), 5000);
+    }
+    // available：保留「立即刷新」按钮等用户操作，不自动清除
+  };
+
   return (
     <>
       <h1 className="page-title">我的</h1>
@@ -76,6 +99,30 @@ export default function Profile() {
             <path d="M4.5 11.5 11.5 4.5M11.5 4.5H6.5M11.5 4.5V9.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </a>
+
+        <div className="update-check">
+          <button
+            type="button"
+            className="btn update-check-btn"
+            onClick={() => void handleCheckUpdate()}
+            disabled={updateState === 'checking'}
+          >
+            {updateState === 'checking'
+              ? '检查中…'
+              : updateState === 'available'
+                ? '发现新版本'
+                : '检查更新'}
+          </button>
+          {updateState === 'available' && (
+            <span className="update-check-latest">
+              发现新版本，刷新即可使用
+              <button type="button" className="btn btn-primary update-check-refresh" onClick={applyUpdate}>
+                立即刷新
+              </button>
+            </span>
+          )}
+          {updateMessage && <span className="update-check-message">{updateMessage}</span>}
+        </div>
       </div>
 
       <div className="card">
@@ -115,7 +162,7 @@ export default function Profile() {
       </div>
 
       <p className="muted" style={{ textAlign: 'center', marginTop: 20 }}>
-        书时 TailTale v1.5.2 · 开源致谢补全
+        书时 TailTale v{__APP_VERSION__} · 检查更新上线
       </p>
     </>
   );

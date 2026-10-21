@@ -1833,3 +1833,38 @@ button {
   line-height: 1.7;
   color: var(--text-secondary);
 }
+
+/* ========== 我的页：检查更新 ========== */
+.update-check {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.update-check-btn {
+  /* 次级按钮：与卡片内 GitHub 链接的视觉权重匹配 */
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+.update-check-btn:disabled {
+  opacity: 0.6;
+}
+.update-check-latest {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+}
+.update-check-refresh {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+.update-check-message {
+  font-size: 13px;
+  color: var(--text-secondary);
+}

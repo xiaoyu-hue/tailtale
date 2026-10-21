@@ -13,6 +13,13 @@ export function formatKey(date: Date): string {
   return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
 }
 
+const WEEKDAY_LABELS = ['日', '一', '二', '三', '四', '五', '六'];
+
+/** 展示用完整日期：2026年10月22日 周四（月份日期不带前导零，符合中文阅读习惯）。 */
+export function formatDateLabel(date: Date): string {
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 周${WEEKDAY_LABELS[date.getDay()]}`;
+}
+
 export function todayKey(now: Date = new Date()): string {
   return formatKey(now);
 }
