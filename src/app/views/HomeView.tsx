@@ -3,6 +3,14 @@ import type { JSX } from 'react';
 import type { TabKey } from '../../shared/ui/BottomNav';
 import { ImportZone, ContinueReading, BookList, useRecentBook } from '../../modules/books';
 import { TodayCard } from '../../modules/gamification';
+import {
+  CatStage,
+  MOOD_LABELS,
+  STAGE_LABELS,
+  currentStage,
+  deriveMood,
+  usePet,
+} from '../../modules/pet';
 
 interface HomeViewProps {
   onOpenBook: (bookId: string) => void;
@@ -14,7 +22,7 @@ interface Feature {
   icon: JSX.Element;
   /** 里程碑编号，缺省表示已可用 */
   milestone?: string;
-  action?: 'recent' | 'profile' | 'stats' | 'calendar';
+  action?: 'recent' | 'profile' | 'stats' | 'calendar' | 'pet' | 'shop';
 }
 
 const FEATURES: Feature[] = [
@@ -37,8 +45,8 @@ const FEATURES: Feature[] = [
     ),
     action: 'recent',
   },
-  { label: '宠物', milestone: 'M3', icon: <PawIcon /> },
-  { label: '商店', milestone: 'M3', icon: <BagIcon /> },
+  { label: '宠物', icon: <PawIcon />, action: 'pet' },
+  { label: '商店', icon: <BagIcon />, action: 'shop' },
   {
     label: 'AI 解读书',
     milestone: 'M5',
@@ -144,7 +152,29 @@ function BagIcon() {
   );
 }
 
-/** 首页视图：导入 → 继续阅读 → 功能网格 → 全部书籍。书籍相关 UI 全部来自 books 模块。 */
+/** 首页宠物预览条：小猫近况 + 快捷入口（宠物页大图在宠物 Tab）。 */
+function PetStrip({ onOpen }: { onOpen: () => void }) {
+  const pet = usePet();
+  if (!pet) return null;
+  return (
+    <section className="card pet-strip">
+      <CatStage pet={pet} variant="sm" />
+      <div className="pet-strip-info">
+        <div className="pet-strip-name">
+          {pet.name} · {STAGE_LABELS[currentStage(pet.growth)]}
+        </div>
+        <div className="muted">
+          {MOOD_LABELS[deriveMood(pet)]} · 好感 {pet.affinity}
+        </div>
+      </div>
+      <button type="button" className="btn btn-primary pet-strip-go" onClick={onOpen}>
+        去看它
+      </button>
+    </section>
+  );
+}
+
+/** 首页视图：导入 → 继续阅读 → 宠物预览 → 功能网格 → 全部书籍。书籍相关 UI 全部来自 books 模块。 */
 export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
   const toastTimerRef = useRef<number>(0);
   const [toast, setToast] = useState<string | null>(null);
@@ -159,6 +189,10 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
   const handleFeature = (feature: Feature) => {
     if (feature.action === 'profile') {
       onNavigateTab('profile');
+      return;
+    }
+    if (feature.action === 'pet' || feature.action === 'shop') {
+      onNavigateTab(feature.action);
       return;
     }
     if (feature.action === 'recent') {
@@ -189,6 +223,7 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
       <ImportZone onToast={showToast} />
       <ContinueReading onOpenBook={onOpenBook} />
       <TodayCard onToast={showToast} />
+      <PetStrip onOpen={() => onNavigateTab('pet')} />
 
       <h2 className="section-title">功能</h2>
       <div className="feature-grid">

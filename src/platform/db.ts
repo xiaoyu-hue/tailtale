@@ -1,5 +1,5 @@
 const DB_NAME = 'tailtale';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 /**
  * 存储 schema：store 名集中登记在平台层。
@@ -10,6 +10,7 @@ export const STORE_CONTENTS = 'contents';
 export const STORE_WALLET = 'wallet';
 export const STORE_CHECKINS = 'checkins';
 export const STORE_READING_SESSION = 'reading_session';
+export const STORE_PET = 'pet';
 
 interface Migration {
   version: number;
@@ -31,6 +32,13 @@ const MIGRATIONS: Migration[] = [
       createStoreIfMissing(db, STORE_WALLET);
       createStoreIfMissing(db, STORE_CHECKINS);
       createStoreIfMissing(db, STORE_READING_SESSION);
+    },
+  },
+  {
+    // v3：宠物系统（M3/S1）——宠物单例行（三属性/好感度/成长/睡觉态）
+    version: 3,
+    upgrade: (db) => {
+      createStoreIfMissing(db, STORE_PET);
     },
   },
 ];

@@ -6,6 +6,8 @@ type EventMap = {
   'wallet:changed': { coins: number; xp: number; todayMinutes: number };
   'checkin:done': { date: string; streak: number; bonus: number };
   'book:finished': { bookId: string };
+  /** 羁绊时刻：阅读会话每跨满 30 分钟广播一次（PRD §5.2 情感钩子，pet 订阅后加好感） */
+  'reading:bond_moment': { bookId: string; minutes: number };
 };
 
 type Handler<K extends keyof EventMap> = (payload: EventMap[K]) => void;
@@ -14,6 +16,7 @@ const handlers: { [K in keyof EventMap]: Set<Handler<K>> } = {
   'wallet:changed': new Set(),
   'checkin:done': new Set(),
   'book:finished': new Set(),
+  'reading:bond_moment': new Set(),
 };
 
 /** 订阅事件，返回取消订阅函数。 */

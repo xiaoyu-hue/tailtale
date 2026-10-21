@@ -1,5 +1,6 @@
 import { on } from '../../platform/events';
 import { createStore, useStore } from '../../platform/store';
+import { todayKey } from '../../shared/dates';
 import {
   awardBookFinish,
   loadCheckinDates,
@@ -7,7 +8,7 @@ import {
   loadWallet,
   saveWallet,
 } from './service';
-import { computeStreak, rolloverDaily, todayKey } from './model';
+import { computeStreak, rolloverDaily } from './model';
 
 interface GamificationState {
   coins: number;

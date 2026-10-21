@@ -3,6 +3,7 @@
  * 本文件不依赖 React / DOM / IndexedDB，可独立单测。
  * 数值权威来源：docs/书时-PRD.md §3.1.1，改动须先改 PRD。
  */
+import { shiftDay } from '../../shared/dates';
 
 /** 经济数值（PRD §3.1.1）。 */
 export const ECONOMY = {
@@ -24,6 +25,13 @@ export const ECONOMY = {
   BOOK_FINISH_COINS: 100,
   /** 每阅读 1 分钟获得的 XP */
   XP_PER_MINUTE: 1,
+  /**
+   * 羁绊时刻块长（分钟）：阅读会话每累计跨满一个块广播一次 reading:bond_moment
+   * （PRD §5.2 情感钩子「连续阅读 30 分钟，猫会蹭屏幕撒娇」）。
+   * 语义上属宠物规则，但触发点在阅读会话累计值上，按模块边界置于此；
+   * 宠物侧的好感增量见 pet 模块 PET_RULES.BOND_AFFINITY。
+   */
+  BOND_BLOCK_MINUTES: 30,
 } as const;
 
 /** 钱包单例行的 id（wallet store 只有一行）。 */
@@ -65,6 +73,8 @@ export interface PersistedSession {
   xpAwarded: number;
   /** 本会话已发放的金币 */
   coinsAwarded: number;
+  /** 本会话已触发的羁绊时刻次数（防刷新后重复触发；旧行无此字段按 0） */
+  bondsAwarded: number;
   updatedAt: number;
 }
 
@@ -75,6 +85,7 @@ export interface ActiveSession {
   minutesCounted: number;
   xpAwarded: number;
   coinsAwarded: number;
+  bondsAwarded: number;
   lastTickAt: number;
 }
 
@@ -103,25 +114,6 @@ export function streakBonus(streakDays: number): number {
 export function pendingAwards(accumulatedMs: number): { minutes: number; xp: number; coins: number } {
   const minutes = Math.floor(accumulatedMs / 60_000);
   return { minutes, xp: minutes * ECONOMY.XP_PER_MINUTE, coins: coinsForReadMinutes(minutes) };
-}
-
-function pad2(value: number): string {
-  return value < 10 ? `0${value}` : String(value);
-}
-
-/** 本地时区日期键 YYYY-MM-DD（不能用 toISOString，那是 UTC 会差一天）。 */
-export function formatKey(date: Date): string {
-  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
-}
-
-export function todayKey(now: Date = new Date()): string {
-  return formatKey(now);
-}
-
-/** 日期键平移 days 天（负数为往前；按本地时区，自动处理月末跨月）。 */
-export function shiftDay(key: string, days: number): string {
-  const [year, month, day] = key.split('-').map(Number);
-  return formatKey(new Date(year, month - 1, day + days));
 }
 
 /**

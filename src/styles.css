@@ -960,3 +960,394 @@ button {
   color: var(--text-secondary);
   font-size: 14px;
 }
+
+/* ========== 宠物（M3）：像素猫舞台 ========== */
+/* 属性条颜色：三属性 + 成长条（深色模式在下方覆盖） */
+:root {
+  --stat-hunger: #e07b39;
+  --stat-mood: #d9738f;
+  --stat-energy: #6b9bd1;
+  --stat-growth: #9c7bc0;
+}
+
+:root[data-theme='dark'] {
+  --stat-hunger: #e88a4e;
+  --stat-mood: #e08ba0;
+  --stat-energy: #8fb4dd;
+  --stat-growth: #b294d4;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']) {
+    --stat-hunger: #e88a4e;
+    --stat-mood: #e08ba0;
+    --stat-energy: #8fb4dd;
+    --stat-growth: #b294d4;
+  }
+}
+
+.cat-stage {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: 10px 0 4px;
+}
+
+/* 像素放大：canvas 内部已是整数倍渲染，CSS 端兜底非整数缩放 */
+.cat-canvas {
+  display: block;
+  image-rendering: pixelated;
+}
+
+.cat-stage--lg .cat-canvas {
+  width: 160px;
+  height: 160px;
+}
+
+.cat-stage--sm .cat-canvas {
+  width: 84px;
+  height: 84px;
+}
+
+/* 睡觉 Zzz 气泡：错峰上浮 */
+.cat-zzz {
+  position: absolute;
+  top: 6px;
+  right: 22%;
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  pointer-events: none;
+}
+
+.cat-zzz span {
+  font-size: 15px;
+  animation: zzz-float 1.8s ease-in-out infinite;
+}
+
+.cat-zzz span:nth-child(2) {
+  font-size: 12px;
+  animation-delay: 0.35s;
+}
+
+.cat-zzz span:nth-child(3) {
+  font-size: 10px;
+  animation-delay: 0.7s;
+}
+
+@keyframes zzz-float {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-9px);
+  }
+}
+
+/* ========== 宠物页：主卡 ========== */
+.pet-hero-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pet-identity {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pet-name {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.pet-stage {
+  font-size: 12px;
+  color: var(--primary-strong);
+  background: var(--primary-soft);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-weight: 600;
+}
+
+.pet-hero-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pet-affinity {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.pet-mood-chip {
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--surface-soft);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+/* 羁绊横幅：连续阅读 30 分钟后猫蹭过屏幕 */
+.bond-banner {
+  margin: 2px auto 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary-strong);
+  background: var(--primary-soft);
+  border-radius: 999px;
+  padding: 6px 14px;
+  text-align: center;
+  animation: bond-in 0.3s ease;
+}
+
+@keyframes bond-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 成长进度 */
+.pet-growth {
+  margin-top: 8px;
+}
+
+.pet-growth-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+/* ========== 属性条 ========== */
+.stat-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-bar-row {
+  display: grid;
+  grid-template-columns: 52px 1fr 30px;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-bar-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.stat-bar-value {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-bar-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.stat-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--stat-energy);
+  transition: width 0.4s ease;
+}
+
+.stat-bar-fill--hunger {
+  background: var(--stat-hunger);
+}
+
+.stat-bar-fill--mood {
+  background: var(--stat-mood);
+}
+
+.stat-bar-fill--growth {
+  background: var(--stat-growth);
+}
+
+.stat-bar-fill.is-low {
+  background: var(--danger);
+}
+
+/* ========== 宠物页：互动区 ========== */
+.pet-actions .btn-row .btn {
+  flex: 1;
+}
+
+.pet-shop-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.pet-shop-hint .btn {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+/* ========== 首页：宠物预览条 ========== */
+.pet-strip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pet-strip .cat-stage {
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.pet-strip-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pet-strip-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.pet-strip-go {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+/* ========== 商店 ========== */
+.shop-balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.shop-coins {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.shop-balance-note {
+  margin: 0;
+  text-align: right;
+  max-width: 40%;
+}
+
+.shop-pet {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.shop-pet .cat-stage {
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.shop-pet-info {
+  min-width: 0;
+}
+
+/* 零食列表 */
+.snack-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.snack-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.snack-row + .snack-row {
+  border-top: 1px solid var(--border);
+}
+
+.snack-row.is-disabled {
+  opacity: 0.55;
+}
+
+.snack-info {
+  min-width: 0;
+}
+
+.snack-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.snack-price {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary-strong);
+  background: var(--primary-soft);
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.snack-effects {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+.snack-buy {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 13px;
+  min-width: 76px;
+}
+
+.shop-planned .placeholder-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.9;
+}

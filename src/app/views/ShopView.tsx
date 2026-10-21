@@ -1,26 +1,86 @@
-export default function Shop() {
+import { useRef, useState } from 'react';
+import { useCoins } from '../../modules/gamification';
+import {
+  CatStage,
+  MOOD_LABELS,
+  PET_ACTION_HINTS,
+  SNACKS,
+  STAGE_LABELS,
+  SnackButtons,
+  currentStage,
+  deriveMood,
+  usePet,
+} from '../../modules/pet';
+import type { SnackId } from '../../modules/pet';
+import { buyAndUseSnack } from '../commerce';
+
+/** 商店页：金币余额 + 四件零食（购买即喂食）+ 装扮线规划。购买事务在 app 层编排。 */
+export default function ShopView() {
+  const pet = usePet();
+  const coins = useCoins();
+  const toastTimerRef = useRef(0);
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (message: string) => {
+    setToast(message);
+    window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => setToast(null), 2400);
+  };
+
+  const handleBuy = async (snack: SnackId) => {
+    const result = await buyAndUseSnack(snack);
+    if (result.ok) {
+      showToast(`${SNACKS[snack].name}喂食成功 · 好感 +${result.affinityGained} · 剩余 ${result.coinsLeft} 币`);
+    } else if (result.reason === 'insufficient') {
+      showToast('金币不够，先去阅读赚金币吧');
+    } else {
+      showToast(PET_ACTION_HINTS[result.reason]);
+    }
+  };
+
   return (
     <>
-      <div className="placeholder-hero">
-        <div className="placeholder-icon">
-          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M5 8h14l-1.2 12.2a1.6 1.6 0 0 1-1.6 1.4H7.8a1.6 1.6 0 0 1-1.6-1.4L5 8Z" />
-            <path d="M9 10V6a3 3 0 0 1 6 0v4" />
-          </svg>
-        </div>
-        <h2>宠物商店</h2>
-        <p className="muted">M3 上线 · 金币只能靠阅读赚取，不可购买</p>
-      </div>
+      <h1 className="page-title">商店</h1>
 
-      <div className="card">
+      <section className="card shop-balance">
+        <div className="shop-balance-main">
+          <div className="muted">金币余额</div>
+          <div className="shop-coins">{coins}</div>
+        </div>
+        <p className="muted shop-balance-note">金币只能靠阅读赚取，不可购买</p>
+      </section>
+
+      {pet && (
+        <section className="card shop-pet">
+          <CatStage pet={pet} variant="sm" />
+          <div className="shop-pet-info">
+            <div className="pet-name">{pet.name}</div>
+            <div className="muted">
+              {MOOD_LABELS[deriveMood(pet)]} · {STAGE_LABELS[currentStage(pet.growth)]}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <section className="card">
+        <h2 className="section-title">零食与玩具</h2>
+        {pet ? (
+          <SnackButtons pet={pet} coins={coins} onBuy={handleBuy} />
+        ) : (
+          <p className="muted">小猫还没醒，稍后再来</p>
+        )}
+      </section>
+
+      <section className="card shop-planned">
+        <h2 className="section-title">装扮线（规划中）</h2>
         <ul className="placeholder-list">
-          <li>每日一次免费抚摸（好感度 +1）</li>
-          <li>小鱼干 20 币 · 逗猫棒 30 币 · 猫条 50 币 · 猫薄荷 80 币</li>
-          <li>皮肤：橘猫 200 / 三花 400 / 黑猫 600，阅读主题皮肤 300</li>
+          <li>皮肤：橘猫 200 / 三花 400 / 黑猫 600 币</li>
+          <li>阅读主题皮肤 300 币</li>
           <li>日收入与日常消耗大致持平，基础皮肤约两周可攒出</li>
-          <li>无任何充值入口，不涉及支付</li>
         </ul>
-      </div>
+      </section>
+
+      {toast && <div className="toast">{toast}</div>}
     </>
   );
 }

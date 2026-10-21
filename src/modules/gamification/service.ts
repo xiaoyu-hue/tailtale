@@ -1,5 +1,6 @@
 import { STORE_CHECKINS, STORE_READING_SESSION, STORE_WALLET, run } from '../../platform/db';
 import { emit } from '../../platform/events';
+import { todayKey } from '../../shared/dates';
 import type { ActiveSession, Checkin, PersistedSession, Wallet } from './model';
 import {
   ECONOMY,
@@ -10,7 +11,6 @@ import {
   pendingAwards,
   rolloverDaily,
   streakBonus,
-  todayKey,
 } from './model';
 
 // ---- DB 访问（模块私有：外部只经 store 层） ----
@@ -81,6 +81,7 @@ function snapshot(session: ActiveSession): PersistedSession {
     minutesCounted: session.minutesCounted,
     xpAwarded: session.xpAwarded,
     coinsAwarded: session.coinsAwarded,
+    bondsAwarded: session.bondsAwarded,
     updatedAt: Date.now(),
   };
 }
@@ -106,6 +107,7 @@ export async function startReading(bookId: string): Promise<void> {
     minutesCounted: base?.minutesCounted ?? 0,
     xpAwarded: base?.xpAwarded ?? 0,
     coinsAwarded: base?.coinsAwarded ?? 0,
+    bondsAwarded: base?.bondsAwarded ?? 0, // 旧版会话行无此字段，按 0（未触发过）
     lastTickAt: Date.now(),
   };
   lastPersistAt = Date.now();
@@ -175,6 +177,17 @@ async function settle(myGeneration: number): Promise<void> {
           xp: updated.xp,
           todayMinutes: updated.todayMinutes,
         });
+      }
+      // 羁绊时刻：会话每跨满一个 30 分钟块广播一次（含刷新恢复的会话，
+      // 与金币/XP 同口径；已触发计数落库，刷新不重触发）
+      const bondsDue = Math.floor(active.accumulatedMs / (ECONOMY.BOND_BLOCK_MINUTES * 60_000));
+      if (bondsDue > active.bondsAwarded) {
+        active.bondsAwarded = bondsDue;
+        emit('reading:bond_moment', {
+          bookId: active.bookId,
+          minutes: bondsDue * ECONOMY.BOND_BLOCK_MINUTES,
+        });
+        lastPersistAt = 0; // 羁绊计数立即落库（下方持久化条件随即满足）
       }
       if (Date.now() - lastPersistAt >= PERSIST_EVERY_MS) {
         await saveSession(snapshot(active));
@@ -258,5 +271,53 @@ export async function awardBookFinish(): Promise<number> {
   } catch (error) {
     console.error('完读奖励发放失败', error);
     return 0;
+  }
+}
+
+// ---- 商店消费（S2：金币唯一出口） ----
+
+export type SpendResult =
+  | { ok: true; coins: number }
+  | { ok: false; reason: 'insufficient' | 'io-error' };
+
+/** 花费金币（商店购买入口）：余额不足不扣款；成功后广播 wallet:changed。 */
+export async function spendCoins(amount: number): Promise<SpendResult> {
+  try {
+    return await serialize(async (): Promise<SpendResult> => {
+      const wallet = rolloverDaily(await loadWallet(), todayKey());
+      if (wallet.coins < amount) return { ok: false, reason: 'insufficient' as const };
+      const updated: Wallet = { ...wallet, coins: wallet.coins - amount };
+      await saveWallet(updated);
+      emit('wallet:changed', {
+        coins: updated.coins,
+        xp: updated.xp,
+        todayMinutes: updated.todayMinutes,
+      });
+      return { ok: true, coins: updated.coins };
+    });
+  } catch (error) {
+    console.error('金币扣除失败', error);
+    return { ok: false, reason: 'io-error' };
+  }
+}
+
+/**
+ * 退还金币：购买后「使用零食」失败的补偿回滚。
+ * 正常流程不会走到（UI 已按规则禁用按钮）；仅在并发竞态或 IO 异常时兜底。
+ */
+export async function refundCoins(amount: number): Promise<void> {
+  try {
+    await serialize(async () => {
+      const wallet = rolloverDaily(await loadWallet(), todayKey());
+      const updated: Wallet = { ...wallet, coins: wallet.coins + amount };
+      await saveWallet(updated);
+      emit('wallet:changed', {
+        coins: updated.coins,
+        xp: updated.xp,
+        todayMinutes: updated.todayMinutes,
+      });
+    });
+  } catch (error) {
+    console.error('金币退还失败', error);
   }
 }

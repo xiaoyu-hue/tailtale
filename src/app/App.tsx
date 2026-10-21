@@ -3,6 +3,7 @@ import TopBar from '../shared/ui/TopBar';
 import BottomNav, { type TabKey } from '../shared/ui/BottomNav';
 import { refreshBooks, useBooks } from '../modules/books';
 import { refreshGamification, useCoins } from '../modules/gamification';
+import { refreshPet } from '../modules/pet';
 import { ReaderPage } from '../modules/reader';
 import HomeView from './views/HomeView';
 import PetView from './views/PetView';
@@ -33,6 +34,7 @@ export default function App() {
   useEffect(() => {
     void refreshBooks();
     void refreshGamification();
+    void refreshPet();
   }, []);
 
   const currentBook =
@@ -60,7 +62,7 @@ export default function App() {
             onNavigateTab={goTab}
           />
         )}
-        {route.name === 'pet' && <PetView />}
+        {route.name === 'pet' && <PetView onOpenShop={() => setRoute({ name: 'shop' })} />}
         {route.name === 'shop' && <ShopView />}
         {route.name === 'profile' && <ProfileView />}
       </main>

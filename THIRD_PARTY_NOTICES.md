@@ -105,6 +105,37 @@ POSSIBILITY OF SUCH DAMAGE.
 - 项目地址：https://github.com/microsoft/TypeScript
 - 用途：类型检查（不进入产物）
 
+### 像素猫美术资产 pixel_cat.json（1.3.0 引入，非 npm 依赖：随源码分发的美术资产）
+
+```
+MIT License
+
+Copyright (c) 2025 CanFlyhang
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+- 许可证：MIT（LICENSE 原文随资产分发于 `src/modules/pet/ui/assets/pixel_cat.LICENSE`）
+- 项目地址：https://github.com/CanFlyhang/Desktop-Pixel-Pet
+- 用途：宠物形象（32×32 二帧待机像素猫，JSON 帧数据 + 调色板；书时按调色板置换实现皮肤数据，未改动像素数据）
+- 备注：MIT 与 Apache-2.0 兼容；该资产不进入 npm 依赖树，构建时由 Vite 直接打包 JSON
+
 ---
 
 ## 二、间接依赖（传递依赖）总览
