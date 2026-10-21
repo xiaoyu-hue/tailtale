@@ -23,8 +23,16 @@ interface Feature {
   icon: JSX.Element;
   /** 里程碑编号，缺省表示已可用 */
   milestone?: string;
-  action?: 'recent' | 'profile' | 'stats' | 'calendar' | 'pet' | 'shop' | 'ai';
+  action?: 'recent' | 'profile' | 'stats' | 'calendar' | 'pet' | 'shop' | 'ai' | 'backup' | 'skin';
 }
+
+/** 落在「我的」页的功能 → 目标卡片 id（点击先切 Tab，再平滑滚动定位）。 */
+const PROFILE_SECTIONS: Partial<Record<NonNullable<Feature['action']>, string>> = {
+  stats: 'stats',
+  calendar: 'checkin-calendar',
+  backup: 'backup',
+  skin: 'settings',
+};
 
 const FEATURES: Feature[] = [
   {
@@ -91,7 +99,7 @@ const FEATURES: Feature[] = [
   },
   {
     label: '数据备份',
-    milestone: 'M6',
+    action: 'backup',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M12 3.5v11m0 0-4-4m4 4 4-4" />
@@ -110,7 +118,7 @@ const FEATURES: Feature[] = [
   },
   {
     label: '主题皮肤',
-    milestone: 'M6',
+    action: 'skin',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <circle cx="12" cy="12" r="8.5" />
@@ -219,12 +227,12 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
       showToast('还没有书，先导入一本吧');
       return;
     }
-    // 统计/日历在"我的"页：先切 Tab，再滚动到对应卡片（等视图渲染后定位）
-    if (feature.action === 'stats' || feature.action === 'calendar') {
+    // 落在「我的」页的功能：先切 Tab，再滚动到对应卡片（等视图渲染后定位）
+    const profileSection = feature.action ? PROFILE_SECTIONS[feature.action] : undefined;
+    if (profileSection) {
       onNavigateTab('profile');
-      const sectionId = feature.action === 'stats' ? 'stats' : 'checkin-calendar';
       window.setTimeout(() => {
-        document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById(profileSection)?.scrollIntoView({ behavior: 'smooth' });
       }, 120);
       return;
     }
