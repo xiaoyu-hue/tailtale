@@ -1,6 +1,6 @@
 # 书时 TailTale
 
-[![Version](https://img.shields.io/badge/version-v1.5.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.5.0)
+[![Version](https://img.shields.io/badge/version-v1.5.1-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.5.1)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](docs/LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.5.0 · 主题皮肤与数据备份上线**）
+- 当前部署内容为 `main` 分支最新构建（**v1.5.1 · 首页功能入口已接通**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -242,7 +242,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 
 ## 版本与发布
 
-- **当前版本：v1.5.0**（2026-10-21 发布，M6 打磨上线：界面皮肤「液态玻璃 / 像素风」在「我的 → 设置」一键切换并叠加浅色/深色；本地数据一键导出/导入备份，换设备与清缓存可恢复；M5 AI 解读书同期在线：BYOK 设置 + DeepSeek 浏览器直连，阅读器内生成全书大纲/摘要与针对本书提问，调用前预估费用；M3 宠物系统同期在线：三属性衰减/好感度与成长/睡觉行动/商店四件零食/像素猫渲染器，读书赚币喂猫的循环闭合；v1.3.0 为宠物系统，v1.2.2 移动端适配，v1.2.1 继续阅读卡片优化，v1.2.0 滑动翻页，v1.1.0 多格式阅读，v1.0.0 首个正式版）
+- **当前版本：v1.5.1**（2026-10-21 发布，修复 v1.5.0 首页入口：「数据备份」「主题皮肤」两格接通，点击直达「我的」页对应卡片；v1.5.0 为 M6 打磨上线：界面皮肤「液态玻璃 / 像素风」在「我的 → 设置」一键切换并叠加浅色/深色，本地数据一键导出/导入备份；M5 AI 解读书同期在线：BYOK 设置 + DeepSeek 浏览器直连，阅读器内生成全书大纲/摘要与针对本书提问，调用前预估费用；M3 宠物系统同期在线：三属性衰减/好感度与成长/睡觉行动/商店四件零食/像素猫渲染器，读书赚币喂猫的循环闭合；v1.3.0 为宠物系统，v1.2.2 移动端适配，v1.2.1 继续阅读卡片优化，v1.2.0 滑动翻页，v1.1.0 多格式阅读，v1.0.0 首个正式版）
 - [Releases](https://github.com/xiaoyu-hue/tailtale/releases) · [CHANGELOG](CHANGELOG.md)
 - 版本号规则与发版流程：[docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
   - 主版本号（X.0.0）= 架构级变更；次版本号（1.X.0）= 新功能上线；修订号（1.1.X）= 优化、修复、文档同步
@@ -260,7 +260,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 | M3 宠物 | 喂食 / 玩耍 / 好感度 / 成长阶段、金币闭环 | ✅ 已完成（v1.3.0） |
 | M4 工具箱 | 番茄钟 / 白噪音 / 文本统计 / 书摘导出 / 今日一书 | ⬜ 计划中 |
 | M5 AI 解读书 | BYOK 设置、DeepSeek 直连（TXT + EPUB） | ✅ 已完成（v1.4.0） |
-| M6 打磨 | 主题皮肤、商店、数据备份 | 🟡 部分完成（v1.5.0：界面皮肤 + 数据备份；猫皮肤商店待建「商店」模块） |
+| M6 打磨 | 主题皮肤、商店、数据备份 | ✅ 已完成（v1.5.0 上线界面皮肤 + 数据备份，v1.5.1 首页入口接通；猫皮肤商店留待后续「商店」模块） |
 | M7 作品化 | README 完善、demo 优化、内置公版书库 | ⬜ 计划中 |
 
 ---
