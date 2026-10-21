@@ -8,16 +8,38 @@ interface Credit {
   detail: string;
 }
 
-const CREDITS: Credit[] = [
-  { name: 'MindSpace', detail: 'MIT · Jabez · 打卡/经验值逻辑思路' },
-  { name: 'kit', detail: 'MIT · aafnnp · 工具箱交互参考' },
-  { name: 'Tamagochi', detail: 'MIT · Tech-aficionado · 宠物系统蓝本' },
-  { name: 'NextChat', detail: 'MIT · ChatGPTNextWeb · AI 交互模式' },
-  { name: 'epub.js', detail: 'BSD-2-Clause · FuturePress · EPUB 渲染（1.1.0 接入）' },
-  { name: 'pdf.js', detail: 'Apache-2.0 · Mozilla · PDF 渲染（1.1.0 接入）' },
-  { name: 'foliate-js', detail: 'MIT · johnfactotum · 备选渲染引擎' },
-  { name: 'shiki-toolbox', detail: 'MIT · Elari39 · 设计系统思路参考' },
-  { name: 'React / Vite / vite-plugin-pwa', detail: 'MIT · Facebook / Vite 团队' },
+interface CreditGroup {
+  title: string;
+  items: Credit[];
+}
+
+/** 与 README「开源致谢」及 docs/书时-开源组件与合规.md 第 1 节保持一致；逐包许可证全文见仓库 THIRD_PARTY_NOTICES.md。 */
+const CREDIT_GROUPS: CreditGroup[] = [
+  {
+    title: '组件与资产（进入当前构建）',
+    items: [
+      { name: 'React / React DOM', detail: 'MIT · Facebook, Inc. · UI 框架与渲染' },
+      { name: 'epub.js', detail: 'BSD-2-Clause · FuturePress · EPUB 解析与分页渲染' },
+      { name: 'pdf.js', detail: 'Apache-2.0 · Mozilla · PDF 按页渲染' },
+      { name: 'Vite', detail: 'MIT · Vite 团队 · 开发服务器与生产构建' },
+      { name: '@vitejs/plugin-react', detail: 'MIT · Evan You and Vite contributors · JSX 转换与 Fast Refresh' },
+      { name: 'vite-plugin-pwa', detail: 'MIT · Anthony Fu · Service Worker 与 PWA 清单配置' },
+      { name: 'Workbox', detail: 'MIT · Google · vite-plugin-pwa 底层：预缓存与运行时缓存' },
+      { name: 'TypeScript', detail: 'Apache-2.0 · Microsoft · 类型检查（开发期依赖）' },
+      { name: 'Desktop-Pixel-Pet', detail: 'MIT · CanFlyhang · 像素猫美术资产 pixel_cat.json（随源码分发）' },
+    ],
+  },
+  {
+    title: '设计参考（不集成代码，仅参考思路）',
+    items: [
+      { name: 'MindSpace', detail: 'MIT · Jabez · 打卡/经验值逻辑、公版书下载脚本、主题系统思路' },
+      { name: 'kit', detail: 'MIT · aafnnp · 工具箱交互：分类/收藏/最近使用/全局搜索' },
+      { name: 'Tamagochi', detail: 'MIT · Tech-aficionado · 宠物系统蓝本：属性衰减/成长/喂食/睡觉' },
+      { name: 'NextChat', detail: 'MIT · ChatGPTNextWeb · AI 交互模式：BYOK 设置页' },
+      { name: 'shiki-toolbox', detail: 'MIT · Elari39 · 设计系统与算法工程思路（四季箱）' },
+      { name: 'foliate-js', detail: 'MIT · johnfactotum · 备选渲染引擎（计划引入，尚未进入构建）' },
+    ],
+  },
 ];
 
 export default function Profile() {
@@ -58,10 +80,15 @@ export default function Profile() {
 
       <div className="card">
         <h2 style={{ margin: '0 0 10px', fontSize: 17 }}>开源致谢</h2>
-        {CREDITS.map((credit) => (
-          <div className="credit-row" key={credit.name}>
-            <span className="credit-name">{credit.name}</span>
-            <span className="credit-detail">{credit.detail}</span>
+        {CREDIT_GROUPS.map((group) => (
+          <div key={group.title}>
+            <div className="credit-group-title">{group.title}</div>
+            {group.items.map((credit) => (
+              <div className="credit-row" key={credit.name}>
+                <span className="credit-name">{credit.name}</span>
+                <span className="credit-detail">{credit.detail}</span>
+              </div>
+            ))}
           </div>
         ))}
         <p className="muted" style={{ marginBottom: 0 }}>

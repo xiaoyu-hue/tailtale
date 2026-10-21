@@ -5,6 +5,10 @@
 
 ## [未发布]
 
+### 文档
+
+- **开源致谢三处表面对齐补全**：README「开源致谢」直接依赖表补登记 Desktop-Pixel-Pet 像素猫美术资产（CanFlyhang，MIT，随源码分发）；应用内「我的 → 开源致谢」改为分组展示（组件与资产 / 设计参考），补 Desktop-Pixel-Pet，并将「React / Vite / vite-plugin-pwa」合并行拆为 React / React DOM、Vite、@vitejs/plugin-react、vite-plugin-pwa（含 Workbox）、TypeScript 独立行；docs/书时-开源组件与合规.md 第 1 节同步拆行补全（文档版本 v1.6）；THIRD_PARTY_NOTICES.md 此前已完整，无需改动
+
 ## [1.5.1] - 2026-10-21
 
 v1.5.0 的入口修复：首页功能网格中「数据备份」「主题皮肤」两格此前挂着 M6「规划中」角标且点击无反应，实际功能已在「我的」页上线。

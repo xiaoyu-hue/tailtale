@@ -176,6 +176,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 | [vite-plugin-pwa](https://github.com/vite-pwa/vite-plugin-pwa) | Anthony Fu | MIT | Service Worker 生成与 PWA 清单配置（运行时打包 Workbox，MIT） |
 | [TypeScript](https://github.com/microsoft/TypeScript) | Microsoft | Apache-2.0 | 类型检查（开发期依赖，不进入产物） |
 | [Workbox](https://github.com/GoogleChrome/workbox) | Google | MIT | vite-plugin-pwa 底层：Service Worker 预缓存与运行时缓存 |
+| [Desktop-Pixel-Pet](https://github.com/CanFlyhang/Desktop-Pixel-Pet)（pixel_cat.json） | CanFlyhang | MIT | 像素猫美术资产：32×32 二帧待机像素猫（非 npm 依赖，随源码分发；书时按调色板置换实现皮肤数据，未改动像素数据） |
 
 ### 间接依赖
 

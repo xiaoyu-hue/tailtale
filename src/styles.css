@@ -1030,6 +1030,18 @@ button {
 }
 
 /* ========== 关于页 ========== */
+.credit-group-title {
+  margin: 14px 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.credit-group-title:first-child {
+  margin-top: 0;
+}
+
 .credit-row {
   display: flex;
   justify-content: space-between;
