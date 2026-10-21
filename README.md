@@ -1,6 +1,6 @@
 # 书时 TailTale
 
-[![Version](https://img.shields.io/badge/version-v1.5.1-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.5.1)
+[![Version](https://img.shields.io/badge/version-v1.5.2-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.5.2)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](docs/LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.5.1 · 首页功能入口已接通**）
+- 当前部署内容为 `main` 分支最新构建（**v1.5.2 · 开源致谢补全**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -243,7 +243,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 
 ## 版本与发布
 
-- **当前版本：v1.5.1**（2026-10-21 发布，修复 v1.5.0 首页入口：「数据备份」「主题皮肤」两格接通，点击直达「我的」页对应卡片；v1.5.0 为 M6 打磨上线：界面皮肤「液态玻璃 / 像素风」在「我的 → 设置」一键切换并叠加浅色/深色，本地数据一键导出/导入备份；M5 AI 解读书同期在线：BYOK 设置 + DeepSeek 浏览器直连，阅读器内生成全书大纲/摘要与针对本书提问，调用前预估费用；M3 宠物系统同期在线：三属性衰减/好感度与成长/睡觉行动/商店四件零食/像素猫渲染器，读书赚币喂猫的循环闭合；v1.3.0 为宠物系统，v1.2.2 移动端适配，v1.2.1 继续阅读卡片优化，v1.2.0 滑动翻页，v1.1.0 多格式阅读，v1.0.0 首个正式版）
+- **当前版本：v1.5.2**（2026-10-21 发布，开源致谢三处表面对齐补全：README / 应用内「我的 → 开源致谢」/ docs 合规文档，补登记 Desktop-Pixel-Pet 像素猫资产与 Workbox；v1.5.1 修复 v1.5.0 首页入口：「数据备份」「主题皮肤」两格接通，点击直达「我的」页对应卡片；v1.5.0 为 M6 打磨上线：界面皮肤「液态玻璃 / 像素风」在「我的 → 设置」一键切换并叠加浅色/深色，本地数据一键导出/导入备份；M5 AI 解读书同期在线：BYOK 设置 + DeepSeek 浏览器直连，阅读器内生成全书大纲/摘要与针对本书提问，调用前预估费用；M3 宠物系统同期在线：三属性衰减/好感度与成长/睡觉行动/商店四件零食/像素猫渲染器，读书赚币喂猫的循环闭合；v1.3.0 为宠物系统，v1.2.2 移动端适配，v1.2.1 继续阅读卡片优化，v1.2.0 滑动翻页，v1.1.0 多格式阅读，v1.0.0 首个正式版）
 - [Releases](https://github.com/xiaoyu-hue/tailtale/releases) · [CHANGELOG](CHANGELOG.md)
 - 版本号规则与发版流程：[docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
   - 主版本号（X.0.0）= 架构级变更；次版本号（1.X.0）= 新功能上线；修订号（1.1.X）= 优化、修复、文档同步

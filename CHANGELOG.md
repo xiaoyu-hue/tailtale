@@ -3,11 +3,18 @@
 本文件遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 规范，版本号规则见 [docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)。
 本文件随源代码采用 [Apache-2.0](LICENSE) 许可；docs/ 目录下的文档采用 CC BY-NC 4.0。
 
-## [未发布]
+## [1.5.2] - 2026-10-21
+
+开源致谢三处表面对齐补全（文档修订）。
 
 ### 文档
 
-- **开源致谢三处表面对齐补全**：README「开源致谢」直接依赖表补登记 Desktop-Pixel-Pet 像素猫美术资产（CanFlyhang，MIT，随源码分发）；应用内「我的 → 开源致谢」改为分组展示（组件与资产 / 设计参考），补 Desktop-Pixel-Pet，并将「React / Vite / vite-plugin-pwa」合并行拆为 React / React DOM、Vite、@vitejs/plugin-react、vite-plugin-pwa（含 Workbox）、TypeScript 独立行；docs/书时-开源组件与合规.md 第 1 节同步拆行补全（文档版本 v1.6）；THIRD_PARTY_NOTICES.md 此前已完整，无需改动
+- **README「开源致谢」**：直接依赖表补登记 Desktop-Pixel-Pet 像素猫美术资产（CanFlyhang，MIT，随源码分发）
+- **应用内「我的 → 开源致谢」**：改为分组展示（组件与资产 / 设计参考），补 Desktop-Pixel-Pet 与 Workbox 独立行，原「React / Vite / vite-plugin-pwa」合并行拆为 React / React DOM、Vite、@vitejs/plugin-react、vite-plugin-pwa、TypeScript 独立行
+- **docs/书时-开源组件与合规.md**：第 1 节同步拆行补全（文档版本 v1.6），并更正 NextChat 作者名拼写（ChatGPTNextweb → ChatGPTNextWeb）
+- THIRD_PARTY_NOTICES.md 此前已完整（含 pixel_cat.json 许可证原文），本次无需改动
+
+## [未发布]
 
 ## [1.5.1] - 2026-10-21
 
