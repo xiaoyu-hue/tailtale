@@ -2,6 +2,7 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { Book } from '../../books';
 import { markFinished, readBookContent, reportProgress } from '../../books';
 import { MAX_FONT_SIZE_INDEX, fontSizeAt, setFontSizeIndex, useFontSizeIndex } from '../../settings';
+import { AiDrawer } from '../../ai';
 import { useSwipe } from '../../../shared/hooks/useSwipe';
 import { splitChapters } from '../model';
 
@@ -42,6 +43,7 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
   const [scrollRatio, setScrollRatio] = useState(book.scrollRatio);
   const [chromeVisible, setChromeVisible] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   // 正文字号为全局偏好（settings 模块），跨书籍记忆、在我的页亦可调
   const fontSizeIndex = useFontSizeIndex();
   const fontSize = fontSizeAt(fontSizeIndex);
@@ -245,6 +247,9 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
         <button type="button" className="icon-btn" onClick={() => setDrawerOpen(true)}>
           目录
         </button>
+        <button type="button" className="icon-btn" onClick={() => setAiOpen(true)} aria-label="AI 解读">
+          AI
+        </button>
         <button
           type="button"
           className="icon-btn"
@@ -273,6 +278,8 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
           </aside>
         </>
       )}
+
+      {aiOpen && <AiDrawer book={book} onClose={() => setAiOpen(false)} />}
     </div>
   );
 }

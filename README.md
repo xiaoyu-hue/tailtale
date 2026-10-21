@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.3.0 · 宠物系统上线**）
+- 当前部署内容为 `main` 分支最新构建（**v1.3.0 · 宠物系统上线**；M5 AI 解读书已合并至 main，待实测后发版 v1.4.0）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -232,7 +232,8 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
     │   ├── books/            书架：model（类型 + 状态机 + 多格式）/ store / service / ui
     │   ├── reader/           阅读器：model（TXT 章节拆分）/ ui（TxtReader / EpubReader / PdfReader 按格式分流）
     │   ├── gamification/     游戏化：model（经济数值 + 纯函数）/ service（计时 + 持久化）/ store / ui
-    │   └── settings/         全局偏好：model（字号档位 + 主题）/ service（localStorage）/ store / ui
+    │   ├── settings/         全局偏好：model（字号档位 + 主题）/ service（localStorage）/ store / ui
+    │   └── ai/               AI 解读书：model（纯函数 + prompt）/ service（DeepSeek 直连）/ store / ui（设置 + 抽屉）
     ├── platform/             平台能力：db（IndexedDB + 迁移）/ store（状态工厂）/ events（事件总线）/ hash（内容指纹）
     └── shared/               跨模块共享：ui（TopBar / BottomNav 等）/ hooks（useSwipe 手势）/ utils
 ```
@@ -258,7 +259,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 | 阅读手势 | 滑动翻页：三个阅读器统一手势，左滑/上滑 = 下一页 | ✅ 已完成（v1.2.0） |
 | M3 宠物 | 喂食 / 玩耍 / 好感度 / 成长阶段、金币闭环 | ✅ 已完成（v1.3.0） |
 | M4 工具箱 | 番茄钟 / 白噪音 / 文本统计 / 书摘导出 / 今日一书 | ⬜ 计划中 |
-| M5 AI 解读书 | BYOK 设置、DeepSeek 直连 | ⬜ 计划中 |
+| M5 AI 解读书 | BYOK 设置、DeepSeek 直连（TXT + EPUB） | ✅ 已完成（待实测后发版 v1.4.0） |
 | M6 打磨 | 主题皮肤、商店、数据备份 | ⬜ 计划中 |
 | M7 作品化 | README 完善、demo 优化、内置公版书库 | ⬜ 计划中 |
 

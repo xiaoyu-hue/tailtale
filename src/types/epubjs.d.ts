@@ -41,10 +41,20 @@ declare module 'epubjs' {
     destroy(): void;
   }
 
+  export interface EpubSection {
+    href: string;
+    /** 加载章节内容（epubjs Section.load，参数为 Book 实例） */
+    load(book: EpubBook): Promise<unknown>;
+    /** 卸载章节，释放 document */
+    unload(): void;
+    /** load 之后可访问的章节文档（M5 AI 解读提取全文用） */
+    document?: Document;
+  }
+
   export interface EpubBook {
     ready: Promise<void>;
     navigation: { toc: NavItem[] };
-    spine: { length: number };
+    spine: { length: number; spine: EpubSection[] };
     renderTo(element: HTMLElement, options?: Record<string, unknown>): Rendition;
     destroy(): void;
   }

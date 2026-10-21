@@ -1,4 +1,5 @@
 import { SettingsPanel } from '../../modules/settings';
+import { AiSettingsSection } from '../../modules/ai';
 import { StatsCard } from './StatsCard';
 import { CheckinCalendar } from './CheckinCalendar';
 
@@ -27,12 +28,13 @@ export default function Profile() {
       <StatsCard />
       <CheckinCalendar />
       <SettingsPanel />
+      <AiSettingsSection />
 
       <div className="card">
         <h2 style={{ margin: '0 0 8px', fontSize: 17 }}>关于书时</h2>
         <p className="muted" style={{ margin: 0 }}>
           书时（TailTale）是一款游戏化阅读器 + 轻量工具箱：读书积累时长换取金币，金币养育一只永远陪伴你的猫。
-          本地优先、无需登录、无支付，AI 功能采用 BYOK 模式（用户自带密钥，M5 上线）。
+          本地优先、无需登录、无支付，AI 功能采用 BYOK 模式（用户自带密钥，密钥仅存本机浏览器）。
         </p>
         <a
           className="repo-link"
@@ -79,7 +81,8 @@ export default function Profile() {
         <h2 style={{ margin: '0 0 10px', fontSize: 17 }}>隐私说明</h2>
         <p className="muted" style={{ margin: 0 }}>
           书籍文件、阅读进度与设置仅存储于本机浏览器（IndexedDB / localStorage），
-          无任何服务端数据收集。请勿在公共电脑上填写任何密钥（M5 起适用）。
+          无任何服务端数据收集；AI 密钥同样只保存在本机浏览器，不会上传。
+          请勿在公共电脑上填写任何密钥。
         </p>
       </div>
 

@@ -3,6 +3,7 @@ import type { NavItem, Rendition, EpubBook } from 'epubjs';
 import type { Book } from '../../books';
 import { markFinished, readBookBinary, reportProgress } from '../../books';
 import { MAX_FONT_SIZE_INDEX, fontSizeAt, setFontSizeIndex, useFontSizeIndex } from '../../settings';
+import { AiDrawer } from '../../ai';
 import { useSwipe } from '../../../shared/hooks/useSwipe';
 
 interface EpubReaderProps {
@@ -27,6 +28,7 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
   const [pageInfo, setPageInfo] = useState('');
   const [chromeVisible, setChromeVisible] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
   const finishedRef = useRef(false);
   const saveTimerRef = useRef<number>(0);
   const bookStatusRef = useRef(book.status);
@@ -213,6 +215,9 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
         <button type="button" className="icon-btn" onClick={() => setDrawerOpen(true)}>
           目录
         </button>
+        <button type="button" className="icon-btn" onClick={() => setAiOpen(true)} aria-label="AI 解读">
+          AI
+        </button>
         <button type="button" className="icon-btn" onClick={() => renditionRef.current?.next()}>
           下一页 ›
         </button>
@@ -236,6 +241,8 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
           </aside>
         </>
       )}
+
+      {aiOpen && <AiDrawer book={book} onClose={() => setAiOpen(false)} />}
     </div>
   );
 }

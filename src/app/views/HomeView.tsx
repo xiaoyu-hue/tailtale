@@ -3,6 +3,7 @@ import type { JSX } from 'react';
 import type { TabKey } from '../../shared/ui/BottomNav';
 import { ImportZone, ContinueReading, BookList, useRecentBook } from '../../modules/books';
 import { TodayCard } from '../../modules/gamification';
+import { useAiConfigured } from '../../modules/ai';
 import {
   CatStage,
   MOOD_LABELS,
@@ -22,7 +23,7 @@ interface Feature {
   icon: JSX.Element;
   /** 里程碑编号，缺省表示已可用 */
   milestone?: string;
-  action?: 'recent' | 'profile' | 'stats' | 'calendar' | 'pet' | 'shop';
+  action?: 'recent' | 'profile' | 'stats' | 'calendar' | 'pet' | 'shop' | 'ai';
 }
 
 const FEATURES: Feature[] = [
@@ -49,7 +50,7 @@ const FEATURES: Feature[] = [
   { label: '商店', icon: <BagIcon />, action: 'shop' },
   {
     label: 'AI 解读书',
-    milestone: 'M5',
+    action: 'ai',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8L12 3Z" />
@@ -179,6 +180,7 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
   const toastTimerRef = useRef<number>(0);
   const [toast, setToast] = useState<string | null>(null);
   const recentBook = useRecentBook();
+  const aiConfigured = useAiConfigured();
 
   const showToast = (message: string) => {
     setToast(message);
@@ -198,6 +200,23 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
     if (feature.action === 'recent') {
       if (recentBook) onOpenBook(recentBook.id);
       else showToast('还没有在读的书，先导入一本吧');
+      return;
+    }
+    // AI 解读书：未配置密钥先去「我的」页填写；已配置则打开最近的书并提示入口
+    if (feature.action === 'ai') {
+      if (!aiConfigured) {
+        onNavigateTab('profile');
+        window.setTimeout(() => {
+          document.getElementById('ai-settings')?.scrollIntoView({ behavior: 'smooth' });
+        }, 120);
+        return;
+      }
+      if (recentBook) {
+        onOpenBook(recentBook.id);
+        showToast('打开书籍后，点底部「AI」按钮开始解读');
+        return;
+      }
+      showToast('还没有书，先导入一本吧');
       return;
     }
     // 统计/日历在"我的"页：先切 Tab，再滚动到对应卡片（等视图渲染后定位）
