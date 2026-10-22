@@ -1,0 +1,95 @@
+{
+  "version": 1,
+  "books": [
+    {
+      "file": "hongloumeng.txt",
+      "title": "红楼梦",
+      "author": "曹雪芹 / 高鹗",
+      "dynasty": "清",
+      "chars": 866902,
+      "chapters": 121,
+      "fingerprint": "39f46115520e5b19d3a61"
+    },
+    {
+      "file": "sanguoyanyi.txt",
+      "title": "三国演义",
+      "author": "罗贯中",
+      "dynasty": "元末明初",
+      "chars": 607006,
+      "chapters": 119,
+      "fingerprint": "125643088051d144943a2"
+    },
+    {
+      "file": "xiyouji.txt",
+      "title": "西游记",
+      "author": "吴承恩",
+      "dynasty": "明",
+      "chars": 740208,
+      "chapters": 99,
+      "fingerprint": "3684fdb252ce30e6b4bca"
+    },
+    {
+      "file": "shuihuzhuan.txt",
+      "title": "水浒传",
+      "author": "施耐庵",
+      "dynasty": "元末明初",
+      "chars": 857328,
+      "chapters": 120,
+      "fingerprint": "add50eccfed40fe8d14f6"
+    },
+    {
+      "file": "daodejing.txt",
+      "title": "道德经",
+      "author": "老子",
+      "dynasty": "先秦",
+      "chars": 7545,
+      "chapters": 81,
+      "fingerprint": "e8b3e8ac5a537a181d7a"
+    },
+    {
+      "file": "lunyu.txt",
+      "title": "论语",
+      "author": "孔子及弟子",
+      "dynasty": "先秦",
+      "chars": 22665,
+      "chapters": 0,
+      "fingerprint": "a2fd66b4f6f8c150588f"
+    },
+    {
+      "file": "shishuoxinyu.txt",
+      "title": "世说新语",
+      "author": "刘义庆",
+      "dynasty": "南朝宋",
+      "chars": 84850,
+      "chapters": 0,
+      "fingerprint": "e086829fde8d4eeb14b8c"
+    },
+    {
+      "file": "tangshi300.txt",
+      "title": "唐诗三百首",
+      "author": "孙洙（蘅塘退士） 编",
+      "dynasty": "清",
+      "chars": 30088,
+      "chapters": 0,
+      "fingerprint": "028f444123d4668d758c"
+    },
+    {
+      "file": "songci300.txt",
+      "title": "宋词三百首",
+      "author": "朱祖谋 编",
+      "dynasty": "清末",
+      "chars": 37082,
+      "chapters": 0,
+      "fingerprint": "fd32d80c6df985e090e6"
+    },
+    {
+      "file": "aqzhengzhuan.txt",
+      "title": "阿Q正传",
+      "author": "鲁迅",
+      "dynasty": "民国",
+      "chars": 22939,
+      "chapters": 9,
+      "fingerprint": "5ab0dbd75bab47e3599b"
+    }
+  ]
+}

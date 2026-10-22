@@ -127,6 +127,31 @@ export async function importBinaryFile(
   return book;
 }
 
+/** 内置公版书领取（M7）：与导入完全同一数据链路——内容指纹即 id，已领取过直接返回既有书。
+ * source 标为 builtin：数据备份不导出其内容（可随时从书库重新领取），书架行为与导入书一致。 */
+export async function addBuiltinBook(input: { title: string; text: string }): Promise<Book> {
+  const id = hashText(input.text);
+  const existing = await getBook(id);
+  if (existing) return existing;
+
+  const book: Book = {
+    id,
+    title: input.title,
+    format: 'txt',
+    size: input.text.length,
+    status: 'want',
+    addedAt: Date.now(),
+    lastReadAt: 0,
+    progress: 0,
+    chapterIndex: 0,
+    scrollRatio: 0,
+    source: 'builtin',
+  };
+  await putContent({ id, kind: 'text', text: input.text });
+  await putBook(book);
+  return book;
+}
+
 export async function loadBooks(): Promise<Book[]> {
   const books = await getAllBooks();
   return books.sort(

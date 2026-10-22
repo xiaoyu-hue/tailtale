@@ -6,6 +6,7 @@ export {
   refreshBooks,
   importFiles,
   deleteBookById,
+  claimBuiltin,
   changeStatus,
   reportProgress,
   markFinished,
@@ -17,3 +18,6 @@ export { STATUS_LABEL, nextStatus, FORMAT_LABEL } from './model';
 export { ImportZone } from './ui/ImportZone';
 export { ContinueReading } from './ui/ContinueReading';
 export { BookList } from './ui/BookList';
+export { LibrarySection } from './ui/LibrarySection';
+export { fetchLibraryManifest, claimBuiltinBook, LIBRARY_BASE_URL } from './library';
+export type { LibraryBook, LibraryManifest } from './library-model';

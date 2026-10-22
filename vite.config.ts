@@ -15,6 +15,13 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon-192.png', 'icon-512.png', 'icon-512-maskable.png'],
+      // 书库 txt（约 9.5MB）显式排除出 precache：领取后文本即落 IndexedDB，
+      // 无需 SW 再缓存一份；否则 SW 首次安装要拉全量书库，安装体积与耗时失控。
+      // 书单 library-manifest.json（约 2KB）仍随包，离线可见列表。
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        globIgnores: ['library-books/**'],
+      },
       manifest: {
         name: '书时 TailTale',
         short_name: '书时',

@@ -5,7 +5,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseBackupBundle, BACKUP_VERSION } from '../.test-dist/settings/model.js';
+import { parseBackupBundle, BACKUP_VERSION, isBuiltinBookRow, builtinBookIds, filterContentsForBackup, filterBooksForRestore } from '../.test-dist/settings/model.js';
 
 const sampleBundle = {
   app: 'tailtale',
@@ -63,4 +63,67 @@ test('正常备份包 → 成功并保留字段', () => {
     assert.deepEqual(result.bundle.stores, sampleBundle.stores);
     assert.deepEqual(result.bundle.localStorage, sampleBundle.localStorage);
   }
+});
+
+/* —— 内置公版书（M7）备份过滤 —— */
+
+test('isBuiltinBookRow：仅 source==="builtin" 为真，旧数据（无 source）不受影响', () => {
+  assert.equal(isBuiltinBookRow({ id: 'b1', source: 'builtin' }), true);
+  assert.equal(isBuiltinBookRow({ id: 'b1' }), false); // 旧版导入书无 source 字段
+  assert.equal(isBuiltinBookRow({ id: 'b1', source: 'import' }), false);
+  assert.equal(isBuiltinBookRow(null), false);
+  assert.equal(isBuiltinBookRow('b1'), false);
+});
+
+test('builtinBookIds：混合行只收集内置书 id，跳过无 id / id 非字符串', () => {
+  const ids = builtinBookIds([
+    { id: 'fp1', source: 'builtin' },
+    { id: 'imp1' }, // 导入书，不收集
+    { source: 'builtin' }, // 无 id，跳过
+    { id: 99, source: 'builtin' }, // id 非字符串，跳过
+    { id: 'fp2', source: 'builtin' },
+  ]);
+  assert.deepEqual([...ids].sort(), ['fp1', 'fp2']);
+});
+
+test('filterContentsForBackup：剔除内置书内容，导入书内容全保留', () => {
+  const contents = [
+    { id: 'fp1', text: '红楼梦全文' },
+    { id: 'imp1', text: '我自己导入的书' },
+    { id: 'imp2', text: '另一本导入书' },
+  ];
+  const kept = filterContentsForBackup(contents, new Set(['fp1']));
+  assert.deepEqual(kept, [
+    { id: 'imp1', text: '我自己导入的书' },
+    { id: 'imp2', text: '另一本导入书' },
+  ]);
+});
+
+test('filterBooksForRestore：剔除内置书行，导入书行全保留', () => {
+  const books = [
+    { id: 'fp1', title: '红楼梦', source: 'builtin' },
+    { id: 'imp1', title: '我的书' },
+    { id: 'imp2', title: '旧版书（无 source）' },
+  ];
+  const kept = filterBooksForRestore(books);
+  assert.deepEqual(kept, [
+    { id: 'imp1', title: '我的书' },
+    { id: 'imp2', title: '旧版书（无 source）' },
+  ]);
+});
+
+test('内置书不在备份中的闭环：备份体积与内容解耦，恢复后可重新领取', () => {
+  // 模拟一次完整导出：books 含 1 内置 + 2 导入；contents 仅导入书内容
+  const bookRows = [
+    { id: 'fp1', source: 'builtin' },
+    { id: 'imp1' },
+    { id: 'imp2' },
+  ];
+  const builtinIds = builtinBookIds(bookRows);
+  assert.equal(builtinIds.size, 1);
+  const contentRows = [{ id: 'imp1', text: '…' }, { id: 'imp2', text: '…' }];
+  const backupContents = filterContentsForBackup(contentRows, builtinIds);
+  assert.equal(backupContents.length, 2); // 备份里没有内置书内容
+  const restoredBooks = filterBooksForRestore(bookRows);
+  assert.equal(restoredBooks.length, 2); // 恢复后内置书行被跳过
 });

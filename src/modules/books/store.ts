@@ -2,6 +2,8 @@ import { emit } from '../../platform/events';
 import { createStore, useStore } from '../../platform/store';
 import type { Book, BookStatus } from './model';
 import { formatFromFilename, importBinaryFile, importTxtFile, loadBooks, removeBook, saveProgress, setBookStatus } from './service';
+import { claimBuiltinBook } from './library';
+import type { LibraryBook } from './library-model';
 
 interface BooksState {
   books: Book[];
@@ -86,6 +88,19 @@ export async function importFiles(
 export async function deleteBookById(book: Book): Promise<void> {
   await removeBook(book.id);
   store.setState((s) => ({ ...s, books: s.books.filter((b) => b.id !== book.id) }));
+}
+
+/**
+ * 领取一本内置公版书：读取 → 指纹校验 → 落库（library.ts）→ 增量同步 store。
+ * 落库不同步 store 的话，useBooks 拿不到新书，「已领取」判据与书架列表都不更新——
+ * 本 action 是领取链路在 UI 层生效的必要一环。重复领取时 service 直接返回既有书，
+ * 此时 store 去重后不重复追加。
+ */
+export async function claimBuiltin(entry: LibraryBook): Promise<void> {
+  const book = await claimBuiltinBook(entry);
+  store.setState((s) =>
+    s.books.some((b) => b.id === book.id) ? s : { ...s, books: [...s.books, book] }
+  );
 }
 
 /**

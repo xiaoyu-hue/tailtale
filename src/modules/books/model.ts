@@ -27,6 +27,8 @@ export interface Book {
   scrollRatio: number;
   /** EPUB 专用：上次阅读位置的 CFI（epub.js rendition location.start.cfi），用于精确续读 */
   cfi?: string;
+  /** 来源：import = 用户本地导入；builtin = 内置公版书库领取。旧数据无此字段按 import 处理 */
+  source?: 'import' | 'builtin';
 }
 
 /**

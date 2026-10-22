@@ -2318,3 +2318,39 @@ button {
     transform: none;
   }
 }
+
+/* ========== 精选书库（M7 内置公版书） ========== */
+/* 复用 .card/.book-row/.chip/.btn 既有视觉；本节只补板块自身间距与布局。
+   像素皮肤对上述组件类的直角描边覆盖自动生效，无需在本节重复适配。 */
+
+.library-section {
+  /* 锚点滚动定位时与顶部留缝，避免标题贴边 */
+  scroll-margin-top: 12px;
+}
+
+.library-intro {
+  margin: -2px 0 12px;
+}
+
+/* 「还想找更多？」与上方书籍列表拉开距离，形成视觉分组 */
+.library-sources-title {
+  margin-top: 28px;
+}
+
+.library-sources-note {
+  margin: 0 0 12px;
+}
+
+/* 外链竖排：四个书源一字铺开，避免窄屏横向挤压导致换行错乱 */
+.library-source-row {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+}
+
+/* 外链是 <a class="btn">：文字左对齐，站名与备注允许两行折行 */
+.library-source-row .btn {
+  text-align: left;
+  white-space: normal;
+  line-height: 1.6;
+}

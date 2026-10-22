@@ -69,6 +69,40 @@ export function isUiSkin(value: unknown): value is UiSkin {
 /** 备份包格式版本（与代码解耦，便于将来兼容旧备份）。 */
 export const BACKUP_VERSION = 1;
 
+/** 内置公版书（source=builtin）的备份策略（M7）：书籍元数据可随备份迁移，
+ * 但内容不导出——内置书随时可从书库重新领取，导出全文只会让备份无谓膨胀。 */
+
+/** 判断一行是否为内置书（books store 的行）。 */
+export function isBuiltinBookRow(row: unknown): boolean {
+  if (typeof row !== 'object' || row === null) return false;
+  return (row as { source?: unknown }).source === 'builtin';
+}
+
+/** 从 books 行数组收集内置书 id 集合。 */
+export function builtinBookIds(rows: unknown[]): Set<string> {
+  const ids = new Set<string>();
+  for (const row of rows) {
+    if (!isBuiltinBookRow(row)) continue;
+    const id = (row as { id?: unknown }).id;
+    if (typeof id === 'string') ids.add(id);
+  }
+  return ids;
+}
+
+/** 过滤 contents 行：剔除内置书内容（保留导入书内容）。 */
+export function filterContentsForBackup(rows: unknown[], builtinIds: Set<string>): unknown[] {
+  return rows.filter((row) => {
+    const id = (row as { id?: unknown } | null)?.id;
+    return !(typeof id === 'string' && builtinIds.has(id));
+  });
+}
+
+/** 过滤 books 行：恢复时跳过内置书（其内容不在备份中，恢复出来也是点不开的书，
+ * 换设备后按需重新领取即可）。 */
+export function filterBooksForRestore(rows: unknown[]): unknown[] {
+  return rows.filter((row) => !isBuiltinBookRow(row));
+}
+
 /** 备份包：全量本地数据快照，供换设备 / 清缓存恢复。 */
 export interface BackupBundle {
   /** 来源标识，防止误导入别的应用的 JSON */

@@ -2,8 +2,11 @@ import {
   BACKUP_VERSION,
   DEFAULT_FONT_SIZE_INDEX,
   FONT_SIZES,
+  builtinBookIds,
   clampFontSizeIndex,
   defaultSettings,
+  filterBooksForRestore,
+  filterContentsForBackup,
   isThemeChoice,
   isUiSkin,
   parseBackupBundle,
@@ -78,10 +81,21 @@ export function saveSettings(settings: Settings): void {
 /** 收集全量本地数据，组装为备份包。 */
 export async function collectBackup(): Promise<BackupBundle> {
   const stores: Record<string, unknown[]> = {};
+  // 内置书（source=builtin）内容不进备份：可随时从书库重新领取（M7 策略）。
+  // books 在 BACKUP_STORES 中位于 contents 之前，先读到 books 即可拿到内置书 id 集合。
+  let builtinIds: Set<string> = new Set();
   for (const name of BACKUP_STORES) {
     try {
       const rows = await run<unknown[]>(name, 'readonly', (s) => s.getAll());
-      stores[name] = rows ?? [];
+      const all = rows ?? [];
+      if (name === STORE_BOOKS) {
+        builtinIds = builtinBookIds(all);
+        stores[name] = all;
+      } else if (name === STORE_CONTENTS) {
+        stores[name] = filterContentsForBackup(all, builtinIds);
+      } else {
+        stores[name] = all;
+      }
     } catch (error) {
       console.error(`读取 store ${name} 失败`, error);
       stores[name] = [];
@@ -110,12 +124,14 @@ export async function restoreBackup(bundle: BackupBundle): Promise<void> {
   for (const name of BACKUP_STORES) {
     const rows = bundle.stores[name];
     if (!Array.isArray(rows)) continue;
+    // 内置书不恢复：内容不在备份中，恢复后按需重新领取（M7 策略）
+    const target = name === STORE_BOOKS ? filterBooksForRestore(rows) : rows;
     try {
       await run(name, 'readwrite', (s) => {
         const req = s.clear();
-        for (const row of rows) s.put(row as never);
+        for (const row of target) s.put(row as never);
         // 返回最后一个 put 的 request 供 run 等待（clear 后所有 put 在同一事务内排队）
-        return rows.length > 0 ? (s.put(rows[rows.length - 1] as never) as IDBRequest) : req;
+        return target.length > 0 ? (s.put(target[target.length - 1] as never) as IDBRequest) : req;
       });
     } catch (error) {
       console.error(`恢复 store ${name} 失败`, error);

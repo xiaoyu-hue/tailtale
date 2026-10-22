@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { JSX } from 'react';
 import type { TabKey } from '../../shared/ui/BottomNav';
-import { ImportZone, ContinueReading, BookList, useRecentBook } from '../../modules/books';
+import { ImportZone, ContinueReading, BookList, LibrarySection, useRecentBook } from '../../modules/books';
 import { TodayCard } from '../../modules/gamification';
 import { useAiConfigured } from '../../modules/ai';
 import { greetingForHour } from '../../shared/dates';
@@ -25,7 +25,7 @@ interface Feature {
   icon: JSX.Element;
   /** 里程碑编号，缺省表示已可用 */
   milestone?: string;
-  action?: 'recent' | 'profile' | 'stats' | 'calendar' | 'pet' | 'shop' | 'ai' | 'backup' | 'skin';
+  action?: 'recent' | 'profile' | 'stats' | 'calendar' | 'pet' | 'shop' | 'ai' | 'backup' | 'skin' | 'library';
 }
 
 /** 落在「我的」页的功能 → 目标卡片 id（点击先切 Tab，再平滑滚动定位）。 */
@@ -111,7 +111,7 @@ const FEATURES: Feature[] = [
   },
   {
     label: '公版书库',
-    milestone: 'M7',
+    action: 'library',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
         <path d="M4 20h16M6 20V9l6-5 6 5v11M9 20v-6h6v6" />
@@ -245,6 +245,11 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
       document.getElementById('bookshelf')?.scrollIntoView({ behavior: 'smooth' });
       return;
     }
+    // 公版书库：首页常驻板块，滚动定位（与「书架」同模式）
+    if (feature.action === 'library') {
+      document.getElementById('library')?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
     showToast(`「${feature.label}」规划中（${feature.milestone} 上线），敬请期待`);
   };
 
@@ -279,6 +284,7 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
       </div>
 
       <BookList onOpenBook={onOpenBook} onToast={showToast} />
+      <LibrarySection onOpenBook={onOpenBook} onToast={showToast} />
 
       {toast && <div className="toast">{toast}</div>}
     </>
