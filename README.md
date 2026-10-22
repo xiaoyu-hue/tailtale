@@ -1,6 +1,6 @@
 # 书时 TailTale
 
-[![Version](https://img.shields.io/badge/version-v1.8.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.8.0)
+[![Version](https://img.shields.io/badge/version-v1.9.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.9.0)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](docs/LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.8.0 · 安全加固、无障碍与质量门禁**）
+- 当前部署内容为 `main` 分支最新构建（**v1.9.0 · 内置公版书库上线**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -254,7 +254,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 
 ## 版本与发布
 
-- **当前版本：v1.8.0**（2026-10-22 发布，全维度代码审查修复：安全加固——新增 CI 质量门禁与 CSP 响应头、备份导出前明文密钥警示、恢复备份白名单校验；无障碍——全局键盘焦点圈与浅色对比度达 WCAG AA；功能——经济核心补单测、减少动画开关实时生效、商店文案对齐、大文件导入异步进度、读完发币仅在持久化成功后触发；文档同步——CHANGELOG 指纹算法更正、技术栈文档 CI 描述对齐、README 补 pet 模块等）；v1.7.0 及更早版本演进见 [CHANGELOG](CHANGELOG.md)
+- **当前版本：v1.9.0**（2026-10-23 发布，M7 内置公版书库上线：首页常驻「精选书库」板块，首批 10 本全中文公有领域名著——四大名著、道德经、论语、世说新语、唐诗三百首、宋词三百首、阿Q正传，逐本按著作权保护期核算（溯源见 docs/书时-内置书库版权核查.md）；领取的书与导入的书完全同权（阅读/计时/金币/进度记忆）；书籍文本随应用同源分发、领取时指纹校验、内置书内容不随备份导出；另新增 manifest 形状校验与备份过滤单测，CHANGELOG 记录实施期三项决策偏差——分发方式由 GitHub raw 改为同源、校验算法统一为 hashText、清洗增加繁→简）；v1.8.0 及更早版本演进见 [CHANGELOG](CHANGELOG.md)
 - [Releases](https://github.com/xiaoyu-hue/tailtale/releases) · [CHANGELOG](CHANGELOG.md)
 - 版本号规则与发版流程：[docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
   - 主版本号（X.0.0）= 架构级变更；次版本号（1.X.0）= 新功能上线；修订号（1.1.X）= 优化、修复、文档同步
