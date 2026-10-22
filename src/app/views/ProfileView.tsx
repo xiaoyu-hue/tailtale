@@ -163,7 +163,7 @@ export default function Profile() {
       </div>
 
       <p className="muted" style={{ textAlign: 'center', marginTop: 20 }}>
-        书时 TailTale v{__APP_VERSION__} · 微交互与实时时间
+        书时 TailTale v{__APP_VERSION__}
       </p>
     </>
   );
