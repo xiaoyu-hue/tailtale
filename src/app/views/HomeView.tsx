@@ -4,6 +4,8 @@ import type { TabKey } from '../../shared/ui/BottomNav';
 import { ImportZone, ContinueReading, BookList, useRecentBook } from '../../modules/books';
 import { TodayCard } from '../../modules/gamification';
 import { useAiConfigured } from '../../modules/ai';
+import { greetingForHour } from '../../shared/dates';
+import { useTicker } from '../../shared/hooks/useTicker';
 import {
   CatStage,
   MOOD_LABELS,
@@ -189,6 +191,9 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
   const [toast, setToast] = useState<string | null>(null);
   const recentBook = useRecentBook();
   const aiConfigured = useAiConfigured();
+  // 分钟级刷新即可覆盖时段（问候语按小时切换），无需秒级
+  const now = useTicker(30_000);
+  const greeting = greetingForHour(new Date(now).getHours());
 
   const showToast = (message: string) => {
     setToast(message);
@@ -245,7 +250,12 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
 
   return (
     <>
-      <h1 className="page-title">书架</h1>
+      <h1 className="page-title">
+        书架
+        <span className="greeting" key={greeting}>
+          {greeting}
+        </span>
+      </h1>
 
       <ImportZone onToast={showToast} />
       <ContinueReading onOpenBook={onOpenBook} />

@@ -262,6 +262,7 @@ button {
 }
 
 .topbar-coins {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -273,11 +274,17 @@ button {
 
 /* ========== 页面容器 ========== */
 .page {
+  position: relative;
+  z-index: 1; /* 内容层高于 .ambient 氛围背景（定位元素默认绘制在普通流之上） */
   flex: 1;
   padding: 16px 16px calc(var(--nav-h) + env(safe-area-inset-bottom, 0px) + 20px);
 }
 
 .page-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
   font-size: 20px;
   font-weight: 700;
   margin: 4px 0 14px;
@@ -407,6 +414,55 @@ button {
   box-shadow: var(--shadow);
 }
 
+/* 设置：减少动画开关（v1.7.0） */
+.settings-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 46px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-soft);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.switch.on {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.switch.on .switch-knob {
+  transform: translateX(20px);
+}
+
+/* 像素皮肤：开关改直角硬边 */
+:root[data-skin='pixel'] .switch,
+:root[data-skin='pixel'] .switch-knob {
+  border-radius: 0;
+}
+
 /* ========== 我的页：阅读统计 ========== */
 .stats-grid {
   display: grid;
@@ -520,6 +576,8 @@ button {
 
 /* ========== 按钮 ========== */
 .btn {
+  position: relative;
+  overflow: hidden;
   border: none;
   border-radius: 12px;
   padding: 9px 16px;
@@ -527,11 +585,11 @@ button {
   font-weight: 600;
   background: var(--surface-soft);
   color: var(--text);
-  transition: transform 0.05s ease, opacity 0.15s ease;
+  transition: transform 0.14s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
 }
 
 .btn:active {
-  transform: scale(0.97);
+  transform: scale(0.94);
 }
 
 .btn:disabled {
@@ -683,6 +741,7 @@ button {
 
 .feature-cell {
   position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -694,10 +753,21 @@ button {
   font-size: 12px;
   color: var(--text);
   text-align: center;
+  transition: transform 0.16s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* 悬浮微抬仅限指针设备（移动端无 hover 概念，避免点击后状态卡住） */
+@media (hover: hover) {
+  .feature-cell:not(:disabled):hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-float);
+  }
 }
 
 .feature-cell:not(:disabled):active {
-  transform: scale(0.96);
+  transform: scale(0.94);
 }
 
 .feature-cell.planned {
@@ -1867,4 +1937,351 @@ button {
 .update-check-message {
   font-size: 13px;
   color: var(--text-secondary);
+}
+
+/* ========== 微交互与实时时间（v1.7.0） ========== */
+/* 设计原则：全部动画克制在 0.1~0.6s；统一尊重 prefers-reduced-motion（文末总开关）；
+   颜色全部走既有设计变量，天然兼容三主题 × 三皮肤 × 深浅色。 */
+
+/* —— 氛围背景：三团柔和光斑缓慢漂移（装饰层，不拦截指针） —— */
+.ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ambient-dot {
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--primary) 11%, transparent) 0%,
+    transparent 70%
+  );
+  animation: ambient-drift 26s ease-in-out infinite alternate;
+}
+
+.ambient-dot:nth-child(1) {
+  top: -50px;
+  left: -70px;
+}
+
+.ambient-dot:nth-child(2) {
+  top: 26%;
+  right: -90px;
+  width: 230px;
+  height: 230px;
+  animation-duration: 33s;
+  animation-delay: -9s;
+}
+
+.ambient-dot:nth-child(3) {
+  bottom: 6%;
+  left: 8%;
+  width: 210px;
+  height: 210px;
+  animation-duration: 40s;
+  animation-delay: -18s;
+}
+
+@keyframes ambient-drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(26px, 34px) scale(1.12);
+  }
+}
+
+/* 像素皮肤气质硬朗，不使用柔光氛围 */
+:root[data-skin='pixel'] .ambient {
+  display: none;
+}
+
+/* —— 点击涟漪（JS 委托注入 .ripple，见 shared/interactions.ts） —— */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.2;
+  pointer-events: none;
+  animation: ripple-out 0.55s ease-out forwards;
+}
+
+@keyframes ripple-out {
+  from {
+    transform: scale(0);
+    opacity: 0.2;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+/* 像素皮肤：涟漪改为方形，保持硬边语言 */
+:root[data-skin='pixel'] .ripple {
+  border-radius: 0;
+}
+
+/* —— 卡片进场：切 Tab 时子元素错落淡入（.page 重挂载即播放） —— */
+.page > * {
+  animation: card-in 0.4s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.page > *:nth-child(2) {
+  animation-delay: 0.04s;
+}
+.page > *:nth-child(3) {
+  animation-delay: 0.08s;
+}
+.page > *:nth-child(4) {
+  animation-delay: 0.12s;
+}
+.page > *:nth-child(5) {
+  animation-delay: 0.16s;
+}
+.page > *:nth-child(6) {
+  animation-delay: 0.2s;
+}
+.page > *:nth-child(7) {
+  animation-delay: 0.24s;
+}
+.page > *:nth-child(n + 8) {
+  animation-delay: 0.28s;
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* —— 底部导航：图标弹跳 + 活动指示条 —— */
+.nav-item {
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 18px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--primary);
+  transform: translateX(-50%) scaleX(0);
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.nav-item.active::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.nav-item.active svg {
+  animation: nav-pop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes nav-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.26) translateY(-2px);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 像素皮肤：指示条改直角 */
+:root[data-skin='pixel'] .nav-item::after {
+  border-radius: 0;
+  height: 4px;
+}
+
+/* —— 顶栏实时时钟：秒位轻跳 + 冒号呼吸闪烁 —— */
+.topbar-clock {
+  font-variant-numeric: tabular-nums;
+}
+
+.topbar-seconds {
+  display: inline-block;
+  min-width: 2ch;
+  animation: sec-tick 0.35s ease-out;
+}
+
+.topbar-colon {
+  animation: colon-blink 1s steps(1, end) infinite;
+}
+
+@keyframes sec-tick {
+  from {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes colon-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0.25;
+  }
+}
+
+/* —— 金币飘字：余额变化时从金币处上浮 —— */
+.coin-float {
+  position: absolute;
+  left: 50%;
+  top: -4px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: coin-float-up 0.9s ease-out forwards;
+}
+
+.coin-float.is-up {
+  color: var(--primary-strong);
+}
+
+.coin-float.is-down {
+  color: var(--danger);
+}
+
+@keyframes coin-float-up {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 4px);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+}
+
+/* —— 首页问候语：随时段切换，key 变化重挂载即淡入 —— */
+.greeting {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  animation: greeting-in 0.5s ease both;
+}
+
+@keyframes greeting-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* —— 今日分钟数：数值变化时轻弹（key={minutes} 触发） —— */
+.today-card-number {
+  display: inline-block;
+  animation: num-bump 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes num-bump {
+  0% {
+    transform: scale(1.22);
+    color: var(--primary-strong);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* —— 宠物舞台：地面投影随待机呼吸 —— */
+.cat-stage::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 96px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    color-mix(in srgb, var(--text) 13%, transparent) 0%,
+    transparent 70%
+  );
+  animation: ground-breathe 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.cat-stage--sm::after {
+  width: 52px;
+  height: 8px;
+}
+
+@keyframes ground-breathe {
+  0%,
+  100% {
+    transform: translateX(-50%) scaleX(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateX(-50%) scaleX(0.86);
+    opacity: 0.6;
+  }
+}
+
+/* 首页宠物预览条内投影过挤，隐藏（大图舞台才显示） */
+.pet-strip .cat-stage::after {
+  display: none;
+}
+
+/* —— 动画总开关：用户设置（<html data-reduce-motion="on">）或系统偏好任一开启，全局静止 —— */
+/* 通配 kill 覆盖本章与既有全部动画/过渡（涟漪、进场、导航、时钟、飘字、投影、Zzz、
+   .btn 回弹、抽屉滑入、toast 等）；!important 压过各类组件自身声明。 */
+:root[data-reduce-motion='on'] *,
+:root[data-reduce-motion='on'] *::before,
+:root[data-reduce-motion='on'] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* 保留作者既有意图：减少动态时链接卡无按压位移 */
+:root[data-reduce-motion='on'] .repo-link:active {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .repo-link:active {
+    transform: none;
+  }
 }

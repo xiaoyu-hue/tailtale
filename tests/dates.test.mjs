@@ -7,7 +7,13 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { formatDateLabel, formatKey, shiftDay, todayKey } from '../.test-dist/shared/dates.js';
+import {
+  formatDateLabel,
+  formatKey,
+  greetingForHour,
+  shiftDay,
+  todayKey,
+} from '../.test-dist/shared/dates.js';
 
 test('formatDateLabel：2026-10-22 输出 2026年10月22日 周四', () => {
   // 2026-10-22 是周四（本地时区构造，避免 UTC 偏移）
@@ -38,4 +44,20 @@ test('shiftDay：跨年与闰日边界', () => {
   assert.equal(shiftDay('2026-01-01', -1), '2025-12-31');
   assert.equal(shiftDay('2024-02-28', 1), '2024-02-29'); // 闰年
   assert.equal(shiftDay('2026-02-28', 1), '2026-03-01'); // 平年
+});
+
+test('greetingForHour：六个时段全覆盖且边界正确', () => {
+  assert.equal(greetingForHour(0), '夜深了');
+  assert.equal(greetingForHour(4), '夜深了');
+  assert.equal(greetingForHour(5), '早上好');
+  assert.equal(greetingForHour(7), '早上好');
+  assert.equal(greetingForHour(8), '上午好');
+  assert.equal(greetingForHour(10), '上午好');
+  assert.equal(greetingForHour(11), '中午好');
+  assert.equal(greetingForHour(12), '中午好');
+  assert.equal(greetingForHour(13), '下午好');
+  assert.equal(greetingForHour(17), '下午好');
+  assert.equal(greetingForHour(18), '晚上好');
+  assert.equal(greetingForHour(22), '晚上好');
+  assert.equal(greetingForHour(23), '夜深了');
 });

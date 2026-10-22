@@ -1,13 +1,23 @@
 import { FONT_SIZES, THEME_CHOICES, THEME_SKINS } from '../model';
-import { setFontSizeIndex, setSkin, setTheme, useFontSizeIndex, useSkin, useTheme } from '../store';
+import {
+  setFontSizeIndex,
+  setReduceMotion,
+  setSkin,
+  setTheme,
+  useFontSizeIndex,
+  useReduceMotion,
+  useSkin,
+  useTheme,
+} from '../store';
 
 const FONT_LABELS = ['小', '标准', '大', '特大'];
 
-/** 设置面板：正文字号 + 主题 + 界面皮肤（我的页入口，全站生效）。 */
+/** 设置面板：正文字号 + 主题 + 界面皮肤 + 减少动画（我的页入口，全站生效）。 */
 export function SettingsPanel() {
   const fontSizeIndex = useFontSizeIndex();
   const theme = useTheme();
   const skin = useSkin();
+  const reduceMotion = useReduceMotion();
 
   return (
     <section className="card settings-panel" id="settings">
@@ -62,6 +72,23 @@ export function SettingsPanel() {
             </button>
           ))}
         </div>
+      </div>
+
+      <div className="settings-row">
+        <span className="settings-label">
+          减少动画
+          <span className="settings-hint">关闭界面动画与过渡效果</span>
+        </span>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={reduceMotion}
+          aria-label="减少动画"
+          className={`switch${reduceMotion ? ' on' : ''}`}
+          onClick={() => setReduceMotion(!reduceMotion)}
+        >
+          <span className="switch-knob" />
+        </button>
       </div>
     </section>
   );

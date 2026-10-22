@@ -54,8 +54,9 @@ export function CatStage({ pet, variant = 'lg' }: CatStageProps) {
     canvas.height = CAT_SIZE * scale;
 
     const reduceMotion =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      document.documentElement.dataset.reduceMotion === 'on' || // 用户设置（设置页开关）
+      (typeof window.matchMedia === 'function' &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches); // 系统偏好
     const timing = MOOD_TIMING[mood];
     let raf = 0;
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import TopBar from '../shared/ui/TopBar';
 import BottomNav, { type TabKey } from '../shared/ui/BottomNav';
+import { installRipple } from '../shared/interactions';
 import { refreshBooks, useBooks } from '../modules/books';
 import { refreshGamification, useCoins } from '../modules/gamification';
 import { refreshPet } from '../modules/pet';
@@ -35,6 +36,7 @@ export default function App() {
     void refreshBooks();
     void refreshGamification();
     void refreshPet();
+    return installRipple(); // 全局点击涟漪（事件委托，卸载时解绑）
   }, []);
 
   const currentBook =
@@ -54,6 +56,12 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      {/* 氛围背景层：纯装饰，pointer-events:none，位于内容之下 */}
+      <div className="ambient" aria-hidden="true">
+        <span className="ambient-dot" />
+        <span className="ambient-dot" />
+        <span className="ambient-dot" />
+      </div>
       <TopBar coins={coins} />
       <main className="page">
         {route.name === 'home' && (

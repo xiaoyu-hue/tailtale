@@ -3,6 +3,36 @@
 本文件遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 规范，版本号规则见 [docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)。
 本文件随源代码采用 [Apache-2.0](LICENSE) 许可；docs/ 目录下的文档采用 CC BY-NC 4.0。
 
+## [未发布]
+
+## [1.7.0] - 2026-10-22
+
+### 新增
+
+- **实时时间（v1.7.0 打磨）**：顶栏时钟由 30 秒刷新升级为**秒级实时**——秒位变化时轻跳、冒号每秒呼吸闪烁；日期随秒级 tick 自然跨天切换，无需额外逻辑
+- **时段问候语**：首页标题行右侧随时段切换（夜深了 / 早上好 / 上午好 / 中午好 / 下午好 / 晚上好），切换时淡入；纯函数 `greetingForHour(hour)` 置于 `shared/dates.ts`（可单测），由分钟级 ticker 驱动
+- **全局点击涟漪**：`.btn` / `.feature-cell` / `.segmented-item` / `.icon-btn` 按下位置注入水波纹。实现为 `document` 级 pointerdown 事件委托（`src/shared/interactions.ts`），不逐组件改代码即覆盖现有与未来的按钮类元素；禁用态（disabled / aria-disabled）不响应
+- **金币飘字**：顶栏金币余额变化时飘出 `+N` / `-N`（购入零食扣费亦可感知），0.9s 上浮淡出后自动清除
+- **氛围背景层**：`app-shell` 内新增纯装饰光斑层（`.ambient`，三团径向渐变色斑 26~40s 缓慢漂移），`pointer-events: none` 且绘制于内容层之下；像素皮肤自动隐藏（气质不符）
+- **动画总开关（v1.7.0 打磨）**：「我的 → 设置」新增「减少动画」开关——开启后全局关闭动画与过渡（等效系统「减少动态效果」），照顾对动效敏感或低性能设备用户；落 `<html data-reduce-motion>`，与 `prefers-reduced-motion` 媒体查询并列生效，持久化随数据备份
+
+### 变更
+
+- **按钮与功能格按压反馈**：`.btn` / `.feature-cell` 按压由 scale(0.96~0.97) 加深为 scale(0.94)，回弹曲线改为 `cubic-bezier(0.34, 1.56, 0.64, 1)`（弹性收敛）；功能格在指针设备上新增悬浮微抬（translateY(-2px) + 描边高亮），移动端无 hover 不受影响
+- **底部导航**：活动图标弹跳一次（nav-pop）+ 底部小指示条弹性展开；指示条随 active 状态滑动切换
+- **卡片进场**：切换 Tab 时 `.page` 子元素错落淡入（stagger 40ms/项，0.4s 收敛），利用条件渲染重挂载自然触发，零 JS
+- **宠物舞台**：猫脚下新增椭圆地面投影，随待机呼吸同步缩放（2.6s 循环）；首页宠物预览条内投影隐藏（空间局促）
+- **今日分钟数**：数值变化时数字轻弹一次（scale 1.22 → 1，回弹曲线），阅读计时增长可感知
+
+### 技术内部
+
+- 新增 `src/shared/interactions.ts`（零依赖，符合 shared 层规则）：`installRipple(root)` 挂载/卸载事件委托；涟漪尺寸取点击点至元素边缘覆盖全元素的直径，`animationend` + 800ms 兜底双清理防泄漏
+- `TopBar` 改用既有 `useTicker(1000)`（原自建 30s interval 删除，逻辑收敛）；秒 span 与金币飘字均以 key 变化驱动重挂载动画，动画结束回调清理状态
+- `shared/dates.ts` 新增 `greetingForHour` 纯函数；`tests/dates.test.mjs` 新增 1 项用例（六时段 13 个边界值），测试总数 72 → 73
+- 样式集中于 `styles.css` 末尾「微交互与实时时间（v1.7.0）」章节；`.page` 补 `position: relative; z-index: 1`——定位绘制的氛围层默认盖在普通流卡片之上，需显式抬升内容层
+- **全量尊重 `prefers-reduced-motion: reduce`**：文末统一媒体查询关闭本章全部动画（氛围漂移、卡片进场、导航弹跳、秒跳、闪烁、飘字、轻弹、投影呼吸、Zzz），并静态呈现终态，不留半透明残影；该降级路径经既有 `.repo-link` 规则延续，本次集中收口
+- **动画总开关技术内部**：设置模型新增 `reduceMotion` 字段（旧设置无此键 → 默认 false，向后兼容）；`<html data-reduce-motion>` 与系统媒体查询经通配选择器 `*` + `!important` 双重通道通杀全部动画/过渡（覆盖本章与既有 `.btn`/抽屉/toast 等），比原先仅覆盖 `.repo-link` 的降级更完整；JS 侧三处动画驱动同步尊重该开关——涟漪委托（`installRipple`）、像素猫 canvas 渲染循环（`CatStage`）、金币飘字（`TopBar`，关闭时不渲染，避免 `animationend` 不触发导致残留）；备份经 localStorage 全量快照自动覆盖，无需改备份格式
+
 ## [1.6.0] - 2026-10-22
 
 手动检查更新上线 + 版本号单点管理 + 首页日期格式升级。
@@ -33,8 +63,6 @@
 - **应用内「我的 → 开源致谢」**：改为分组展示（组件与资产 / 设计参考），补 Desktop-Pixel-Pet 与 Workbox 独立行，原「React / Vite / vite-plugin-pwa」合并行拆为 React / React DOM、Vite、@vitejs/plugin-react、vite-plugin-pwa、TypeScript 独立行
 - **docs/书时-开源组件与合规.md**：第 1 节同步拆行补全（文档版本 v1.6），并更正 NextChat 作者名拼写（ChatGPTNextweb → ChatGPTNextWeb）
 - THIRD_PARTY_NOTICES.md 此前已完整（含 pixel_cat.json 许可证原文），本次无需改动
-
-## [未发布]
 
 ## [1.5.1] - 2026-10-21
 

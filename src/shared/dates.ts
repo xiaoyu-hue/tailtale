@@ -20,6 +20,20 @@ export function formatDateLabel(date: Date): string {
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日 周${WEEKDAY_LABELS[date.getDay()]}`;
 }
 
+/**
+ * 时段问候语（首页标题行展示）：按小时划分，跨小时自然切换。
+ * 纯函数便于单测；调用方以 hour 为 key 驱动切换动画。
+ */
+export function greetingForHour(hour: number): string {
+  if (hour < 5) return '夜深了';
+  if (hour < 8) return '早上好';
+  if (hour < 11) return '上午好';
+  if (hour < 13) return '中午好';
+  if (hour < 18) return '下午好';
+  if (hour < 23) return '晚上好';
+  return '夜深了';
+}
+
 export function todayKey(now: Date = new Date()): string {
   return formatKey(now);
 }

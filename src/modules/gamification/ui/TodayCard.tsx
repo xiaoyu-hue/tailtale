@@ -43,7 +43,10 @@ export function TodayCard({ onToast }: TodayCardProps) {
     <section className="card today-card">
       <div className="today-card-main">
         <div className="today-card-minutes">
-          <span className="today-card-number">{minutes}</span>
+          {/* key={minutes}：数值变化时重挂载，播放 num-bump 轻弹动画 */}
+          <span key={minutes} className="today-card-number">
+            {minutes}
+          </span>
           <span className="today-card-unit">分钟</span>
         </div>
         <div className="today-card-meta">

@@ -45,6 +45,8 @@ export function loadSettings(): Settings {
         fontSizeIndex: clampFontSizeIndex(parsed.fontSizeIndex ?? DEFAULT_FONT_SIZE_INDEX),
         theme: isThemeChoice(parsed.theme) ? parsed.theme : defaultSettings().theme,
         skin: isUiSkin(parsed.skin) ? parsed.skin : defaultSettings().skin,
+        // v1.7.0 新增字段：旧设置无此键 → 默认 false（保持动画开启）
+        reduceMotion: parsed.reduceMotion === true,
       };
     }
     const base = defaultSettings();

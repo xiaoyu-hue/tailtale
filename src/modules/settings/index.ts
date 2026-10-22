@@ -1,5 +1,15 @@
-// settings 模块公开 API：全局偏好（正文字号、主题、界面皮肤、数据备份）
-export { useSettings, useFontSizeIndex, useTheme, useSkin, setFontSizeIndex, setTheme, setSkin } from './store';
+// settings 模块公开 API：全局偏好（正文字号、主题、界面皮肤、减少动画、数据备份）
+export {
+  useSettings,
+  useFontSizeIndex,
+  useTheme,
+  useSkin,
+  useReduceMotion,
+  setFontSizeIndex,
+  setTheme,
+  setSkin,
+  setReduceMotion,
+} from './store';
 export {
   FONT_SIZES,
   THEME_CHOICES,

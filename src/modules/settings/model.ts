@@ -37,10 +37,12 @@ export interface Settings {
   theme: ThemeChoice;
   /** 界面皮肤（M6 主题皮肤）；default = 不附加皮肤，沿用现有暖色主题 */
   skin: UiSkin;
+  /** 减少动画（v1.7.0 总开关）：true = 全局关闭动画与过渡，等效系统「减少动态效果」 */
+  reduceMotion: boolean;
 }
 
 export function defaultSettings(): Settings {
-  return { fontSizeIndex: DEFAULT_FONT_SIZE_INDEX, theme: 'auto', skin: 'default' };
+  return { fontSizeIndex: DEFAULT_FONT_SIZE_INDEX, theme: 'auto', skin: 'default', reduceMotion: false };
 }
 
 export function clampFontSizeIndex(index: number): number {
