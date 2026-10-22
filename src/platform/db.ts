@@ -60,7 +60,16 @@ function openDb(): Promise<IDBDatabase> {
           if (migration.version > oldVersion) migration.upgrade(db);
         }
       };
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => {
+        const db = request.result;
+        // 其他标签页触发版本升级时，浏览器会关闭本连接的旧版本库。
+        // 立即关闭并清空缓存，下次访问以新版本重新打开，避免复用已失效连接导致后续事务失败。
+        db.onversionchange = () => {
+          db.close();
+          dbPromise = null;
+        };
+        resolve(db);
+      };
       request.onerror = () => reject(request.error);
     });
   }

@@ -36,6 +36,18 @@ export function isAiConfigured(config: AiConfig): boolean {
   );
 }
 
+/**
+ * 端点是否安全可直连：https 一律允许；http 仅放行本地回环（localhost / 127.0.0.1），
+ * 便于本机调试。其他 http 端点会被浏览器混合内容策略拦截，且明文传输密钥不安全，
+ * 故在此提前拦截并给出明确错误，而非让浏览器抛难以理解的混合内容异常。
+ */
+export function isSecureEndpoint(baseUrl: string): boolean {
+  const url = baseUrl.trim();
+  if (!url) return false;
+  if (/^https:\/\//i.test(url)) return true;
+  return /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/?$/i.test(url);
+}
+
 // ---- token 估算 ----
 
 /** CJK 统一表意文字 + 中文标点 + 全角字符：BPE 下大体一字一 token。 */
@@ -282,6 +294,7 @@ export type AiErrorCode =
   | 'empty-response'
   | 'epub-extract-failed'
   | 'book-missing'
+  | 'config'
   | 'not-configured'
   | 'no-outline'
   | 'unknown';

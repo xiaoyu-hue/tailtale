@@ -1,0 +1,25 @@
+name: CI
+
+# 质量门禁：任何推送到 main 或新建 PR 都会跑「类型检查 → 测试 → 构建」。
+# 目的：在代码进入 main（从而触发 Cloudflare Pages 自动部署）前，先拦住
+# 类型错误、测试挂掉、构建失败的提交，避免带病上线。
+# 注意：本门禁提供「可见性」，真正阻止部署需将 Pages 改为「从 CI 构建产物发布」，
+# 那是 Cloudflare 侧配置，不在本仓库内。
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      - run: npm test
+      - run: npm run build

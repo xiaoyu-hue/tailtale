@@ -25,6 +25,8 @@ export function TodayCard({ onToast }: TodayCardProps) {
         onToast(`打卡成功 +${result.total} 金币，连续 ${result.streak} 天`);
       } else if (result.reason === 'already') {
         onToast('今天已经打过卡了');
+      } else if (result.reason === 'error') {
+        onToast('打卡失败：本地数据读写异常，请稍后重试或检查浏览器存储');
       } else {
         onToast(`阅读满 ${ECONOMY.CHECKIN_MIN_MINUTES} 分钟才能打卡`);
       }

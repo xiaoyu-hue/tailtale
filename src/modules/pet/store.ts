@@ -60,7 +60,7 @@ export async function refreshPet(): Promise<void> {
 }
 
 /** 使用零食/玩具（喂食/玩耍；金币扣除由 S2 商店在 app 层编排）。 */
-export function useSnack(snack: SnackId): Promise<PetActionResult> {
+export function feedSnack(snack: SnackId): Promise<PetActionResult> {
   return mutatePet((pet, now, today) => feed(pet, snack, now, today)).then(sync);
 }
 

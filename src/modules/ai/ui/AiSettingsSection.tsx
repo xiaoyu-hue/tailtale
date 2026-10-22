@@ -29,9 +29,14 @@ export function AiSettingsSection() {
 
   const switchMode = (next: EndpointMode): void => {
     setMode(next);
-    // 切回预设时同步写入预设端点（保留已填密钥，避免用户重复输入）
-    if (next === 'preset')
+    // 切回预设：写入预设端点（保留已填密钥，避免用户重复输入）
+    if (next === 'preset') {
       patchAiConfig({ baseUrl: DEEPSEEK_PRESET.baseUrl, model: DEEPSEEK_PRESET.model });
+      // 切到自定义：若当前仍是预设地址，清空让用户填自己的端点，
+      // 避免「选了自定义却显示预设地址」的歧义（与切预设对称）
+    } else if (config.baseUrl === DEEPSEEK_PRESET.baseUrl) {
+      patchAiConfig({ baseUrl: '' });
+    }
   };
 
   return (

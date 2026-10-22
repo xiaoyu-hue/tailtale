@@ -75,7 +75,7 @@ export default function ShopView() {
         <h2 className="section-title">装扮线（规划中）</h2>
         <ul className="placeholder-list">
           <li>皮肤：橘猫 200 / 三花 400 / 黑猫 600 币</li>
-          <li>阅读主题皮肤 300 币</li>
+          <li>阅读主题皮肤：免费 UI 个性化（金币解锁装扮待「商店」模块建成后）</li>
           <li>日收入与日常消耗大致持平，基础皮肤约两周可攒出</li>
         </ul>
       </section>

@@ -16,6 +16,11 @@ export function useBooks(): Book[] {
   return useStore(store, (s) => s.books);
 }
 
+/** 书架是否已从 IndexedDB 加载完成（用于区分「还没加载」与「确实没有这本书」）。 */
+export function useBooksLoaded(): boolean {
+  return useStore(store, (s) => s.loaded);
+}
+
 /** 最近阅读的书（lastReadAt > 0）；selector 返回 state 中已存在的引用，引用稳定。 */
 export function useRecentBook(): Book | undefined {
   return useStore(store, (s) => s.books.find((b) => b.lastReadAt > 0));
@@ -44,8 +49,12 @@ export interface ImportResult {
   skipped: number;
 }
 
-/** 批量导入：按扩展名分发到 TXT / EPUB / PDF 对应处理器。 */
-export async function importFiles(files: FileList | null): Promise<ImportResult> {
+/** 批量导入：按扩展名分发到 TXT / EPUB / PDF 对应处理器。
+ * onProgress 透传至二进制指纹计算，用于大文件导入时的进度反馈。 */
+export async function importFiles(
+  files: FileList | null,
+  onProgress?: (ratio: number) => void
+): Promise<ImportResult> {
   if (!files || files.length === 0) return { ok: 0, failed: [], skipped: 0 };
   const all = Array.from(files);
 
@@ -62,7 +71,7 @@ export async function importFiles(files: FileList | null): Promise<ImportResult>
       if (format === 'txt') {
         await importTxtFile(file);
       } else {
-        await importBinaryFile(file, format);
+        await importBinaryFile(file, format, onProgress);
       }
       ok += 1;
     } catch (error) {
@@ -85,9 +94,11 @@ export async function deleteBookById(book: Book): Promise<void> {
  * 避免点击后界面因等待 IndexedDB 写入而延迟。
  */
 export function changeStatus(book: Book, status: BookStatus): void {
+  const prev = store.getState().books.find((b) => b.id === book.id) ?? book;
   patchBook({ ...book, status });
-  void setBookStatus(book, status).catch((error: unknown) => {
+  void setBookStatus({ ...book, status }, status).catch((error: unknown) => {
     console.error('状态保存失败', error);
+    patchBook(prev); // 持久化失败时回滚 UI，避免界面与实际存储不一致
   });
 }
 
@@ -102,16 +113,21 @@ export async function reportProgress(
   patchBook(await saveProgress(book, chapterIndex, scrollRatio, progress, cfi));
 }
 
-/** 读完：立即置 finished 与 100% 进度，后台持久化（与 M1 行为一致的乐观更新）。
- * 内部取 store 中最新状态，避免与并发的 reportProgress 补丁相互覆盖（竞态）。 */
-export function markFinished(book: Book): void {
+/** 读完：立即置 finished 与 100% 进度（乐观更新），后台持久化；
+ * 内部取 store 中最新状态，避免与并发的 reportProgress 补丁相互覆盖（竞态）。
+ * 只有持久化成功才广播 book:finished（触发发放一次性金币），保存失败时回滚 UI，
+ * 避免出现「发币但没记账」的资产与状态不一致。 */
+export async function markFinished(book: Book): Promise<void> {
   const latest = store.getState().books.find((b) => b.id === book.id) ?? book;
-  patchBook({ ...latest, status: 'finished', progress: 1 });
-  void saveProgress({ ...latest, status: 'finished' }, latest.chapterIndex, latest.scrollRatio, 1).catch(
-    (error: unknown) => {
-      console.error('读完状态保存失败', error);
-    }
-  );
+  const finished: Book = { ...latest, status: 'finished', progress: 1 };
+  patchBook(finished);
+  try {
+    await saveProgress(finished, latest.chapterIndex, latest.scrollRatio, 1);
+  } catch (error) {
+    console.error('读完状态保存失败', error);
+    patchBook(latest);
+    return;
+  }
   // 广播完读事件：gamification 模块监听后发放一次性奖励（模块间只经事件总线交互）
   emit('book:finished', { bookId: book.id });
 }

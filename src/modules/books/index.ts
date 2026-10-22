@@ -1,6 +1,7 @@
 // books 模块公开 API：其他模块与应用层只准经此文件依赖 books
 export {
   useBooks,
+  useBooksLoaded,
   useRecentBook,
   refreshBooks,
   importFiles,

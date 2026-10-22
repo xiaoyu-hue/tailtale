@@ -5,7 +5,7 @@ export {
   usePetLoaded,
   usePetMood,
   refreshPet,
-  useSnack,
+  feedSnack,
   strokeCat,
   toggleSleep,
   acknowledgeBonds,

@@ -15,12 +15,13 @@ interface CreditGroup {
   items: Credit[];
 }
 
-/** 与 README「开源致谢」及 docs/书时-开源组件与合规.md 第 1 节保持一致；逐包许可证全文见仓库 THIRD_PARTY_NOTICES.md。 */
+/** 与 README「开源致谢」及 docs/书时-开源组件与合规.md 第 1 节保持一致（React / React DOM 已拆分为两行）；逐包许可证全文见仓库 THIRD_PARTY_NOTICES.md。 */
 const CREDIT_GROUPS: CreditGroup[] = [
   {
     title: '组件与资产（进入当前构建）',
     items: [
-      { name: 'React / React DOM', detail: 'MIT · Facebook, Inc. · UI 框架与渲染' },
+      { name: 'React', detail: 'MIT · Facebook, Inc. · UI 框架' },
+      { name: 'React DOM', detail: 'MIT · Facebook, Inc. · 浏览器渲染' },
       { name: 'epub.js', detail: 'BSD-2-Clause · FuturePress · EPUB 解析与分页渲染' },
       { name: 'pdf.js', detail: 'Apache-2.0 · Mozilla · PDF 按页渲染' },
       { name: 'Vite', detail: 'MIT · Vite 团队 · 开发服务器与生产构建' },

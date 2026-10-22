@@ -1,6 +1,6 @@
 # 书时 TailTale
 
-[![Version](https://img.shields.io/badge/version-v1.7.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.7.0)
+[![Version](https://img.shields.io/badge/version-v1.8.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.8.0)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](docs/LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.7.0 · 微交互与实时时间**）
+- 当前部署内容为 `main` 分支最新构建（**v1.8.0 · 安全加固、无障碍与质量门禁**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -153,6 +153,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 - **计时与结算**：涉及计时发放奖励的逻辑必须防作弊（单 tick 增量上限）且幂等（刷新不重发不漏发），参考 `modules/gamification/service.ts`
 - **测试**：核心纯函数有单元测试；每次改动跑 `npm run build` + 冒烟测试；涉及 UI 的改动附浏览器实时验收
 - **版本管理**：语义化版本 + 本项目三级映射，发版流程与必改位置清单见 [docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
+- **CI 质量门禁**：仓库已配置 GitHub Actions（`.github/workflows/ci.yml`），push / PR 自动执行类型检查、测试与构建；Cloudflare Pages 仍直接部署 `main`，CI 为质量可见性（详见 [docs/书时-技术栈.md](docs/书时-技术栈.md)）
 - **提交规范**：conventional commits（`feat:` / `fix:` / `docs:` / `refactor:` / `release:` 等），与版本升级的对应关系见版本管理规范第 7 节
 - **代码与文档同步**：功能变更必须同步更新 README 与 docs/ 相关文档后再提交
 - **凭证安全**：代码中禁止出现任何密钥、令牌；涉及推送使用一次性令牌并限期吊销
@@ -233,17 +234,18 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
     │   ├── books/            书架：model（类型 + 状态机 + 多格式）/ store / service / ui
     │   ├── reader/           阅读器：model（TXT 章节拆分）/ ui（TxtReader / EpubReader / PdfReader 按格式分流）
     │   ├── gamification/     游戏化：model（经济数值 + 纯函数）/ service（计时 + 持久化）/ store / ui
+    │   ├── pet/              宠物：model（属性/好感/成长/羁绊纯函数）/ service（计时队列）/ store / ui（像素猫 canvas）
     │   ├── settings/         全局偏好：model（字号档位 + 主题）/ service（localStorage）/ store / ui
     │   └── ai/               AI 解读书：model（纯函数 + prompt）/ service（DeepSeek 直连）/ store / ui（设置 + 抽屉）
     ├── platform/             平台能力：db（IndexedDB + 迁移）/ store（状态工厂）/ events（事件总线）/ hash（内容指纹）/ update（PWA 更新检查）
-    └── shared/               跨模块共享：ui（TopBar / BottomNav 等）/ hooks（useSwipe 手势）/ utils
+    └── shared/               跨模块共享：ui（TopBar / BottomNav 等）/ hooks（useSwipe 手势）/ utils（dates 日期工具 / interactions 涟漪委托 / useTicker 时钟）
 ```
 
 ---
 
 ## 版本与发布
 
-- **当前版本：v1.7.0**（2026-10-22 发布，微动态交互与实时时间上线：①顶栏时钟秒级实时——秒位轻跳、冒号呼吸闪烁，跨天自动切换；②首页时段问候语随时段切换；③全局点击涟漪、按钮弹性按压、切 Tab 卡片错落进场、底部导航图标弹跳与活动指示条；④氛围背景光斑、宠物舞台地面投影、金币余额飘字、今日分钟数轻弹等画面细节；⑤「我的 → 设置」新增「减少动画」总开关，一键关闭全部动画与过渡，与系统「减少动态效果」并列生效；v1.6.0 为两项体验与工程升级：①「我的 → 关于书时」新增手动检查更新——三态提示（发现新版本 / 已是最新 / 检查失败），发现新版本一键刷新加载，PWA 自动更新机制不变；②版本号单点管理——package.json 为唯一来源，构建时自动注入应用内版本脚注，发版不再手改多处；③首页顶栏日期升级为完整格式「2026年10月22日 周四 + 时钟」；v1.5.2 为开源致谢三处表面对齐补全：README / 应用内「我的 → 开源致谢」/ docs 合规文档，补登记 Desktop-Pixel-Pet 像素猫资产与 Workbox；v1.5.1 修复 v1.5.0 首页入口：「数据备份」「主题皮肤」两格接通，点击直达「我的」页对应卡片；v1.5.0 为 M6 打磨上线：界面皮肤「液态玻璃 / 像素风」在「我的 → 设置」一键切换并叠加浅色/深色，本地数据一键导出/导入备份；M5 AI 解读书同期在线：BYOK 设置 + DeepSeek 浏览器直连，阅读器内生成全书大纲/摘要与针对本书提问，调用前预估费用；M3 宠物系统同期在线：三属性衰减/好感度与成长/睡觉行动/商店四件零食/像素猫渲染器，读书赚币喂猫的循环闭合；v1.3.0 为宠物系统，v1.2.2 移动端适配，v1.2.1 继续阅读卡片优化，v1.2.0 滑动翻页，v1.1.0 多格式阅读，v1.0.0 首个正式版）
+- **当前版本：v1.8.0**（2026-10-22 发布，全维度代码审查修复：安全加固——新增 CI 质量门禁与 CSP 响应头、备份导出前明文密钥警示、恢复备份白名单校验；无障碍——全局键盘焦点圈与浅色对比度达 WCAG AA；功能——经济核心补单测、减少动画开关实时生效、商店文案对齐、大文件导入异步进度、读完发币仅在持久化成功后触发；文档同步——CHANGELOG 指纹算法更正、技术栈文档 CI 描述对齐、README 补 pet 模块等）；v1.7.0 及更早版本演进见 [CHANGELOG](CHANGELOG.md)
 - [Releases](https://github.com/xiaoyu-hue/tailtale/releases) · [CHANGELOG](CHANGELOG.md)
 - 版本号规则与发版流程：[docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
   - 主版本号（X.0.0）= 架构级变更；次版本号（1.X.0）= 新功能上线；修订号（1.1.X）= 优化、修复、文档同步
@@ -281,6 +283,7 @@ shared/       跨模块共享：ui（TopBar / BottomNav 等）
 - 书籍文件、阅读进度、设置、书摘等数据仅存储于浏览器本地（IndexedDB / localStorage），无任何服务端收集
 - 不提供、不索引任何盗版书源；用户本地导入文件的来源合规责任由用户自行承担
 - M5 上线后，AI 密钥同样仅存浏览器本地，代码中不存在上传或传输密钥的逻辑
+- 数据备份为本地文件导出，**包含 AI 密钥等明文内容**；导出前会明确警示，请勿将备份文件分享给他人或上传到不受信任的位置
 
 ---
 

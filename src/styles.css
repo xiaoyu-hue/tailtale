@@ -5,7 +5,8 @@
   --surface: #ffffff;
   --surface-soft: #f5eee3;
   --text: #3a2e28;
-  --text-secondary: #8a7a6d;
+  /* #6f6154 对 --bg #faf6ef 对比度 5.55:1，过 WCAG AA（原 #8a7a6d 仅 3.83:1） */
+  --text-secondary: #6f6154;
   --primary: #e07b39;
   --primary-strong: #c96a2b;
   --primary-soft: #f9e8d8;
@@ -13,6 +14,7 @@
   --shadow: 0 2px 12px rgba(58, 46, 40, 0.08);
   --shadow-float: 0 6px 24px rgba(58, 46, 40, 0.16);
   --danger: #c0503f;
+  --success: #1a9d5a;
 
   --font-ui: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB',
     'Microsoft YaHei', 'Segoe UI', sans-serif;
@@ -53,7 +55,17 @@
     --shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
     --shadow-float: 0 6px 24px rgba(0, 0, 0, 0.45);
     --danger: #d9705e;
+    --success: #2fb37a;
   }
+}
+
+/* ========== 键盘焦点可见性（WCAG 2.4.7） ========== */
+/* :focus-visible 仅在键盘导航（Tab / 方向键等）时显示焦点圈，鼠标点击不显示；
+   全局一条规则覆盖全部可交互元素，后续新增控件自动生效，无需逐组件维护。
+   现代浏览器中 outline 会自动贴合元素的 border-radius（像素皮肤直角按钮即方角圈）。 */
+:focus-visible {
+  outline: 2px solid var(--primary-strong);
+  outline-offset: 2px;
 }
 
 /* ========== M6 主题皮肤：液态玻璃 / 像素风 ========== */
@@ -118,7 +130,8 @@
   --surface: #fffaf0;
   --surface-soft: #efe2c4;
   --text: #2e2620;
-  --text-secondary: #7a6a58;
+  /* #6b5f52 对像素浅色 --bg #f3e9d2 对比度 5.14:1，过 WCAG AA（原 #7a6a58 仅 4.32:1） */
+  --text-secondary: #6b5f52;
   --primary: #d2691e;
   --primary-strong: #b5570f;
   --primary-soft: #f6e2c4;
@@ -638,6 +651,27 @@ button {
   border-color: var(--primary);
   background: var(--primary-soft);
   color: var(--primary-strong);
+}
+
+.import-zone.importing {
+  cursor: progress;
+  color: var(--text);
+}
+
+.import-progress {
+  margin: 12px auto 0;
+  width: 80%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-soft);
+  overflow: hidden;
+}
+
+.import-progress-bar {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+  transition: width 0.1s linear;
 }
 
 /* ========== 书架：书籍行 ========== */
@@ -1682,7 +1716,6 @@ button {
 }
 
 .ai-input:focus {
-  outline: none;
   border-color: var(--primary);
 }
 

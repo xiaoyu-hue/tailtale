@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { STAGE_LABELS, currentStage, deriveMood } from '../model';
 import { MOOD_LABELS } from '../model';
 import type { Pet, PetMood } from '../model';
 import { CAT_SIZE, MOOD_TIMING, frameCanvas } from './pixelCat';
+import { useReduceMotion } from '../../settings/store';
 
 /** 变体 → 整数放大倍数（32×32 原图 × 倍数 = 画布逻辑尺寸，保证像素锐利）。 */
 const SCALE = { lg: 5, sm: 3 } as const;
@@ -33,6 +34,23 @@ export function CatStage({ pet, variant = 'lg' }: CatStageProps) {
   const mood: PetMood = deriveMood(pet);
   const stage = currentStage(pet.growth);
 
+  // 减少动画：设置开关 + 系统偏好，二者任一为真即生效。
+  // 放入组件作用域并作为渲染循环的依赖，使「运行中切换」能重建循环（CHANGELOG v1.7.0 声称的行为）。
+  const settingReduceMotion = useReduceMotion();
+  const [systemReduceMotion, setSystemReduceMotion] = useState<boolean>(() =>
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+  // 订阅系统「减少动态效果」偏好变化，使其与设置开关一样实时生效
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = () => setSystemReduceMotion(mq.matches);
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
+  }, []);
+  const reduceMotion = settingReduceMotion || systemReduceMotion;
+
   // 羁绊蹭屏：未看计数变大（0 → n）时触发一次
   useEffect(() => {
     const previous = lastBondsRef.current;
@@ -53,10 +71,6 @@ export function CatStage({ pet, variant = 'lg' }: CatStageProps) {
     canvas.width = CAT_SIZE * scale;
     canvas.height = CAT_SIZE * scale;
 
-    const reduceMotion =
-      document.documentElement.dataset.reduceMotion === 'on' || // 用户设置（设置页开关）
-      (typeof window.matchMedia === 'function' &&
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches); // 系统偏好
     const timing = MOOD_TIMING[mood];
     let raf = 0;
 
@@ -104,7 +118,7 @@ export function CatStage({ pet, variant = 'lg' }: CatStageProps) {
 
     raf = requestAnimationFrame(render);
     return () => cancelAnimationFrame(raf);
-  }, [mood, pet.skin, variant]);
+  }, [mood, pet.skin, variant, reduceMotion]);
 
   const label = `${pet.name}，${STAGE_LABELS[stage]}，${MOOD_LABELS[mood]}`;
   return (

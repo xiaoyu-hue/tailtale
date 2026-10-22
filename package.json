@@ -1,7 +1,7 @@
 {
   "name": "tailtale",
   "private": true,
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "书时 TailTale：游戏化阅读器 + 轻量工具箱",
   "type": "module",
   "license": "Apache-2.0",
@@ -10,7 +10,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "tsc src/modules/pet/model.ts src/modules/ai/model.ts src/modules/settings/model.ts --outDir .test-dist --rootDir src/modules --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022 && tsc src/shared/dates.ts --outDir .test-dist/shared --rootDir src/shared --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022 && node --test tests/*.test.mjs"
+    "test": "tsc src/modules/pet/model.ts src/modules/ai/model.ts src/modules/settings/model.ts --outDir .test-dist --rootDir src/modules --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022 && tsc src/modules/gamification/model.ts src/shared/dates.ts --outDir .test-dist --rootDir src --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022 && tsc src/shared/dates.ts --outDir .test-dist/shared --rootDir src/shared --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022 && node --test tests/*.test.mjs"
   },
   "dependencies": {
     "epubjs": "^0.3.93",

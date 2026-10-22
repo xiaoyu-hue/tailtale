@@ -16,6 +16,7 @@ import {
   estimateTokens,
   groupText,
   isAiConfigured,
+  isSecureEndpoint,
   type AiConfig,
   type AiErrorInfo,
   type CostEstimate,
@@ -117,6 +118,14 @@ export async function callChat(
 ): Promise<string> {
   return serialize(async (): Promise<string> => {
     throwIfAborted(signal);
+    // 提前拦截不安全的 http 端点（非本地回环），避免浏览器混合内容拦截后抛出难以理解的异常
+    if (!isSecureEndpoint(config.baseUrl)) {
+      throw new AiError(
+        'config',
+        '端点不安全',
+        '请使用 https 端点（本地调试可用 http://localhost）；浏览器会拦截不安全的 http 请求，请改用 https'
+      );
+    }
     const controller = new AbortController();
     let timedOut = false;
     const timer = setTimeout(() => {

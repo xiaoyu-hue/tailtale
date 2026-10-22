@@ -25,6 +25,10 @@ const BACKUP_STORES = [
 const SETTINGS_KEY = 'tailtale:settings';
 /** M1 阅读器写入的旧字号键（px 值），首次加载时迁移进新结构后删除。 */
 const LEGACY_FONT_SIZE_KEY = 'tailtale:fontSize';
+/** 允许写回的 localStorage 键白名单（应用实际使用的全部 tailtale:* 键）。
+ * 恢复备份时仅放开这两个键，拒绝伪造/损坏备份注入的未知键（避免污染未来功能读取）。
+ * 若 ai 模块新增本地键，须在此同步登记。 */
+const ALLOWED_LOCAL_KEYS = new Set<string>([SETTINGS_KEY, 'tailtale:ai']);
 
 function migrateLegacy(): Partial<Settings> {
   const legacy = window.localStorage.getItem(LEGACY_FONT_SIZE_KEY);
@@ -102,7 +106,9 @@ export async function collectBackup(): Promise<BackupBundle> {
 
 /** 把备份包写回本地存储（覆盖式：先清后写，导入即覆盖）。 */
 export async function restoreBackup(bundle: BackupBundle): Promise<void> {
-  for (const [name, rows] of Object.entries(bundle.stores)) {
+  // 仅恢复「已知 store」：伪造/损坏备份中的未知 store 名一律忽略，避免打开不存在的事务或污染未来 store。
+  for (const name of BACKUP_STORES) {
+    const rows = bundle.stores[name];
     if (!Array.isArray(rows)) continue;
     try {
       await run(name, 'readwrite', (s) => {
@@ -115,7 +121,19 @@ export async function restoreBackup(bundle: BackupBundle): Promise<void> {
       console.error(`恢复 store ${name} 失败`, error);
     }
   }
+  // 先清除白名单键（清掉目标设备上的旧值），再写回备份值，保证 settings/ai 与备份完全一致，
+  // 避免目标设备残留的旧键污染恢复结果。
+  for (const key of ALLOWED_LOCAL_KEYS) {
+    try {
+      window.localStorage.removeItem(key);
+    } catch (error) {
+      console.error(`清除 localStorage ${key} 失败`, error);
+    }
+  }
+  // 仅恢复「白名单键」：备份只应写回应用实际使用的 tailtale:* 键，
+  // 拒绝伪造/损坏备份注入的未知键（如将来某功能读取的键被旧/恶意备份污染）。
   for (const [key, value] of Object.entries(bundle.localStorage)) {
+    if (!ALLOWED_LOCAL_KEYS.has(key)) continue;
     try {
       window.localStorage.setItem(key, value);
     } catch (error) {

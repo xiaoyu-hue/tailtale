@@ -1,0 +1,9 @@
+# Cloudflare Pages 响应头（部署时自动下发）。
+# 收紧默认源、禁止内联脚本与 object 注入、约束表单与基址，降低 XSS 与供应链风险。
+# 说明：style-src 保留 'unsafe-inline' 以兼容 React 的内联 style 属性；
+# script-src 仅 'self'，杜绝运行时注入脚本；connect-src 放开 DeepSeek API（AI 直连）。
+/*
+  Content-Security-Policy: default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://api.deepseek.com; worker-src 'self' blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY

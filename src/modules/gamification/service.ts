@@ -220,7 +220,7 @@ if (typeof window !== 'undefined') {
 
 export type CheckinResult =
   | { ok: true; streak: number; bonus: number; total: number }
-  | { ok: false; reason: 'already' | 'not-enough-minutes' };
+  | { ok: false; reason: 'already' | 'not-enough-minutes' | 'error' };
 
 /** 每日打卡：当日阅读满 CHECKIN_MIN_MINUTES 分钟可领，基础 + 连续奖励。 */
 export async function checkIn(today: string = todayKey()): Promise<CheckinResult> {
@@ -249,8 +249,10 @@ export async function checkIn(today: string = todayKey()): Promise<CheckinResult
       return { ok: true, streak, bonus, total };
     });
   } catch (error) {
+    // 区分「时长不足」与「存储/持久化失败」：后者不应被误报成前者，否则会误导用户以为
+    // 自己今天没读够，实则是本地数据库故障（隐私模式 / 存储满 / 浏览器异常）。
     console.error('打卡失败', error);
-    return { ok: false, reason: 'not-enough-minutes' };
+    return { ok: false, reason: 'error' };
   }
 }
 

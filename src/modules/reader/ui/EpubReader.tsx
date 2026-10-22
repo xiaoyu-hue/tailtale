@@ -78,8 +78,16 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
         });
         renditionRef.current = rendition;
         rendition.themes.fontSize(`${fontSize}px`);
-        // 有 CFI 精确恢复，否则从头开始
-        rendition.display(book.cfi || undefined);
+        // 有 CFI 精确恢复，否则从头开始。epubjs 的 display 在类型上声明返回 void，但运行时会
+        // 返回 Promise；用 Promise.resolve 兜底捕获其 rejection（如跨设备/旧版备份导致的非法 CFI），
+        // 失败时回首页，避免 unhandled rejection 卡死阅读页。
+        const safeDisplay = (target?: string, fallback = true): void => {
+          Promise.resolve(rendition.display(target) as unknown as Promise<unknown>).catch(() => {
+            console.error('恢复阅读位置失败', target);
+            if (fallback) safeDisplay(undefined, false);
+          });
+        };
+        safeDisplay(book.cfi);
 
         rendition.on('relocated', (location) => {
           const { start } = location;

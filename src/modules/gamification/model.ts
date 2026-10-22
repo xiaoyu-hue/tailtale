@@ -3,7 +3,9 @@
  * 本文件不依赖 React / DOM / IndexedDB，可独立单测。
  * 数值权威来源：docs/书时-PRD.md §3.1.1，改动须先改 PRD。
  */
-import { shiftDay } from '../../shared/dates';
+// 注意：import 路径带 .js 扩展名是 TypeScript NodeNext 规范写法
+// （tsc --module NodeNext 编译单测时不报 TS2835），bundler 解析与 Vite 均兼容。
+import { shiftDay } from '../../shared/dates.js';
 
 /** 经济数值（PRD §3.1.1）。 */
 export const ECONOMY = {

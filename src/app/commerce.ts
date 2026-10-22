@@ -10,7 +10,7 @@
  * 不采用「先用后扣」：那样在使用成功但扣款失败时会白送零食。
  */
 import { refundCoins, spendCoins } from '../modules/gamification';
-import { SNACKS, useSnack } from '../modules/pet';
+import { SNACKS, feedSnack } from '../modules/pet';
 import type { Pet, PetRejectReason, SnackId } from '../modules/pet';
 
 export type PurchaseRejectReason = 'insufficient' | PetRejectReason;
@@ -28,7 +28,7 @@ export async function buyAndUseSnack(snack: SnackId): Promise<PurchaseResult> {
     if (!spend.ok) return { ok: false, reason: spend.reason };
     coinsLeft = spend.coins; // 扣款后余额（使用零食不再动币）
   }
-  const result = await useSnack(snack);
+  const result = await feedSnack(snack);
   if (!result.ok) {
     if (price > 0) await refundCoins(price); // 扣币成功但使用失败：回滚
     return { ok: false, reason: result.reason };

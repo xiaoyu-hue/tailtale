@@ -88,10 +88,15 @@ export async function importTxtFile(file: File): Promise<Book> {
   return book;
 }
 
-/** 导入 EPUB / PDF：读取文件二进制入库；重复导入同一文件时保留原阅读进度。 */
-export async function importBinaryFile(file: File, format: 'epub' | 'pdf'): Promise<Book> {
+/** 导入 EPUB / PDF：读取文件二进制入库；重复导入同一文件时保留原阅读进度。
+ * onProgress 透传至内容指纹计算，用于大文件导入时的进度反馈。 */
+export async function importBinaryFile(
+  file: File,
+  format: 'epub' | 'pdf',
+  onProgress?: (ratio: number) => void
+): Promise<Book> {
   const data = await file.arrayBuffer();
-  const id = hashBytes(data);
+  const id = await hashBytes(data, onProgress);
   const existing = await getBook(id);
 
   if (existing) {
