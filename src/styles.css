@@ -1844,6 +1844,75 @@ button {
   margin: 0 0 10px;
 }
 
+/* ---- 备份导出选项弹窗（v1.10.0 备份安全分级） ---- */
+.backup-dialog-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: grid;
+  place-items: center;
+  z-index: 22;
+  padding: 20px;
+}
+
+.backup-dialog {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 18px;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: var(--shadow-float);
+}
+
+.backup-dialog-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.backup-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+
+.backup-option {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.backup-option.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.backup-option input[type='radio'] {
+  margin-top: 3px;
+  accent-color: var(--primary);
+}
+
+.backup-option-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.backup-option-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.backup-option-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
 /* ---- 进度 / 结果 / 错误 ---- */
 .ai-running .ai-progress {
   height: 6px;

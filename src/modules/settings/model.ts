@@ -117,6 +117,30 @@ export interface BackupBundle {
   localStorage: Record<string, string>;
 }
 
+/** AI 配置（含密钥）在 localStorage 中的键（由 ai 模块持久化，备份侧在此登记）。 */
+export const AI_CONFIG_KEY = 'tailtale:ai';
+
+/** 备份中是否包含有效的 AI 密钥（明文）——用于导出选项的风险说明。 */
+export function backupContainsAiKey(bundle: BackupBundle): boolean {
+  const raw = bundle.localStorage[AI_CONFIG_KEY];
+  if (!raw) return false;
+  try {
+    const cfg = JSON.parse(raw) as { key?: unknown };
+    return typeof cfg.key === 'string' && cfg.key.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+/** 剔除备份中的 AI 密钥（标准备份档）：换设备后重新粘贴一次密钥即可，避免密钥随文件泄露。
+ *  返回新对象，不修改入参；无密钥键时原样返回。 */
+export function stripAiKey(bundle: BackupBundle): BackupBundle {
+  if (!(AI_CONFIG_KEY in bundle.localStorage)) return bundle;
+  const localStorage = { ...bundle.localStorage };
+  delete localStorage[AI_CONFIG_KEY];
+  return { ...bundle, localStorage };
+}
+
 /** parse 结果：成功带 bundle，失败带中文错误原因。 */
 export type ParseResult =
   | { ok: true; bundle: BackupBundle }

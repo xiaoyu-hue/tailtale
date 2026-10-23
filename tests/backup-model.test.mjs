@@ -5,7 +5,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseBackupBundle, BACKUP_VERSION, isBuiltinBookRow, builtinBookIds, filterContentsForBackup, filterBooksForRestore } from '../.test-dist/settings/model.js';
+import { parseBackupBundle, BACKUP_VERSION, isBuiltinBookRow, builtinBookIds, filterContentsForBackup, filterBooksForRestore, AI_CONFIG_KEY, backupContainsAiKey, stripAiKey } from '../.test-dist/settings/model.js';
 
 const sampleBundle = {
   app: 'tailtale',
@@ -126,4 +126,48 @@ test('内置书不在备份中的闭环：备份体积与内容解耦，恢复�
   assert.equal(backupContents.length, 2); // 备份里没有内置书内容
   const restoredBooks = filterBooksForRestore(bookRows);
   assert.equal(restoredBooks.length, 2); // 恢复后内置书行被跳过
+});
+
+/* —— 导出档位（v1.10.0）：AI 密钥识别与剔除 —— */
+
+test('backupContainsAiKey：有有效密钥为真；缺失 / 空串 / 非法 JSON 为假', () => {
+  const withKey = { localStorage: { [AI_CONFIG_KEY]: '{"key":"sk-abc","model":"deepseek-chat"}' } };
+  const emptyKey = { localStorage: { [AI_CONFIG_KEY]: '{"key":""}' } };
+  const noKeyField = { localStorage: { [AI_CONFIG_KEY]: '{"model":"deepseek-chat"}' } };
+  const broken = { localStorage: { [AI_CONFIG_KEY]: 'not-json' } };
+  const missing = { localStorage: { 'tailtale:settings': '{}' } };
+  assert.equal(backupContainsAiKey(withKey), true);
+  assert.equal(backupContainsAiKey(emptyKey), false);
+  assert.equal(backupContainsAiKey(noKeyField), false);
+  assert.equal(backupContainsAiKey(broken), false);
+  assert.equal(backupContainsAiKey(missing), false);
+});
+
+test('stripAiKey：剔除 tailtale:ai，其余 localStorage 键与 stores 原样保留', () => {
+  const bundle = {
+    app: 'tailtale',
+    version: BACKUP_VERSION,
+    exportedAt: '2026-10-23T00:00:00.000Z',
+    stores: { books: [{ id: 'imp1' }] },
+    localStorage: { 'tailtale:settings': '{"theme":"dark"}', [AI_CONFIG_KEY]: '{"key":"sk-abc"}' },
+  };
+  const stripped = stripAiKey(bundle);
+  assert.equal(AI_CONFIG_KEY in stripped.localStorage, false);
+  assert.deepEqual(stripped.localStorage, { 'tailtale:settings': '{"theme":"dark"}' });
+  assert.deepEqual(stripped.stores, bundle.stores); // 非 localStorage 数据不受影响
+  // 不修改原对象（纯函数）
+  assert.equal(AI_CONFIG_KEY in bundle.localStorage, true);
+});
+
+test('stripAiKey：无密钥键时不影响其他数据（标准备份与旧备份行为一致）', () => {
+  const bundle = {
+    app: 'tailtale',
+    version: BACKUP_VERSION,
+    exportedAt: '',
+    stores: {},
+    localStorage: { 'tailtale:settings': '{}' },
+  };
+  const stripped = stripAiKey(bundle);
+  assert.deepEqual(stripped.localStorage, { 'tailtale:settings': '{}' });
+  assert.equal(backupContainsAiKey(stripped), false);
 });

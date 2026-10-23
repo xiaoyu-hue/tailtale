@@ -1,4 +1,5 @@
 import {
+  AI_CONFIG_KEY,
   BACKUP_VERSION,
   DEFAULT_FONT_SIZE_INDEX,
   FONT_SIZES,
@@ -31,7 +32,7 @@ const LEGACY_FONT_SIZE_KEY = 'tailtale:fontSize';
 /** 允许写回的 localStorage 键白名单（应用实际使用的全部 tailtale:* 键）。
  * 恢复备份时仅放开这两个键，拒绝伪造/损坏备份注入的未知键（避免污染未来功能读取）。
  * 若 ai 模块新增本地键，须在此同步登记。 */
-const ALLOWED_LOCAL_KEYS = new Set<string>([SETTINGS_KEY, 'tailtale:ai']);
+const ALLOWED_LOCAL_KEYS = new Set<string>([SETTINGS_KEY, AI_CONFIG_KEY]);
 
 function migrateLegacy(): Partial<Settings> {
   const legacy = window.localStorage.getItem(LEGACY_FONT_SIZE_KEY);
