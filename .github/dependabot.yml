@@ -1,0 +1,33 @@
+# Dependabot 配置（v1.13.0 安全加固）
+# 两个生态各司其职：
+#   npm            —— 盯依赖漏洞与版本更新，发现漏洞即时开修复 PR
+#   github-actions —— 盯 CI 里 pin 到 SHA 的 action，有新版本自动开 PR 更新 SHA
+#                    （这正是 pin SHA 策略的配套：防 tag 被改写 + 免手动追更）
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    labels:
+      - ci
+    commit-message:
+      prefix: "ci"

@@ -2,23 +2,38 @@ name: CI
 
 # 质量门禁：任何推送到 main 或新建 PR 都会跑两个作业——
 #   quality：类型检查 → 单测 → 构建 → 覆盖率报告（产物上传）
+#            → 依赖审查（仅 PR：对照公开漏洞库检查本 PR 引入的依赖变更）
 #   smoke：端到端冒烟（真实 Chromium 跑加密备份全链路），quality 通过后才跑
 # 目的：在代码进入 main（从而触发 Cloudflare Pages 自动部署）前，先拦住
 # 类型错误、测试挂掉、构建失败、UI 真问题（单测对 UI/遮挡类问题天然失明，
 # 这层是唯一能抓到它们的门禁）。
 # 注意：本门禁提供「可见性」，真正阻止部署需将 Pages 改为「从 CI 构建产物发布」，
 # 那是 Cloudflare 侧配置，不在本仓库内。
+#
+# 安全加固（v1.13.0）：
+#   - 所有第三方 action pin 到 commit SHA 并附版本注释。tag 是可变的，
+#     2026 年 3 月 Trivy 发布管道被投毒（恶意版本通过改写 tag 下发）后，
+#     「pin SHA + Dependabot 自动追更」是社区公认的防护组合，
+#     SHA 的版本更新由 .github/dependabot.yml 的 github-actions 生态自动开 PR。
+#   - quality 增加依赖审查步骤（dependency-review-action，仅 PR 事件）。
+#     只报告不阻断（continue-on-error）——与覆盖率门槛哲学一致：安全信号
+#     供人复盘，不作为合并硬门槛；持续的高危依赖告警由 GitHub 仓库侧
+#     Dependabot alerts 兜底（需在仓库 Settings 开启，见 docs 收尾说明）。
+#   - 全局最小权限 contents: read（GitHub token 权限最小化实践）。
 on:
   push:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
@@ -31,22 +46,29 @@ jobs:
       - name: 覆盖率报告（lcov）
         run: npm run test:coverage
       - name: 上传覆盖率 artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: coverage-report
           path: coverage/
           retention-days: 30
+      # 依赖审查：仅在 PR 事件运行（push 到 main 时没有可对比的 diff，
+      # 全历史对比会直接爆量）。发现漏洞时作业标记为中性而非失败，
+      # 是否处理由人判断——单人项目不设阻断门槛。
+      - name: 依赖审查（dependency review）
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        uses: actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0
 
   smoke:
     runs-on: ubuntu-latest
     needs: quality
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
           cache: npm
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.11'
       - run: npm ci
