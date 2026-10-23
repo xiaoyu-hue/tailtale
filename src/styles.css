@@ -1845,8 +1845,11 @@ button {
 }
 
 /* ---- 备份导出选项弹窗（v1.10.0 备份安全分级） ---- */
+/* 对话框经 Portal 挂到 document.body，mask 用 fixed 覆盖视口：
+   卡片入场动画（card-in，fill-mode: both）会使 transform 常驻，
+   组件若在卡片内渲染，absolute 会被裁剪进卡片并被后序卡片盖住（v1.11.0 修复）。 */
 .backup-dialog-mask {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
   display: grid;

@@ -22,6 +22,10 @@
 - **导入链路**：`importBackupFromFile` 重构为 `readBackupFile`（分类读取）+ `importEncryptedBackup`（解密恢复），加密与明文两条路径分离
 - **技术栈文档**：新增 §3.5 备份加密选型说明（原 §3.5 顺延为 §3.6）
 
+### 修复
+
+- **备份对话框被遮挡**：导出选项与导入口令两个对话框改经 `createPortal` 挂载到 `document.body`、遮罩层 `position: fixed`。修复「我的」页卡片入场动画（`card-in` 配 `animation-fill-mode: both` 使 `transform` 常驻）把对话框的 absolute 遮罩裁剪进卡片、并被后序卡片盖住导致无法点击的问题（冒烟测试实证：修复前点击超时，修复后全链路通过）
+
 ## [1.10.0] - 2026-10-23
 
 ### 新增

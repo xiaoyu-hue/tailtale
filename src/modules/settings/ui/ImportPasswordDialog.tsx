@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { BackupEnvelope } from '../model';
 
 interface ImportPasswordDialogProps {
@@ -37,7 +38,7 @@ export function ImportPasswordDialog({
 
   const exportedAt = envelope.exportedAt ? envelope.exportedAt.slice(0, 10) : '未知日期';
 
-  return (
+  return createPortal(
     <div
       className="backup-dialog-mask"
       onMouseDown={(event) => {
@@ -84,6 +85,7 @@ export function ImportPasswordDialog({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

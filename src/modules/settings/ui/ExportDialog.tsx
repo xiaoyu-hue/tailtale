@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { backupContainsAiKey, type BackupBundle } from '../model';
 
 /** 导出档位：standard = 标准备份（默认，剔除 AI 密钥）；
@@ -51,7 +52,7 @@ export function ExportDialog({ bundle, onCancel, onExport, exporting = false }: 
     !exporting &&
     (!encrypted || (password.length >= MIN_PASSWORD_LENGTH && password === confirmPassword));
 
-  return (
+  return createPortal(
     <div
       className="backup-dialog-mask"
       onMouseDown={(event) => {
@@ -172,6 +173,7 @@ export function ExportDialog({ bundle, onCancel, onExport, exporting = false }: 
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
