@@ -1,6 +1,6 @@
 # 书时 TailTale
 
-[![Version](https://img.shields.io/badge/version-v1.11.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.11.0)
+[![Version](https://img.shields.io/badge/version-v1.12.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.12.0)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](docs/LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.11.0 · 加密备份上线**）
+- 当前部署内容为 `main` 分支最新构建（**v1.12.0 · 测试体系上线**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -100,6 +100,8 @@ npm install        # 安装依赖
 npm run dev        # 本地开发（默认 http://localhost:5173）
 npm run build      # 类型检查 + 生产构建（输出 dist/）
 npm run preview    # 预览生产构建（默认 http://localhost:4173）
+npm test           # 单元测试（node:test，纯函数层）
+npm run smoke      # 端到端冒烟（需先 build；真实浏览器跑加密备份全链路）
 ```
 
 | 命令 | 说明 |
@@ -108,6 +110,9 @@ npm run preview    # 预览生产构建（默认 http://localhost:4173）
 | `npm run build` | `tsc --noEmit` 类型检查 + Vite 生产构建 |
 | `npm run preview` | 本地预览生产构建（验证 PWA 需用此模式） |
 | `npm run typecheck` | 仅跑 TypeScript 类型检查 |
+| `npm test` | 单元测试（node:test 零框架依赖；自动先编译 `tsconfig.test.json` 清单内的源文件） |
+| `npm run test:coverage` | 单元测试 + 覆盖率报告（终端摘要 + `coverage/lcov.info`） |
+| `npm run smoke` | 端到端冒烟（Playwright 真实浏览器；先 `npm run build`，依赖安装见 `scripts/smoke/README.md`） |
 
 导入书籍：首页点击「导入 TXT 书籍」或把 .txt / .epub / .pdf 文件拖入书架区域。
 
@@ -141,7 +146,7 @@ modules/      领域模块：books（书架）/ reader（阅读器）/ gamificat
 platform/     平台能力：db（IndexedDB + 迁移）/ store（状态工厂）/ events（事件总线）/ hash（内容指纹）/ update（PWA 更新检查）
 shared/       跨模块共享：ui（TopBar / BottomNav 等）
 public/       静态资源：library-books/（内置公版书文本，随应用分发）/ library-manifest.json（书单与指纹清单）
-scripts/      构建期离线工具：clean_books.py（公版书源文本清洗与指纹计算）
+scripts/      构建期离线工具：clean_books.py（公版书源文本清洗与指纹计算）/ smoke/smoke.py（端到端冒烟）
 ```
 
 硬规则：
@@ -160,9 +165,9 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 - **模块边界**：新增功能优先落到对应 `modules/` 子模块；跨模块通信走 `platform/events` 事件总线或公开 API，不建隐藏耦合
 - **状态管理**：全部状态经 `platform/store` 的 `createStore` 工厂创建，selector 必须返回引用稳定值（基本类型或 state 中已存在的对象引用）
 - **计时与结算**：涉及计时发放奖励的逻辑必须防作弊（单 tick 增量上限）且幂等（刷新不重发不漏发），参考 `modules/gamification/service.ts`
-- **测试**：核心纯函数有单元测试；每次改动跑 `npm run build` + 冒烟测试；涉及 UI 的改动附浏览器实时验收
+- **测试**：分层体系——L1 纯函数单测（`npm test`，158 例，新增被测模块在 `tsconfig.test.json` 加一行）；L4 端到端冒烟（`npm run smoke`，真实浏览器跑关键链路，抓 UI 遮挡/交互类真问题）；覆盖率报告 `npm run test:coverage`（只出报告不设门槛，数字供复盘）；每次改动跑 `npm test` + `npm run build`，涉及 UI 或备份链路的改动必须跑冒烟
 - **版本管理**：语义化版本 + 本项目三级映射，发版流程与必改位置清单见 [docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
-- **CI 质量门禁**：仓库已配置 GitHub Actions（`.github/workflows/ci.yml`），push / PR 自动执行类型检查、测试与构建；Cloudflare Pages 仍直接部署 `main`，CI 为质量可见性（详见 [docs/书时-技术栈.md](docs/书时-技术栈.md)）
+- **CI 质量门禁**：仓库已配置 GitHub Actions（`.github/workflows/ci.yml`），push / PR 自动跑两个作业——`quality`（类型检查 → 单测 → 构建 → 覆盖率报告上传 artifact）与 `smoke`（Playwright 端到端冒烟，quality 通过后才跑）；Cloudflare Pages 仍直接部署 `main`，CI 为质量可见性（详见 [docs/书时-技术栈.md](docs/书时-技术栈.md)）
 - **提交规范**：conventional commits（`feat:` / `fix:` / `docs:` / `refactor:` / `release:` 等），与版本升级的对应关系见版本管理规范第 7 节
 - **代码与文档同步**：功能变更必须同步更新 README 与 docs/ 相关文档后再提交
 - **凭证安全**：代码中禁止出现任何密钥、令牌；涉及推送使用一次性令牌并限期吊销
@@ -224,6 +229,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 ├── LICENSE                   Apache-2.0 全文（覆盖自有源代码）
 ├── THIRD_PARTY_NOTICES.md    第三方组件版权与许可证声明
 ├── README.md                 本文件（Apache-2.0）
+├── tsconfig.test.json        测试编译清单（新增被测模块在此加一行，见开发约定）
 ├── docs/                     项目文档（CC BY-NC 4.0，全文见 docs/LICENSE）
 │   ├── LICENSE               CC BY-NC 4.0 官方法律文本（文档许可）
 │   ├── 书时-PRD.md           产品需求文档
@@ -231,6 +237,11 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 │   ├── 书时-架构设计.md       目标架构、模块边界与迁移路径
 │   ├── 书时-版本管理规范.md   版本号规则、发版流程与 CHANGELOG 约定
 │   └── 书时-开源组件与合规.md  组件致谢、许可证义务与合规台账
+├── .github/workflows/ci.yml  CI：quality（类型/单测/构建/覆盖率）+ smoke（端到端冒烟）双作业
+├── scripts/
+│   ├── clean_books.py        构建期离线工具：公版书源文本清洗与指纹计算
+│   └── smoke/               端到端冒烟：smoke.py（Playwright）+ README.md（用法与断言清单）
+├── tests/                    单元测试（node:test，*.test.mjs；与被测模块一一对应）
 ├── index.html
 ├── vite.config.ts            Vite + PWA 配置
 └── src/
@@ -254,7 +265,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 
 ## 版本与发布
 
-- **当前版本：v1.11.0**（2026-10-23 发布，加密备份上线：导出备份新增「加密备份」档位——整个文件加密，PBKDF2-HMAC-SHA256 60 万次迭代派生密钥 + AES-256-GCM，浏览器原生 WebCrypto 零依赖；口令只用于本次派生、不落存储、无找回后门；导入自动识别加密包并弹口令框，口令错误/文件篡改可识别且可重试；加密档默认不开启。新增 11 例加密与信封单测，`npm test` 121 例全绿）；v1.10.0 及更早版本演进见 [CHANGELOG](CHANGELOG.md)
+- **当前版本：v1.12.0**（2026-10-23 发布，测试体系一期：纯函数层补齐至 11 个模块 158 例单测、被测层行覆盖 99.47%；端到端冒烟入仓并进 CI（Playwright 真实浏览器跑加密备份全链路 14 项断言）；Node 22 内置覆盖率报告零新依赖；测试管线收敛为 tsconfig.test.json 清单驱动。v1.11.0 加密备份上线：导出备份三档——标准备份默认剔除 AI 密钥、加密备份整文件加密（PBKDF2-HMAC-SHA256 60 万次迭代 + AES-256-GCM，口令不落存储、无找回后门）、完整明文备份；导入自动识别加密包弹口令框，口令错误/文件篡改可识别且可重试）；更早版本演进见 [CHANGELOG](CHANGELOG.md)
 - [Releases](https://github.com/xiaoyu-hue/tailtale/releases) · [CHANGELOG](CHANGELOG.md)
 - 版本号规则与发版流程：[docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
   - 主版本号（X.0.0）= 架构级变更；次版本号（1.X.0）= 新功能上线；修订号（1.1.X）= 优化、修复、文档同步

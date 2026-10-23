@@ -7,6 +7,20 @@
 
 （占位：下一版本内容写在这里，发版时搬进正式段）
 
+## [1.12.0] - 2026-10-23
+
+### 新增
+
+- **测试体系一期（分层质量门禁）**：L1 纯函数层补齐至 11 个被测模块、158 例单测全绿——新增 `books/model`（状态机与文案表）、`reader/model`（splitChapters 章节切分：中文各体裁标题 / 英文 Chapter·Prologue·Epilogue / 引首章 / offset 首尾相接 / CRLF / 误判防护）、`platform/events`（订阅退订、Set 去重、异常隔离、类型隔离）、`platform/hash`（双路指纹确定性、ASCII 与 hashText 同族一致、大文件分块进度）；补齐 `ai/model` 的 `isSecureEndpoint` 安全校验测试（https 放行、http 仅回环、`localhost.evil.com` 前缀伪装防护）。被测纯函数层覆盖率：行 99.47% / 分支 91.07% / 函数 98.15%
+- **端到端冒烟入仓**：`scripts/smoke/smoke.py`（Playwright + Chromium）——一条命令自包含（`npm run smoke` 自动服务 `dist/`、跑完自动关服务器），14 项断言覆盖加密备份全链路：三档导出 UI、口令双输入校验、加密信封结构、标准档明文、错口令可重试、对口令解密导入、应用重载、全程无 JS 错误。v1.11.0 的「口令框被卡片动画遮挡」即由这层抓出，单测对此类 UI 问题天然失明
+- **覆盖率基建**：Node 22 内置 `--experimental-test-coverage`（零新增依赖），`npm run test:coverage` 一键产出终端摘要 + `coverage/lcov.info`；CI 上传为 artifact（保留 30 天）。按用户决策只出报告、不设硬门槛——数字供人复盘，不作为 CI 通过条件，避免为凑覆盖率写无意义测试
+- **CI 双作业**：`quality`（类型检查 → 单测 → 构建 → 覆盖率）+ `smoke`（Python + Playwright 真实浏览器冒烟，quality 通过后才跑，省 CI 分钟）
+
+### 变更
+
+- **测试管线重构**：`package.json` 里 4 条白名单式 tsc 命令收敛为 `tsconfig.test.json` 单一清单驱动，统一 `rootDir=src` 输出结构（`.test-dist/modules|platform|shared/…`），7 个测试文件 import 路径同步归一；此后新增被测模块只需在 `tsconfig.test.json` 的 include 加一行
+- **文档同步**：README 补测试/冒烟命令表、仓库结构与开发约定；技术栈文档新增 §3.7 测试体系选型（为什么用 node:test 而非 vitest/jest：项目运行时零依赖哲学 + 测试层零框架依赖 + Node 22 原生覆盖率足够）；架构文档补修订记录 v1.13 与目录树
+
 ## [1.11.0] - 2026-10-23
 
 ### 新增
