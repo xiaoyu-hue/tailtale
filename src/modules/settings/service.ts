@@ -6,14 +6,18 @@ import {
   builtinBookIds,
   clampFontSizeIndex,
   defaultSettings,
+  envelopePayload,
   filterBooksForRestore,
   filterContentsForBackup,
+  isBackupEnvelope,
   isThemeChoice,
   isUiSkin,
   parseBackupBundle,
   type BackupBundle,
+  type BackupEnvelope,
   type Settings,
 } from './model';
+import { BackupCryptoError, decryptText, encryptText } from '../../platform/crypto/backup-crypto';
 import { run, STORE_BOOKS, STORE_CONTENTS, STORE_WALLET, STORE_CHECKINS, STORE_READING_SESSION, STORE_PET } from '../../platform/db';
 
 /** 参与备份的 IndexedDB store 列表（顺序无关，全部读出再写回）。 */
@@ -159,25 +163,92 @@ export async function restoreBackup(bundle: BackupBundle): Promise<void> {
   }
 }
 
-/** 触发浏览器下载备份 JSON 文件。 */
-export function exportBackupToFile(bundle: BackupBundle): void {
-  const blob = new Blob([JSON.stringify(bundle, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
+/** 备份文件名：按导出日期，明文与加密备份同名（内容自识别）。 */
+function backupFileName(): string {
   const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+  return `tailtale-backup-${stamp}.json`;
+}
+
+/** 触发浏览器下载 JSON 文件（明文备份与加密信封共用）。 */
+function downloadJson(data: unknown): void {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = `tailtale-backup-${stamp}.json`;
+  anchor.download = backupFileName();
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
   URL.revokeObjectURL(url);
 }
 
-/** 读取并恢复用户选择的备份文件；返回失败原因（ok:false）供 UI 提示。 */
-export async function importBackupFromFile(file: File): Promise<{ ok: true } | { ok: false; error: string }> {
+/** 导出明文备份文件。 */
+export function exportBackupToFile(bundle: BackupBundle): void {
+  downloadJson(bundle);
+}
+
+/**
+ * 收集全量数据并加密导出（加密备份档，v1.11.0）：整个备份文件加密，
+ * 口令只用于本次密钥派生、不落任何存储；环境不支持 WebCrypto 时抛 BackupCryptoError。
+ */
+export async function exportEncryptedBackupToFile(password: string): Promise<void> {
+  const bundle = await collectBackup();
+  const payload = await encryptText(JSON.stringify(bundle), password);
+  const envelope: BackupEnvelope = {
+    app: 'tailtale',
+    encrypted: true,
+    version: BACKUP_VERSION,
+    exportedAt: bundle.exportedAt,
+    kdf: { algorithm: 'PBKDF2', hash: 'SHA-256', iterations: payload.iterations, salt: payload.salt },
+    cipher: { algorithm: 'AES-GCM', iv: payload.iv },
+    ciphertext: payload.ciphertext,
+  };
+  downloadJson(envelope);
+}
+
+/**
+ * 读取备份文件并分类（只读文件 + JSON 解析，不触碰存储）：
+ *  - plain：明文备份包，可直接恢复；
+ *  - encrypted：加密信封，交由 UI 收口令后走 importEncryptedBackup；
+ *  - ok:false：带中文错误原因。
+ */
+export async function readBackupFile(
+  file: File
+): Promise<
+  | { ok: true; kind: 'plain'; bundle: BackupBundle }
+  | { ok: true; kind: 'encrypted'; envelope: BackupEnvelope }
+  | { ok: false; error: string }
+> {
   const text = await file.text();
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    return { ok: false, error: '文件不是合法的 JSON' };
+  }
+  if (isBackupEnvelope(data)) return { ok: true, kind: 'encrypted', envelope: data };
   const parsed = parseBackupBundle(text);
   if (!parsed.ok) return { ok: false, error: parsed.error };
+  return { ok: true, kind: 'plain', bundle: parsed.bundle };
+}
+
+/**
+ * 解密加密备份并写回本地（覆盖式）。口令错误 / 文件被篡改 → ok:false。
+ * 解密内容仍过一次 parseBackupBundle 形状校验，防止伪造内容注入。
+ */
+export async function importEncryptedBackup(
+  envelope: BackupEnvelope,
+  password: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  let plaintext: string;
+  try {
+    plaintext = await decryptText(envelopePayload(envelope), password);
+  } catch (error) {
+    if (error instanceof BackupCryptoError) return { ok: false, error: error.message };
+    return { ok: false, error: '解密失败，请确认文件格式' };
+  }
+  const parsed = parseBackupBundle(plaintext);
+  if (!parsed.ok) return { ok: false, error: `解密成功但备份内容无效：${parsed.error}` };
   await restoreBackup(parsed.bundle);
   return { ok: true };
 }

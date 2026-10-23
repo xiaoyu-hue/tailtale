@@ -25,7 +25,9 @@ export {
   collectBackup,
   restoreBackup,
   exportBackupToFile,
-  importBackupFromFile,
+  exportEncryptedBackupToFile,
+  readBackupFile,
+  importEncryptedBackup,
 } from './service';
 export { parseBackupBundle, BACKUP_VERSION } from './model';
-export type { BackupBundle } from './model';
+export type { BackupBundle, BackupEnvelope } from './model';

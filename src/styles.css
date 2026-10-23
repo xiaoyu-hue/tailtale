@@ -1891,6 +1891,11 @@ button {
   background: var(--primary-soft);
 }
 
+.backup-option.disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .backup-option input[type='radio'] {
   margin-top: 3px;
   accent-color: var(--primary);
@@ -1911,6 +1916,14 @@ button {
   font-size: 12px;
   color: var(--text-secondary);
   line-height: 1.6;
+}
+
+.backup-password-fields {
+  margin: 0 0 4px;
+}
+
+.backup-password-fields .ai-dialog-warning {
+  margin: 8px 0 0;
 }
 
 /* ---- 进度 / 结果 / 错误 ---- */

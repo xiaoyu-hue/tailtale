@@ -5,7 +5,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseBackupBundle, BACKUP_VERSION, isBuiltinBookRow, builtinBookIds, filterContentsForBackup, filterBooksForRestore, AI_CONFIG_KEY, backupContainsAiKey, stripAiKey } from '../.test-dist/settings/model.js';
+import { parseBackupBundle, BACKUP_VERSION, isBuiltinBookRow, builtinBookIds, filterContentsForBackup, filterBooksForRestore, AI_CONFIG_KEY, backupContainsAiKey, stripAiKey, isBackupEnvelope, envelopePayload } from '../.test-dist/settings/model.js';
 
 const sampleBundle = {
   app: 'tailtale',
@@ -170,4 +170,48 @@ test('stripAiKey：无密钥键时不影响其他数据（标准备份与旧备�
   const stripped = stripAiKey(bundle);
   assert.deepEqual(stripped.localStorage, { 'tailtale:settings': '{}' });
   assert.equal(backupContainsAiKey(stripped), false);
+});
+
+/* —— 加密备份信封（v1.11.0）：形状校验 —— */
+
+const validEnvelope = {
+  app: 'tailtale',
+  encrypted: true,
+  version: BACKUP_VERSION,
+  exportedAt: '2026-10-23T00:00:00.000Z',
+  kdf: { algorithm: 'PBKDF2', hash: 'SHA-256', iterations: 600000, salt: 'c2FsdA==' },
+  cipher: { algorithm: 'AES-GCM', iv: 'aXY=' },
+  ciphertext: 'Y2lwaGVy',
+};
+
+test('isBackupEnvelope：合法信封为真', () => {
+  assert.equal(isBackupEnvelope(validEnvelope), true);
+});
+
+test('isBackupEnvelope：明文包 / 非对象 / 缺字段 / 错算法均为假', () => {
+  assert.equal(isBackupEnvelope({ app: 'tailtale', version: 1, stores: {}, localStorage: {} }), false); // 明文备份
+  assert.equal(isBackupEnvelope(null), false);
+  assert.equal(isBackupEnvelope('tailtale'), false);
+  assert.equal(isBackupEnvelope({ ...validEnvelope, encrypted: false }), false);
+  assert.equal(isBackupEnvelope({ ...validEnvelope, app: 'other' }), false);
+  assert.equal(isBackupEnvelope({ ...validEnvelope, version: '1' }), false);
+  assert.equal(isBackupEnvelope({ ...validEnvelope, exportedAt: 123 }), false);
+  assert.equal(isBackupEnvelope({ ...validEnvelope, kdf: { ...validEnvelope.kdf, algorithm: 'scrypt' } }), false);
+  assert.equal(isBackupEnvelope({ ...validEnvelope, kdf: { ...validEnvelope.kdf, hash: 'SHA-1' } }), false);
+  assert.equal(isBackupEnvelope({ ...validEnvelope, cipher: { ...validEnvelope.cipher, algorithm: 'AES-CBC' } }), false);
+  const { kdf, ...missingKdf } = validEnvelope;
+  assert.equal(isBackupEnvelope(missingKdf), false);
+  const { cipher, ...missingCipher } = validEnvelope;
+  assert.equal(isBackupEnvelope(missingCipher), false);
+  const { ciphertext, ...missingCiphertext } = validEnvelope;
+  assert.equal(isBackupEnvelope(missingCiphertext), false);
+});
+
+test('envelopePayload：取出盐 / IV / 迭代次数 / 密文，与信封字段一致', () => {
+  assert.deepEqual(envelopePayload(validEnvelope), {
+    salt: 'c2FsdA==',
+    iv: 'aXY=',
+    iterations: 600000,
+    ciphertext: 'Y2lwaGVy',
+  });
 });

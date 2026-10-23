@@ -185,3 +185,57 @@ export function parseBackupBundle(text: string): ParseResult {
     },
   };
 }
+
+// ============ 加密备份信封（v1.11.0）：纯函数层 ============
+
+/**
+ * 加密备份信封：备份 JSON 整体加密后的外层结构。
+ * 与明文备份同为 .json 文件，导入时按 encrypted 字段自动识别，
+ * 弹口令框走解密链路（见 service.ts / platform/crypto/backup-crypto.ts）。
+ */
+export interface BackupEnvelope {
+  app: 'tailtale';
+  /** 标识此文件为加密备份（明文备份无此字段） */
+  encrypted: true;
+  /** 内层备份格式版本（与 BACKUP_VERSION 同语义） */
+  version: number;
+  exportedAt: string;
+  kdf: { algorithm: 'PBKDF2'; hash: 'SHA-256'; iterations: number; salt: string };
+  cipher: { algorithm: 'AES-GCM'; iv: string };
+  /** base64(AES-256-GCM(JSON.stringify(BackupBundle)))，含认证标签 */
+  ciphertext: string;
+}
+
+/** 判断解析出的数据是否为加密备份信封（只校验形状，不解密）。 */
+export function isBackupEnvelope(data: unknown): data is BackupEnvelope {
+  if (typeof data !== 'object' || data === null) return false;
+  const obj = data as Record<string, unknown>;
+  if (obj.app !== 'tailtale' || obj.encrypted !== true) return false;
+  if (typeof obj.version !== 'number' || typeof obj.exportedAt !== 'string') return false;
+  if (typeof obj.ciphertext !== 'string') return false;
+  const kdf = obj.kdf as Record<string, unknown> | null | undefined;
+  if (!kdf || typeof kdf !== 'object') return false;
+  if (kdf.algorithm !== 'PBKDF2' || kdf.hash !== 'SHA-256') return false;
+  if (typeof kdf.iterations !== 'number' || typeof kdf.salt !== 'string') return false;
+  const cipher = obj.cipher as Record<string, unknown> | null | undefined;
+  if (!cipher || typeof cipher !== 'object') return false;
+  return cipher.algorithm === 'AES-GCM' && typeof cipher.iv === 'string';
+}
+
+/**
+ * 信封 → 加密原语入参（字段已由 isBackupEnvelope 校验）。
+ * 返回结构与 platform/crypto 的 EncryptedPayload 结构兼容（不引入跨层 import）。
+ */
+export function envelopePayload(envelope: BackupEnvelope): {
+  salt: string;
+  iv: string;
+  iterations: number;
+  ciphertext: string;
+} {
+  return {
+    salt: envelope.kdf.salt,
+    iv: envelope.cipher.iv,
+    iterations: envelope.kdf.iterations,
+    ciphertext: envelope.ciphertext,
+  };
+}
