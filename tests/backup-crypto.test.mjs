@@ -17,7 +17,7 @@ import {
   isBackupEnvelope,
   envelopePayload,
   parseBackupBundle,
-} from '../.test-dist/settings/model.js';
+} from '../.test-dist/modules/settings/model.js';
 
 /** 测试用小迭代次数（提速）；生产参数由末尾「生产迭代次数」用例单独验证。 */
 const FAST_ITERATIONS = 1000;

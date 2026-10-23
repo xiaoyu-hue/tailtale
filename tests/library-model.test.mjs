@@ -6,7 +6,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLibraryManifest } from '../.test-dist/books/library-model.js';
+import { parseLibraryManifest } from '../.test-dist/modules/books/library-model.js';
 
 const sampleEntry = {
   file: 'hongloumeng.txt',

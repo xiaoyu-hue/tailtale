@@ -5,7 +5,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseBackupBundle, BACKUP_VERSION, isBuiltinBookRow, builtinBookIds, filterContentsForBackup, filterBooksForRestore, AI_CONFIG_KEY, backupContainsAiKey, stripAiKey, isBackupEnvelope, envelopePayload } from '../.test-dist/settings/model.js';
+import { parseBackupBundle, BACKUP_VERSION, isBuiltinBookRow, builtinBookIds, filterContentsForBackup, filterBooksForRestore, AI_CONFIG_KEY, backupContainsAiKey, stripAiKey, isBackupEnvelope, envelopePayload } from '../.test-dist/modules/settings/model.js';
 
 const sampleBundle = {
   app: 'tailtale',

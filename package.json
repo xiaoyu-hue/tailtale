@@ -1,7 +1,7 @@
 {
   "name": "tailtale",
   "private": true,
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "书时 TailTale：游戏化阅读器 + 轻量工具箱",
   "type": "module",
   "license": "Apache-2.0",
@@ -10,7 +10,9 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
-    "test": "tsc src/modules/pet/model.ts src/modules/ai/model.ts src/modules/settings/model.ts src/modules/books/library-model.ts --outDir .test-dist --rootDir src/modules --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022 && tsc src/modules/gamification/model.ts src/shared/dates.ts --outDir .test-dist --rootDir src --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022 && tsc src/shared/dates.ts --outDir .test-dist/shared --rootDir src/shared --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022 && tsc src/platform/crypto/backup-crypto.ts --outDir .test-dist --rootDir src --module NodeNext --moduleResolution NodeNext --target ES2022 --lib ES2022,DOM && node --test tests/*.test.mjs"
+    "test": "tsc -p tsconfig.test.json && node --test tests/*.test.mjs",
+    "test:coverage": "tsc -p tsconfig.test.json && mkdir -p coverage && node --test --experimental-test-coverage --test-reporter=spec --test-reporter-destination=stdout --test-reporter=lcov --test-reporter-destination=coverage/lcov.info tests/*.test.mjs",
+    "smoke": "python3 scripts/smoke/smoke.py --serve dist"
   },
   "dependencies": {
     "epubjs": "^0.3.93",

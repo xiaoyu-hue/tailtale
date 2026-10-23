@@ -22,7 +22,8 @@ import {
   estimateTokens,
   groupText,
   isAiConfigured,
-} from '../.test-dist/ai/model.js';
+  isSecureEndpoint,
+} from '../.test-dist/modules/ai/model.js';
 
 // ---- 配置校验 ----
 
@@ -221,4 +222,38 @@ test('chatCompletionsUrl：容忍尾斜杠、空白与 /v1', () => {
   assert.equal(chatCompletionsUrl('https://api.deepseek.com/'), 'https://api.deepseek.com/chat/completions');
   assert.equal(chatCompletionsUrl('https://api.deepseek.com/v1'), 'https://api.deepseek.com/v1/chat/completions');
   assert.equal(chatCompletionsUrl('  https://api.deepseek.com/v1/  '), 'https://api.deepseek.com/v1/chat/completions');
+});
+
+// ---- 端点安全校验 ----
+
+test('isSecureEndpoint：https 一律放行', () => {
+  assert.equal(isSecureEndpoint('https://api.deepseek.com'), true);
+  assert.equal(isSecureEndpoint('HTTPS://API.DEEPSEEK.COM'), true);
+  assert.equal(isSecureEndpoint('  https://api.deepseek.com  '), true);
+});
+
+test('isSecureEndpoint：http 仅放行本地回环', () => {
+  assert.equal(isSecureEndpoint('http://localhost'), true);
+  assert.equal(isSecureEndpoint('http://localhost:11434'), true);
+  assert.equal(isSecureEndpoint('http://127.0.0.1'), true);
+  assert.equal(isSecureEndpoint('http://127.0.0.1:8080/'), true);
+});
+
+test('isSecureEndpoint：其余 http 一律拒绝（明文传密钥）', () => {
+  assert.equal(isSecureEndpoint('http://api.example.com'), false);
+  assert.equal(isSecureEndpoint('http://8.8.8.8'), false);
+  assert.equal(isSecureEndpoint('http://localhost/v1'), false, '本地端点也不允许多余路径');
+});
+
+test('isSecureEndpoint：防前缀伪装（localhost.evil.com 等）', () => {
+  assert.equal(isSecureEndpoint('http://localhost.evil.com'), false);
+  assert.equal(isSecureEndpoint('http://127.0.0.1.evil.com'), false);
+  assert.equal(isSecureEndpoint('http://notlocalhost'), false);
+});
+
+test('isSecureEndpoint：空与非 http 协议拒绝', () => {
+  assert.equal(isSecureEndpoint(''), false);
+  assert.equal(isSecureEndpoint('   '), false);
+  assert.equal(isSecureEndpoint('ftp://localhost'), false);
+  assert.equal(isSecureEndpoint('javascript:alert(1)'), false);
 });

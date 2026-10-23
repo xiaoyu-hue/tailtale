@@ -1,8 +1,11 @@
 name: CI
 
-# 质量门禁：任何推送到 main 或新建 PR 都会跑「类型检查 → 测试 → 构建」。
+# 质量门禁：任何推送到 main 或新建 PR 都会跑两个作业——
+#   quality：类型检查 → 单测 → 构建 → 覆盖率报告（产物上传）
+#   smoke：端到端冒烟（真实 Chromium 跑加密备份全链路），quality 通过后才跑
 # 目的：在代码进入 main（从而触发 Cloudflare Pages 自动部署）前，先拦住
-# 类型错误、测试挂掉、构建失败的提交，避免带病上线。
+# 类型错误、测试挂掉、构建失败、UI 真问题（单测对 UI/遮挡类问题天然失明，
+# 这层是唯一能抓到它们的门禁）。
 # 注意：本门禁提供「可见性」，真正阻止部署需将 Pages 改为「从 CI 构建产物发布」，
 # 那是 Cloudflare 侧配置，不在本仓库内。
 on:
@@ -23,3 +26,32 @@ jobs:
       - run: npx tsc --noEmit
       - run: npm test
       - run: npm run build
+      # 覆盖率只出报告、不设硬门槛（v1.12.0 用户决策）：数字供人复盘，
+      # 不作为 CI 通过条件，避免为凑覆盖率写无意义测试
+      - name: 覆盖率报告（lcov）
+        run: npm run test:coverage
+      - name: 上传覆盖率 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+
+  smoke:
+    runs-on: ubuntu-latest
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: npm ci
+      - run: npm run build
+      - run: pip install playwright
+      - run: playwright install --with-deps chromium
+      - name: 端到端冒烟（加密备份全链路）
+        run: npm run smoke

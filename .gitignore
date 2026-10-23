@@ -6,3 +6,4 @@ dev-dist/
 npm-debug.log*
 .vite/
 .test-dist/
+coverage/

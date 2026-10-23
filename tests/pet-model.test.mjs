@@ -22,7 +22,7 @@ import {
   sleep,
   stroke,
   wake,
-} from '../.test-dist/pet/model.js';
+} from '../.test-dist/modules/pet/model.js';
 
 const T0 = 1_700_000_000_000; // 固定基准时间戳（测试不依赖真实时钟）
 const TODAY = '2026-10-21';
