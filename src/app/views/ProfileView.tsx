@@ -30,6 +30,10 @@ const CREDIT_GROUPS: CreditGroup[] = [
       { name: 'Workbox', detail: 'MIT · Google · vite-plugin-pwa 底层：预缓存与运行时缓存' },
       { name: 'TypeScript', detail: 'Apache-2.0 · Microsoft · 类型检查（开发期依赖）' },
       { name: 'Desktop-Pixel-Pet', detail: 'MIT · CanFlyhang · 像素猫美术资产 pixel_cat.json（随源码分发）' },
+      { name: 'MiniSearch', detail: 'MIT · Luca Ongaro · 全文搜索：字段加权 + 模糊搜索，ESM 零依赖' },
+      { name: 'JSZip', detail: 'MIT 或 GPLv3（选 MIT）· Stuart Knightley 等 · FB2 转 EPUB 打包与 CBZ 图片解包' },
+      { name: 'fflate', detail: 'MIT · Arjun Barrett · MOBI / AZW3 记录解压（仅内嵌字体场景按需下载）' },
+      { name: 'foliate-js', detail: 'MIT · John Factotum / foliate-js contributors · MOBI / AZW3 解析（vendored 单文件 mobi.js，不替换 epubjs，按需动态加载）' },
     ],
   },
   {
@@ -40,7 +44,6 @@ const CREDIT_GROUPS: CreditGroup[] = [
       { name: 'Tamagochi', detail: 'MIT · Tech-aficionado · 宠物系统蓝本：属性衰减/成长/喂食/睡觉' },
       { name: 'NextChat', detail: 'MIT · ChatGPTNextWeb · AI 交互模式：BYOK 设置页' },
       { name: 'shiki-toolbox', detail: 'MIT · Elari39 · 设计系统与算法工程思路（四季箱）' },
-      { name: 'foliate-js', detail: 'MIT · johnfactotum · 备选渲染引擎（计划引入，尚未进入构建）' },
     ],
   },
 ];
