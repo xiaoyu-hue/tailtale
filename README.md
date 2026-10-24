@@ -10,7 +10,7 @@
 
 - **本地优先**：电子书与全部用户数据不出浏览器，无需注册登录
 - **零成本运营**：无服务器、无数据库、无 AI 费用（AI 采用 BYOK 模式，用户自带密钥）
-- **无支付、无商业化**：金币只能靠阅读赚取，不可购买
+- **无支付、无商业化**：金币只能靠阅读与小游戏赚取，不可购买
 - **PWA**：可"添加到主屏幕"，离线可用；「我的」页支持手动检查更新，新版本一键刷新加载
 
 ---
@@ -79,6 +79,7 @@
 - **经验值（XP）**：每阅读 1 分钟 +1 XP
 - **每日打卡**：当日阅读满 1 分钟可打卡，+5 金币起；连续打卡第 3 天起每天 +2（单日上限 +10）
 - **读完奖励**：标记读完一本书 +100 金币
+- **小游戏**：首页功能格「游戏」进入，猜数字连胜每局 +1 金币（每日上限 5，首玩 +3）；AI 主持人可选，无 AI 也能玩
 
 ### 个性化与统计
 
@@ -157,7 +158,7 @@ npm run smoke      # 端到端冒烟（需先 build；真实浏览器跑加密�
 
 ```
 app/          应用外壳：App.tsx（导航 + 装配）/ views/（路由级视图）
-modules/      领域模块：books（书架）/ reader（阅读器）/ gamification（游戏化）/ settings（设置）/ toolbox（工具箱）
+modules/      领域模块：books（书架）/ reader（阅读器）/ gamification（游戏化）/ pet（宠物）/ games（游戏）/ settings（设置）/ toolbox（工具箱）
 platform/     平台能力：db（IndexedDB + 迁移）/ store（状态工厂）/ events（事件总线）/ hash（内容指纹）/ update（PWA 更新检查）
 shared/       跨模块共享：ui（TopBar / BottomNav 等）
 public/       静态资源：library-books/（内置公版书文本，随应用分发）/ library-manifest.json（书单与指纹清单）
@@ -275,6 +276,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
     │   ├── pet/              宠物：model（属性/好感/成长/羁绊纯函数）/ service（计时队列）/ store / ui（像素猫 canvas）
 │   ├── settings/         全局偏好：model（字号档位 + 主题）/ service（localStorage）/ store / ui
 │   ├── toolbox/          工具箱：model（文本统计与书摘纯函数）/ ui（8 款本地小工具）/ highlights.ts（书摘 CFI 存储）
+│   ├── games/            游戏：model（经济规则 + 主持人台词）/ store（对局记录）/ service（结算 + AI 降级链）/ ui（猜数字）
 │   └── ai/               AI 解读书：model（纯函数 + prompt）/ service（DeepSeek 直连）/ store / ui（设置 + 抽屉）
     ├── platform/             平台能力：db（IndexedDB + 迁移）/ store（状态工厂）/ events（事件总线）/ hash（内容指纹）/ update（PWA 更新检查）
     └── shared/               跨模块共享：ui（TopBar / BottomNav 等）/ hooks（useSwipe 手势）/ utils（dates 日期工具 / interactions 涟漪委托 / useTicker 时钟）
@@ -304,6 +306,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 | M5 AI 解读书 | BYOK 设置、DeepSeek 直连（TXT + EPUB） | ✅ 已完成（v1.4.0） |
 | M6 打磨 | 主题皮肤、商店、数据备份 | ✅ 已完成（v1.5.0 上线界面皮肤 + 数据备份，v1.5.1 首页入口接通；猫皮肤商店留待后续「商店」模块） |
 | M7 作品化 | README 完善、demo 优化、内置公版书库 | ✅ 已完成（内置公版书库 10 本上线，版权核查见 docs/书时-内置书库版权核查.md） |
+| 游戏模块 | 猜数字 + AI 主持人双模式 + 游戏金币经济（每日上限防刷） | 🚧 进行中（批次 1 已推送 main，未发版；成语 / 歇后语 / 急转弯 / 五子棋 / 井字棋为后续批次） |
 
 ---
 
