@@ -2813,3 +2813,381 @@ button {
 .toast-message {
   word-break: break-word;
 }
+
+/* ========== 工具箱 M4 ========== */
+
+.toolbox-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbox-sub {
+  margin: -6px 0 12px;
+  font-size: 12px;
+}
+
+.toolbox-grid {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.feature-cell .feature-label {
+  font-weight: 600;
+}
+
+.feature-cell .feature-desc {
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--text-secondary);
+}
+
+/* 番茄钟 */
+.pomodoro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.pomodoro-presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pomodoro-ring {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: background 0.3s linear;
+}
+
+.pomodoro-face {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pomodoro-phase {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.pomodoro-time {
+  font-size: 40px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  letter-spacing: 1px;
+}
+
+.pomodoro-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.pomodoro-tip {
+  font-size: 12px;
+  text-align: center;
+}
+
+/* 白噪音 */
+.noise {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 8px 0;
+}
+
+.noise-presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.noise-toggle {
+  align-self: center;
+  min-width: 120px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.12s ease;
+}
+
+.noise-toggle:active {
+  transform: scale(0.96);
+}
+
+.noise-toggle.playing {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.noise-volume {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.noise-tip {
+  font-size: 12px;
+  text-align: center;
+}
+
+/* 文本统计 */
+.textstats {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.textstats-input {
+  width: 100%;
+  resize: vertical;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  padding: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+.textstats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.textstats-cell {
+  background: var(--surface-soft);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  text-align: center;
+}
+
+.textstats-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.textstats-time {
+  font-size: 14px;
+  color: var(--text);
+  text-align: center;
+}
+
+.textstats-time strong {
+  font-size: 18px;
+  color: var(--primary-strong);
+}
+
+/* 今日一书 */
+.bookofday {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.bookofday-cover {
+  width: 72px;
+  height: 96px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-strong));
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 38px;
+  font-weight: 700;
+  box-shadow: var(--shadow-float);
+}
+
+.bookofday-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.bookofday-meta {
+  font-size: 12px;
+}
+
+.bookofday-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* 朗读 */
+.tts {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tts-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tts-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tts-row .muted {
+  min-width: 28px;
+}
+
+.tts-num {
+  font-variant-numeric: tabular-nums;
+  min-width: 36px;
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+.tts-select {
+  flex: 1;
+  padding: 8px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* 全文搜索 */
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.search-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.search-item {
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.search-item:active {
+  transform: scale(0.99);
+}
+
+.search-title {
+  font-weight: 600;
+}
+
+.search-author {
+  font-size: 12px;
+}
+
+.search-snippet {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* 书摘导出 */
+.hl {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hl-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.hl-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.hl-group-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.hl-item {
+  background: var(--surface-soft);
+  border-radius: var(--radius-lg);
+  padding: 10px 12px;
+}
+
+.hl-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.hl-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.hl-del {
+  background: none;
+  border: none;
+  color: var(--primary-strong);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.hl-empty {
+  text-align: center;
+  padding: 12px;
+}

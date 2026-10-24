@@ -14,7 +14,8 @@ import {
 } from '../../settings';
 import { AiDrawer } from '../../ai';
 import { useSwipe } from '../../../shared/hooks/useSwipe';
-import { ErrorState } from '../../../components';
+import { ErrorState, toast } from '../../../components';
+import { addHighlight, loadHighlights } from '../../toolbox/highlights';
 
 interface EpubReaderProps {
   book: Book;
@@ -96,6 +97,29 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
         rendition.themes.fontSize(`${fontSize}px`);
         rendition.themes.override('line-height', String(lineHeight));
         rendition.themes.override('padding', `${margin}px`);
+
+        // —— 书摘收藏（M4）：选中正文即保存 CFI 与文本，并渲染该书已有高亮 ——
+        const rAny = rendition as unknown as {
+          on: (event: string, cb: (...args: any[]) => void) => void;
+          annotations: {
+            add: (type: string, cfi: string, data: object, cb?: (e: Event) => void, className?: string) => void;
+          };
+        };
+        for (const h of loadHighlights().filter((x) => x.bookId === book.id)) {
+          try {
+            rAny.annotations.add('highlight', h.cfi, {}, () => {}, 'tailtale-hl');
+          } catch {
+            /* 旧版/失效 CFI 忽略 */
+          }
+        }
+        rAny.on('selected', (cfiRange: string, contents: unknown) => {
+          const c = contents as { range?: Range; window?: Window };
+          const text = (c?.range?.toString?.() ?? c?.window?.getSelection?.()?.toString?.() ?? '').trim();
+          if (!text) return;
+          addHighlight({ bookId: book.id, bookTitle: book.title, cfi: cfiRange, text });
+          toast.success('已收藏书摘');
+        });
+
         // 有 CFI 精确恢复，否则从头开始。epubjs 的 display 在类型上声明返回 void，但运行时会
         // 返回 Promise；用 Promise.resolve 兜底捕获其 rejection（如跨设备/旧版备份导致的非法 CFI），
         // 失败时回首页，避免 unhandled rejection 卡死阅读页。

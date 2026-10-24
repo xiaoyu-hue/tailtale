@@ -7,6 +7,25 @@
 
 （占位：下一版本内容写在这里，发版时搬进正式段）
 
+## [1.13.0] - 2026-10-24
+
+### 新增
+
+- **M4 工具箱**：首页功能格「工具箱」正式上线（此前挂 M4 规划角标），进入后 8 宫格，每款工具经底部抽屉展开。新增 `src/modules/toolbox/` 模块，复用既有 Sheet / Toast / CheckinCalendar 等原语与 gamification 金币经济，延续「本地优先、零依赖、零上传」的产品基调
+  - **专注番茄钟**：25/50/15 三档预设 + 倒计时环，完成一轮专注经新增 `awardCoins` 发放 +5 金币（与 spendCoins/refundCoins 同源串行队列）
+  - **白噪音**：Web Audio 程序化合成雨声 / 海浪 / 森林 / 篝火，零音频文件、零依赖、零联网
+  - **文本统计**：CJK 按字计数 + 中英文混排预计阅读时长（中文 300 字/分、英文 200 词/分）
+  - **今日一书**：从内置公版书库随机推荐，可「换一本」或「加入书架」
+  - **阅读日历**：直接复用首页打卡日历热力图（GitHub 贡献图样式）
+  - **书摘导出**：EPUB 阅读器选中正文即收藏（epub.js CFI 落 localStorage），工具箱按书分组、单条删除、批量导出 Markdown
+  - **朗读（TTS）**：浏览器内置语音合成（Web Speech API）离线朗读，支持语速 / 音调 / 音色，可载入当前书正文
+  - **全文搜索**：minisearch 本地索引书架，默认搜书名 / 作者，一键「索引正文」后可搜书中内容，零云端
+
+### 技术内部
+
+- gamification 新增公开金币发放入口 `awardCoins`；阅读器 `EpubReader` 订阅书摘存储，不与 toolbox UI 反向耦合
+- 依赖：引入 `minisearch`（约 18KB gzip，ESM，字段加权 + 模糊搜索）；除它外本次未引重型库
+
 ## [1.12.0] - 2026-10-23
 
 ### 新增
@@ -324,3 +343,4 @@ M3 宠物系统完整上线：S1 数据与逻辑层 + S2 商店与金币闭环 +
 [1.2.1]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.2.1
 [1.2.2]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.2.2
 [1.3.0]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.3.0
+[1.13.0]: https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.13.0

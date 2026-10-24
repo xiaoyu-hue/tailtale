@@ -323,3 +323,27 @@ export async function refundCoins(amount: number): Promise<void> {
     console.error('金币退还失败', error);
   }
 }
+
+/**
+ * 发放金币（番茄钟等工具奖励入口）：复用串行队列与钱包事件，余额自动同步到 store。
+ * 与 spendCoins/refundCoins 同源，保证并发结算安全；返回发放后的总余额。
+ */
+export async function awardCoins(amount: number): Promise<number> {
+  if (amount <= 0) return 0;
+  try {
+    return await serialize(async () => {
+      const wallet = rolloverDaily(await loadWallet(), todayKey());
+      const updated: Wallet = { ...wallet, coins: wallet.coins + amount };
+      await saveWallet(updated);
+      emit('wallet:changed', {
+        coins: updated.coins,
+        xp: updated.xp,
+        todayMinutes: updated.todayMinutes,
+      });
+      return updated.coins;
+    });
+  } catch (error) {
+    console.error('金币奖励发放失败', error);
+    return 0;
+  }
+}

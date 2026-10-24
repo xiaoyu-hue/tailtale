@@ -10,13 +10,15 @@ import HomeView from './views/HomeView';
 import PetView from './views/PetView';
 import ShopView from './views/ShopView';
 import ProfileView from './views/ProfileView';
+import { ToolboxView } from '../modules/toolbox';
 
 type Route =
   | { name: 'home' }
   | { name: 'reader'; bookId: string }
   | { name: 'pet' }
   | { name: 'shop' }
-  | { name: 'profile' };
+  | { name: 'profile' }
+  | { name: 'toolbox' };
 
 const TAB_OF_ROUTE: Record<Route['name'], TabKey> = {
   home: 'home',
@@ -24,6 +26,7 @@ const TAB_OF_ROUTE: Record<Route['name'], TabKey> = {
   pet: 'pet',
   shop: 'shop',
   profile: 'profile',
+  toolbox: 'home',
 };
 
 const ROUTE_STORAGE_KEY = 'tailtale:route';
@@ -109,11 +112,18 @@ export default function App() {
           <HomeView
             onOpenBook={(bookId) => setRoute({ name: 'reader', bookId })}
             onNavigateTab={goTab}
+            onOpenToolbox={() => setRoute({ name: 'toolbox' })}
           />
         )}
         {route.name === 'pet' && <PetView onOpenShop={() => setRoute({ name: 'shop' })} />}
         {route.name === 'shop' && <ShopView />}
         {route.name === 'profile' && <ProfileView />}
+        {route.name === 'toolbox' && (
+          <ToolboxView
+            onBack={() => setRoute({ name: 'home' })}
+            onOpenBook={(bookId) => setRoute({ name: 'reader', bookId })}
+          />
+        )}
       </main>
       <BottomNav active={TAB_OF_ROUTE[route.name]} onChange={goTab} />
     </div>
