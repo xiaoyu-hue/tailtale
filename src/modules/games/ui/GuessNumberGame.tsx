@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from '../../../components';
-import { useGameRecord, useHostMode, settleGameRound, setHostMode } from '../store';
+import { useGameRecord, useHostMode, settleGameRound } from '../store';
 import { fetchHostLine, type HostLine } from '../service';
 import { GAME_ECONOMY, type HostContext, type HostEvent } from '../model';
 import { HostBubble } from './HostBubble';
+import { HostModeSwitch } from './HostModeSwitch';
 
 /** 猜数字规则（PRD §3.1.1 配套玩法；log₂100≈6.64，7 次保证可必胜）。 */
 const RANGE_MIN = 1;
@@ -230,25 +231,5 @@ export function GuessNumberGame() {
         </div>
       )}
     </div>
-  );
-}
-
-/** 主持人模式切换（本地 / AI；未配置密钥时禁用并引导去「我的」页）。 */
-function HostModeSwitch() {
-  const hostMode = useHostMode();
-  return (
-    <label className="guess-host-switch">
-      <span className="muted">AI 主持人</span>
-      <input
-        type="checkbox"
-        checked={hostMode === 'ai'}
-        onChange={(e) => {
-          setHostMode(e.target.checked ? 'ai' : 'local');
-          if (e.target.checked) {
-            toast.info('AI 主持人每次互动约 0.003 元，失败会自动降级本地台词');
-          }
-        }}
-      />
-    </label>
   );
 }

@@ -87,6 +87,28 @@ def run_smoke(base):
         # 关抽屉回游戏页，再返回首页；离开视为无结果，不写库不判负
         page.locator(".sheet-mask.open").click()
         page.wait_for_timeout(300)
+
+        # 四选一猜词三兄弟（批次 2）：题干 + 4 选项 + 答题反馈（答一题不结算、不写库）
+        for name in ("猜成语", "猜歇后语", "脑筋急转弯"):
+            page.get_by_role("button", name=name).click()
+            sheet = page.locator(".sheet.open")
+            sheet.wait_for()
+            check(
+                f"{name}对局展开（题干 + 4 个选项）",
+                sheet.locator(".quiz-prompt").is_visible()
+                and sheet.locator(".quiz-option").count() == 4,
+            )
+            sheet.locator(".quiz-option").first.click()
+            check(
+                f"{name}答题有反馈并出现「下一题」",
+                sheet.locator(".quiz-feedback").is_visible()
+                and sheet.get_by_role("button", name="下一题").is_visible(),
+            )
+            # Escape 关闭（内容超高时 mask 中心点被面板遮挡，click 会超时；
+            # Sheet 监听 window keydown，键盘关闭不依赖几何命中）
+            page.keyboard.press("Escape")
+            page.wait_for_timeout(300)
+
         page.get_by_role("button", name="返回首页").click()
         page.get_by_role("heading", name="书架").wait_for()
         check("术语统一：页面无「游戏币」字样", "游戏币" not in page.content())

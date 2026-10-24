@@ -3247,11 +3247,90 @@ button {
   padding: 12px;
 }
 
-/* ========== 游戏模块（批次 1：猜数字） ========== */
+/* ========== 游戏模块（批次 1：猜数字；批次 2：四选一猜词） ========== */
 
 .games-grid {
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
+}
+
+/* 四选一猜词：题干卡 + 选项（对错揭示态） */
+.quiz-prompt {
+  padding: 14px;
+  margin-bottom: 14px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+}
+
+.quiz-prompt-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--accent, #c86b3c);
+  background: color-mix(in srgb, var(--accent, #c86b3c) 12%, transparent);
+}
+
+.quiz-prompt p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quiz-option {
+  padding: 11px 14px;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.quiz-option:hover:not(:disabled) {
+  border-color: var(--accent, #c86b3c);
+}
+
+.quiz-option:disabled {
+  cursor: default;
+}
+
+.quiz-option--right {
+  border-color: #3d8a5a;
+  color: #3d8a5a;
+  font-weight: 600;
+}
+
+.quiz-option--wrong {
+  border-color: #c0453c;
+  color: #c0453c;
+}
+
+.quiz-option--dim {
+  opacity: 0.55;
+}
+
+.quiz-feedback {
+  margin: 12px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.quiz-feedback--right {
+  color: #3d8a5a;
+}
+
+.quiz-feedback--wrong {
+  color: #c0453c;
 }
 
 /* 主持人台词气泡：打字机 + 来源徽标（速查表「等得住 / 信得过」本地化） */

@@ -136,6 +136,79 @@ export function settleGameReward(
   };
 }
 
+// ---- 四选一猜词游戏出题层（猜成语 / 猜歇后语 / 脑筋急转弯共用） ----
+
+import { IDIOMS, PROVERBS, TEASERS } from './data/quizBank.js';
+
+/** 四选一游戏 id（共用 QuizGame 组件与出题函数）。 */
+export type QuizGameId = 'guess_idiom' | 'guess_riddle' | 'brain_teaser';
+
+/** 一轮四选一题目（纯数据，UI 直接渲染）。 */
+export interface QuizRound {
+  /** 题干（成语=释义；歇后语=前半句；急转弯=原题） */
+  prompt: string;
+  /** 4 个选项（已按 seed 确定性打乱，互异） */
+  options: string[];
+  /** 正确选项下标 */
+  answerIndex: number;
+  /** 正确答案（= options[answerIndex]，结算/提示用） */
+  answer: string;
+}
+
+/** 确定性伪随机（LCG）：同 seed 同序列，供抽题与选项打乱使用。 */
+function makeRng(seed: number): () => number {
+  let s = (Math.abs(Math.trunc(seed)) * 1103515245 + 12345) & 0x7fffffff;
+  return () => {
+    s = (s * 1103515245 + 12345) & 0x7fffffff;
+    return s / 0x7fffffff;
+  };
+}
+
+/**
+ * 生成一轮四选一题目（纯函数）：同 seed 同结果（可单测、可复现对局）。
+ * - 抽题：idx = seed % bank.length；
+ * - 干扰项：LCG 序列取样 3 个 ≠ idx 的下标（题库答案唯一，无多解歧义）；
+ * - 选项位次：答案放入 rng 生成的随机位，干扰按取样顺序填充其余位。
+ */
+export function buildQuizRound(gameId: QuizGameId, seed: number): QuizRound {
+  const bank: Array<{ prompt: string; answer: string }> =
+    gameId === 'guess_idiom'
+      ? IDIOMS.map((it) => ({ prompt: it.meaning, answer: it.idiom }))
+      : gameId === 'guess_riddle'
+        ? PROVERBS.map((it) => ({ prompt: it.front, answer: it.back }))
+        : TEASERS.map((it) => ({ prompt: it.q, answer: it.a }));
+  const idx = Math.abs(Math.trunc(seed)) % bank.length;
+  const rng = makeRng(seed + 1);
+
+  const distractors: string[] = [];
+  const taken = new Set<number>([idx]);
+  let guard = 0;
+  while (distractors.length < 3 && guard++ < 500) {
+    const j = Math.floor(rng() * bank.length) % bank.length;
+    if (taken.has(j)) continue;
+    taken.add(j);
+    distractors.push(bank[j].answer);
+  }
+  // 题库 >= 4 条时 guard 必然成功；兜底（题库被改坏时）用相邻条目
+  for (let k = 1; distractors.length < 3; k += 1) {
+    const j = (idx + k) % bank.length;
+    if (taken.has(j)) continue;
+    taken.add(j);
+    distractors.push(bank[j].answer);
+  }
+
+  const answerIndex = Math.floor(rng() * 4) % 4;
+  const options: string[] = ['', '', '', ''];
+  options[answerIndex] = bank[idx].answer;
+  let cursor = 0;
+  for (let slot = 0; slot < 4; slot += 1) {
+    if (slot === answerIndex) continue;
+    options[slot] = distractors[cursor];
+    cursor += 1;
+  }
+  return { prompt: bank[idx].prompt, options, answerIndex, answer: bank[idx].answer };
+}
+
 // ---- 主持人台词层（AI / 本地双通道共用） ----
 
 /** 主持人模式：local=本地模板；ai=AI 生成（未配置或失败时自动降级本地）。 */
@@ -163,7 +236,7 @@ export interface HostContext {
 /** 本地主持人台词池（无 AI 模式兜底；{game}/{streak}/{best}/{detail} 为占位变量）。 */
 export const HOST_LINES: Record<HostEvent, string[]> = {
   start: [
-    '{game}开局！我心里已经想好一个数了，来猜吧～{detail}',
+    '{game}开局！我已经准备好了，来猜吧～{detail}',
     '新的一局{game}！放马过来，{detail}',
     '开始啦！{detail}，猜中可以赚金币哦',
   ],

@@ -34,6 +34,7 @@
     "src/modules/books/mobi.ts",
     "src/modules/gamification/model.ts",
     "src/modules/games/model.ts",
+    "src/modules/games/data/quizBank.ts",
     "src/modules/reader/model.ts",
     "src/modules/reader/cbz.ts",
     "src/platform/events.ts",
