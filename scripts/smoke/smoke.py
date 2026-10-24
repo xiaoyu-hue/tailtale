@@ -72,6 +72,25 @@ def run_smoke(base):
         page.on("console", lambda m: errors.append(m.text) if m.type == "error" else None)
 
         page.goto(base, wait_until="networkidle")
+
+        # —— 游戏模块：首页入口 → 游戏页 → 猜数字对局展开 → 返回（离开不判负）——
+        page.get_by_role("button", name="游戏").click()
+        page.get_by_role("heading", name="游戏").wait_for()
+        check("游戏入口可见可点", True)
+        page.get_by_role("button", name="猜数字").click()
+        sheet = page.locator(".sheet.open")
+        sheet.wait_for()
+        check(
+            "猜数字对局展开（输入框 + 7 次机会）",
+            sheet.get_by_label("你的猜测").is_visible() and "还剩 7 次机会" in sheet.text_content(),
+        )
+        # 关抽屉回游戏页，再返回首页；离开视为无结果，不写库不判负
+        page.locator(".sheet-mask.open").click()
+        page.wait_for_timeout(300)
+        page.get_by_role("button", name="返回首页").click()
+        page.get_by_role("heading", name="书架").wait_for()
+        check("术语统一：页面无「游戏币」字样", "游戏币" not in page.content())
+
         page.get_by_role("button", name="我的").click()
         page.get_by_role("button", name="导出备份").wait_for()
 

@@ -19,6 +19,7 @@ interface HomeViewProps {
   onOpenBook: (bookId: string) => void;
   onNavigateTab: (tab: TabKey) => void;
   onOpenToolbox: () => void;
+  onOpenGames: () => void;
 }
 
 interface Feature {
@@ -26,7 +27,7 @@ interface Feature {
   icon: JSX.Element;
   /** 里程碑编号，缺省表示已可用 */
   milestone?: string;
-  action?: 'recent' | 'profile' | 'stats' | 'calendar' | 'pet' | 'shop' | 'ai' | 'backup' | 'skin' | 'library';
+  action?: 'recent' | 'profile' | 'stats' | 'calendar' | 'pet' | 'shop' | 'ai' | 'backup' | 'skin' | 'library' | 'games';
 }
 
 /** 落在「我的」页的功能 → 目标卡片 id（点击先切 Tab，再平滑滚动定位）。 */
@@ -79,6 +80,16 @@ const FEATURES: Feature[] = [
         <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
       </svg>
     ),
+  },
+  {
+    label: '游戏',
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <rect x="2.5" y="7" width="19" height="10.5" rx="4" />
+        <path d="M7 10.5v3M5.5 12h3M15.5 11.5h.01M18 13.5h.01" />
+      </svg>
+    ),
+    action: 'games',
   },
   {
     label: '打卡日历',
@@ -244,7 +255,12 @@ function LoadingSkeleton() {
 }
 
 /** 首页视图：导入 → 继续阅读 → 宠物预览 → 功能网格 → 全部书籍。书籍相关 UI 全部来自 books 模块。 */
-export default function HomeView({ onOpenBook, onNavigateTab, onOpenToolbox }: HomeViewProps) {
+export default function HomeView({
+  onOpenBook,
+  onNavigateTab,
+  onOpenToolbox,
+  onOpenGames,
+}: HomeViewProps) {
   const toastTimerRef = useRef<number>(0);
   const [toast, setToast] = useState<string | null>(null);
   const recentBook = useRecentBook();
@@ -263,6 +279,10 @@ export default function HomeView({ onOpenBook, onNavigateTab, onOpenToolbox }: H
   const handleFeature = (feature: Feature) => {
     if (feature.label === '工具箱') {
       onOpenToolbox();
+      return;
+    }
+    if (feature.action === 'games') {
+      onOpenGames();
       return;
     }
     if (feature.action === 'profile') {

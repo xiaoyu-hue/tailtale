@@ -2,6 +2,7 @@ import { createStore, useStore } from '../../platform/store';
 import type { Book } from '../books';
 import {
   askAboutBook,
+  callChat,
   loadAiConfig,
   prepareExplain,
   runExplain,
@@ -119,3 +120,24 @@ export async function ask(
 
 /** 解读前准备（费用预估数据源），UI 弹窗确认后才调 runOutline。 */
 export { prepareExplain, testConnection };
+
+/**
+ * 单轮通用补全（无书籍上下文、无会话缓存）：供游戏主持人等轻场景使用。
+ * 与 ask / runOutline 的会话缓存语义区分——本函数每次调用都会产生费用，
+ * 命名「Once」即向调用方明示这一点。未配置密钥时抛 not-configured。
+ */
+export async function chatOnce(
+  systemPrompt: string,
+  userPrompt: string,
+  signal?: AbortSignal
+): Promise<string> {
+  const config = requireConfig();
+  return callChat(
+    config,
+    [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    signal
+  );
+}

@@ -12,6 +12,7 @@ export {
   getCachedOutline,
   runOutline,
   ask,
+  chatOnce,
   prepareExplain,
 } from './store';
 export type { AiState, CachedOutline } from './store';

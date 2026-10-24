@@ -11,6 +11,7 @@ import PetView from './views/PetView';
 import ShopView from './views/ShopView';
 import ProfileView from './views/ProfileView';
 import { ToolboxView } from '../modules/toolbox';
+import { GamesView, refreshGames } from '../modules/games';
 
 type Route =
   | { name: 'home' }
@@ -18,7 +19,8 @@ type Route =
   | { name: 'pet' }
   | { name: 'shop' }
   | { name: 'profile' }
-  | { name: 'toolbox' };
+  | { name: 'toolbox' }
+  | { name: 'games' };
 
 const TAB_OF_ROUTE: Record<Route['name'], TabKey> = {
   home: 'home',
@@ -27,6 +29,7 @@ const TAB_OF_ROUTE: Record<Route['name'], TabKey> = {
   shop: 'shop',
   profile: 'profile',
   toolbox: 'home',
+  games: 'home',
 };
 
 const ROUTE_STORAGE_KEY = 'tailtale:route';
@@ -56,6 +59,7 @@ export default function App() {
     void refreshBooks();
     void refreshGamification();
     void refreshPet();
+    void refreshGames();
     return installRipple(); // 全局点击涟漪（事件委托，卸载时解绑）
   }, []);
 
@@ -113,6 +117,7 @@ export default function App() {
             onOpenBook={(bookId) => setRoute({ name: 'reader', bookId })}
             onNavigateTab={goTab}
             onOpenToolbox={() => setRoute({ name: 'toolbox' })}
+            onOpenGames={() => setRoute({ name: 'games' })}
           />
         )}
         {route.name === 'pet' && <PetView onOpenShop={() => setRoute({ name: 'shop' })} />}
@@ -124,6 +129,7 @@ export default function App() {
             onOpenBook={(bookId) => setRoute({ name: 'reader', bookId })}
           />
         )}
+        {route.name === 'games' && <GamesView onBack={() => setRoute({ name: 'home' })} />}
       </main>
       <BottomNav active={TAB_OF_ROUTE[route.name]} onChange={goTab} />
     </div>

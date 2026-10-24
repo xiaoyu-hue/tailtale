@@ -33,6 +33,7 @@
     "src/modules/books/html-text.ts",
     "src/modules/books/mobi.ts",
     "src/modules/gamification/model.ts",
+    "src/modules/games/model.ts",
     "src/modules/reader/model.ts",
     "src/modules/reader/cbz.ts",
     "src/platform/events.ts",
