@@ -1367,36 +1367,6 @@ button {
   }
 }
 
-/* ========== Toast ========== */
-.toast {
-  position: fixed;
-  top: calc(var(--topbar-h) + 12px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 100;
-  background: var(--text);
-  color: var(--bg);
-  font-size: 13px;
-  font-weight: 600;
-  padding: 9px 18px;
-  border-radius: 999px;
-  box-shadow: var(--shadow-float);
-  animation: toast-in 0.18s ease;
-  max-width: 82vw;
-  text-align: center;
-}
-
-@keyframes toast-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -8px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
 /* ========== 阅读加载态 ========== */
 .reader-loading {
   flex: 1;
@@ -2565,4 +2535,281 @@ button {
   text-align: left;
   white-space: normal;
   line-height: 1.6;
+}
+
+/* =====================================================================
+   通用组件原语（底座收尾）：Dialog / Sheet / Tabs / Slider / Toast / ErrorState
+   全部令牌化配色，跟随三主题；减少动画时关闭过渡。
+   ===================================================================== */
+
+/* —— Dialog 居中弹窗 —— */
+.dialog-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.4);
+  animation: dialog-mask-in var(--duration-base) var(--ease-out);
+}
+
+.dialog {
+  width: 100%;
+  max-width: 420px;
+  max-height: 84vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-float);
+  padding: var(--space-5);
+  animation: dialog-in var(--duration-base) var(--ease-spring);
+}
+
+.dialog-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+  color: var(--text);
+}
+
+.dialog-body {
+  font-size: var(--text-base);
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+@keyframes dialog-mask-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dialog-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+/* —— Sheet 底部抽屉（通用，替代阅读器专属 reader-drawer） —— */
+.sheet-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-base) var(--ease-out);
+}
+
+.sheet-mask.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 91;
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: var(--shadow-float);
+  padding: var(--space-3) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+  transform: translateY(100%);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+.sheet.open {
+  transform: translateY(0);
+}
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--border);
+  margin: var(--space-2) auto var(--space-3);
+}
+
+.sheet-title {
+  font-size: var(--text-md);
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+  color: var(--text);
+}
+
+/* —— Tabs 标签页 —— */
+.tabs {
+  display: flex;
+  gap: var(--space-5);
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-item {
+  position: relative;
+  border: none;
+  background: none;
+  padding: var(--space-2) 2px;
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: color var(--duration-fast) ease;
+}
+
+.tab-item.active {
+  color: var(--text);
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+}
+
+/* —— Slider 滑块 —— */
+.slider {
+  width: 100%;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+/* —— Toast 提示 —— */
+.toast-container {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--nav-h) + var(--space-5));
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: 86vw;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--text);
+  color: var(--bg);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  box-shadow: var(--shadow-float);
+  animation: toast-in var(--duration-base) var(--ease-spring);
+}
+
+.toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.toast--success {
+  background: var(--success);
+  color: #fff;
+}
+
+.toast--success .toast-icon {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.toast--error {
+  background: var(--danger);
+  color: #fff;
+}
+
+.toast--error .toast-icon {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.toast--info .toast-icon {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* —— ErrorState 错误态 —— */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  text-align: center;
+  padding: var(--space-6) var(--space-5);
+  color: var(--text-secondary);
+}
+
+.error-state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--surface-soft);
+  color: var(--danger);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.error-state-title {
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--text);
+}
+
+.error-state-message {
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  max-width: 28em;
+}
+
+/* —— 减少动画：关闭所有原语过渡与入场动画 —— */
+:root[data-reduce-motion='on'] .dialog-mask,
+:root[data-reduce-motion='on'] .dialog,
+:root[data-reduce-motion='on'] .sheet,
+:root[data-reduce-motion='on'] .sheet-mask,
+:root[data-reduce-motion='on'] .toast {
+  animation: none;
+  transition: none;
+}
+
+/* —— 抽屉 / Toast 内容容器（极简补丁：父容器已含 padding，此处仅做间距与折行兜底） —— */
+.sheet-body {
+  margin-top: var(--space-1);
+}
+
+.toast-message {
+  word-break: break-word;
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './app/App';
+import { ToastViewport } from './components';
 import './styles.css';
 
 const container = document.getElementById('root');
@@ -16,5 +17,6 @@ window.addEventListener('unhandledrejection', (event) => {
 ReactDOM.createRoot(container).render(
   <React.StrictMode>
     <App />
+    <ToastViewport />
   </React.StrictMode>
 );

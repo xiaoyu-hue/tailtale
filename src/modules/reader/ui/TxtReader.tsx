@@ -14,6 +14,7 @@ import {
 import { AiDrawer } from '../../ai';
 import { useSwipe } from '../../../shared/hooks/useSwipe';
 import { splitChapters } from '../model';
+import { ErrorState } from '../../../components';
 
 interface ReaderPageProps {
   book: Book;
@@ -52,6 +53,8 @@ const ChapterBody = memo(function ChapterBody({
 export function TxtReader({ book, onBack }: ReaderPageProps) {
   const [text, setText] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  // 重试计数器：错误态「重新加载」时 +1，重新触发载入 effect
+  const [reloadKey, setReloadKey] = useState(0);
   const [chapterIndex, setChapterIndex] = useState(0);
   const [scrollRatio, setScrollRatio] = useState(book.scrollRatio);
   const [chromeVisible, setChromeVisible] = useState(true);
@@ -87,7 +90,7 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
     return () => {
       cancelled = true;
     };
-  }, [book.id]);
+  }, [book.id, reloadKey]);
 
   // 首次加载：恢复上次阅读的章节与章内位置
   useEffect(() => {
@@ -194,11 +197,15 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
       <div className="reader">
         {topBar}
         <div className="reader-loading">
-          <div style={{ textAlign: 'center', padding: '0 24px', lineHeight: 1.9 }}>
-            书籍加载失败
-            <br />
-            <span style={{ fontSize: 13 }}>{loadError}</span>
-          </div>
+          <ErrorState
+            title="书籍加载失败"
+            message={loadError}
+            retryLabel="重新加载"
+            onRetry={() => {
+              setLoadError(null);
+              setReloadKey((k) => k + 1);
+            }}
+          />
         </div>
       </div>
     );

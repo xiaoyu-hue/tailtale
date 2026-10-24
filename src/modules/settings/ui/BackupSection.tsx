@@ -10,6 +10,7 @@ import {
 import { stripAiKey, type BackupBundle, type BackupEnvelope } from '../model';
 import { ExportDialog, type ExportMode } from './ExportDialog';
 import { ImportPasswordDialog } from './ImportPasswordDialog';
+import { toast } from '../../../components';
 
 /**
  * 数据备份卡片（M6）：一键导出 / 导入全部本地数据。
@@ -23,17 +24,9 @@ export function BackupSection() {
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
   const [exportBundle, setExportBundle] = useState<BackupBundle | null>(null);
   const [pendingEnvelope, setPendingEnvelope] = useState<BackupEnvelope | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
-  const toastTimer = useRef(0);
-
-  const showToast = (message: string) => {
-    setToast(message);
-    window.clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setToast(null), 2600);
-  };
 
   const handleExport = async () => {
     try {
@@ -41,7 +34,7 @@ export function BackupSection() {
       setExportBundle(await collectBackup());
     } catch (error) {
       console.error('导出备份失败', error);
-      showToast('导出失败，请重试');
+      toast.error('导出失败，请重试');
     }
   };
 
@@ -54,10 +47,10 @@ export function BackupSection() {
       setExporting(true);
       try {
         await exportEncryptedBackupToFile(password);
-        showToast('已导出加密备份，请牢记口令');
+        toast.success('已导出加密备份，请牢记口令');
       } catch (error) {
         console.error('加密导出失败', error);
-        showToast('加密导出失败，请重试');
+        toast.error('加密导出失败，请重试');
       } finally {
         setExporting(false);
       }
@@ -65,7 +58,7 @@ export function BackupSection() {
     }
     const out = mode === 'standard' ? stripAiKey(bundle) : bundle;
     exportBackupToFile(out);
-    showToast(
+    toast.success(
       mode === 'standard' ? '已导出备份（不含 AI 密钥）' : '已导出备份（含明文 AI 密钥，请妥善保管）'
     );
   };
@@ -85,7 +78,7 @@ export function BackupSection() {
     try {
       const read = await readBackupFile(file);
       if (!read.ok) {
-        showToast(`导入失败：${read.error}`);
+        toast.error(`导入失败：${read.error}`);
         setBusy(false);
         return;
       }
@@ -96,12 +89,12 @@ export function BackupSection() {
         return;
       }
       await restoreBackup(read.bundle);
-      showToast('导入成功，正在刷新…');
+      toast.success('导入成功，正在刷新…');
       // 整页刷新，让各模块从存储重新水合（最简单且零残留态）
       window.location.reload();
     } catch (error) {
       console.error('导入备份失败', error);
-      showToast('导入失败，请确认文件格式');
+      toast.error('导入失败，请确认文件格式');
       setBusy(false);
     }
   };
@@ -119,7 +112,7 @@ export function BackupSection() {
         return;
       }
       setPendingEnvelope(null);
-      showToast('导入成功，正在刷新…');
+      toast.success('导入成功，正在刷新…');
       window.location.reload();
     } catch (error) {
       console.error('加密备份导入失败', error);
@@ -180,7 +173,6 @@ export function BackupSection() {
           onConfirm={handleImportConfirm}
         />
       )}
-      {toast && <div className="toast">{toast}</div>}
     </section>
   );
 }

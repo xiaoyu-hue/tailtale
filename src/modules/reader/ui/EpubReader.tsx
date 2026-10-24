@@ -14,6 +14,7 @@ import {
 } from '../../settings';
 import { AiDrawer } from '../../ai';
 import { useSwipe } from '../../../shared/hooks/useSwipe';
+import { ErrorState } from '../../../components';
 
 interface EpubReaderProps {
   book: Book;
@@ -32,6 +33,8 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
   const renditionRef = useRef<Rendition | null>(null);
   const bookRef = useRef<EpubBook | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  // 重试计数器：错误态「重试」时 +1，重新触发载入 effect（清理旧 rendition 后重载）
+  const [reloadKey, setReloadKey] = useState(0);
   const [toc, setToc] = useState<NavItem[]>([]);
   const [percentage, setPercentage] = useState(book.progress);
   const [pageInfo, setPageInfo] = useState('');
@@ -164,8 +167,8 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
       renditionRef.current = null;
       bookRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- 仅按书籍初始化一次；字号变化走独立 effect
-  }, [book.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- 按书籍初始化或重试触发；字号/行距/页边距变化走独立 effect
+  }, [book.id, reloadKey]);
 
   // ---- 字号变化同步到 rendition ----
   useEffect(() => {
@@ -200,11 +203,17 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
       <div className="reader">
         {topBar}
         <div className="reader-loading">
-          <div style={{ textAlign: 'center', padding: '0 24px', lineHeight: 1.9 }}>
-            书籍加载失败
-            <br />
-            <span style={{ fontSize: 13 }}>{loadError}</span>
-          </div>
+          <ErrorState
+            title="书籍加载失败"
+            message={loadError}
+            retryLabel="重新加载"
+            onRetry={() => {
+              setLoadError(null);
+              // 自增计数器触发载入 effect 重新执行（清理旧 rendition 后重载），
+              // 给错误态一条真正的恢复路径，而非只能退出重进。
+              setReloadKey((k) => k + 1);
+            }}
+          />
         </div>
       </div>
     );
