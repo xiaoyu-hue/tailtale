@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import MiniSearch from 'minisearch';
-import { useBooks, readBookContent } from '../../books';
+import { useBooks, extractText } from '../../books';
 import { toast } from '../../../components';
 import type { ToolProps } from './ToolboxView';
 
@@ -57,10 +57,10 @@ export function SearchTool({ onOpenBook, onClose }: ToolProps) {
       const docs: Doc[] = [];
       for (const b of books) {
         try {
-          const text = await readBookContent(b.id);
-          docs.push({ id: b.id, title: b.title, author: '', text: text.slice(0, 100000) });
+          const text = await extractText(b);
+          docs.push({ id: b.id, title: b.title, author: b.author ?? '', text: text.slice(0, 100000) });
         } catch {
-          docs.push({ id: b.id, title: b.title, author: '' });
+          docs.push({ id: b.id, title: b.title, author: b.author ?? '' });
         }
       }
       const m = new MiniSearch<Doc>({

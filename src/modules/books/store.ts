@@ -1,7 +1,7 @@
 import { emit } from '../../platform/events';
 import { createStore, useStore } from '../../platform/store';
 import type { Book, BookStatus } from './model';
-import { formatFromFilename, importBinaryFile, importTxtFile, loadBooks, removeBook, saveProgress, setBookStatus } from './service';
+import { formatFromFilename, importBinaryFile, importTxtFile, importFb2File, loadBooks, removeBook, saveProgress, setBookStatus } from './service';
 import { claimBuiltinBook } from './library';
 import type { LibraryBook } from './library-model';
 
@@ -64,6 +64,17 @@ export async function importFiles(
   let ok = 0;
   let skipped = 0;
   for (const file of all) {
+    // FB2 在导入期转换为 EPUB 落库，不进入 BookFormat 枚举，故按扩展名先行分流
+    if (file.name.toLowerCase().endsWith('.fb2')) {
+      try {
+        await importFb2File(file);
+        ok += 1;
+      } catch (error) {
+        console.error('导入失败', file.name, error);
+        failed.push(file.name);
+      }
+      continue;
+    }
     const format = formatFromFilename(file.name);
     if (!format) {
       skipped += 1;

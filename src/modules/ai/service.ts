@@ -1,4 +1,4 @@
-import { readBookBinary, readBookContent } from '../books';
+import { readBookBinary, readBookContent, extractText, extractEpubText } from '../books';
 import type { Book } from '../books';
 import {
   AI_SYSTEM_PROMPT,
@@ -182,63 +182,7 @@ export async function callChat(
   });
 }
 
-// ---- EPUB 全文提取 ----
-
-/** 块级元素选择器：按块拼接，保留段落换行（textContent 会丢失块边界）。 */
-const EPUB_BLOCK_SELECTOR = 'p, h1, h2, h3, h4, h5, h6, li, blockquote, pre, td, th';
-
-/** 取最外层块级元素的文本，按行拼接（嵌套块去重，如 li 内的 p）。 */
-function blockText(root: HTMLElement): string {
-  const blocks = Array.from(root.querySelectorAll<HTMLElement>(EPUB_BLOCK_SELECTOR)).filter(
-    (el) => el.closest(EPUB_BLOCK_SELECTOR) === el
-  );
-  const source = blocks.length > 0 ? blocks : [root];
-  return source
-    .map((el) => (el.textContent ?? '').trim())
-    .filter((line) => line.length > 0)
-    .join('\n');
-}
-
-interface EpubExtractResult {
-  text: string;
-  /** 解析失败的章节数（降级：跳过并在结果中明示） */
-  failedSections: number;
-}
-
-/**
- * 从 EPUB 二进制提取全书文本：经 epubjs 逐节 load/unload（大书懒加载，防内存峰值），
- * 结束后 destroy。整体失败抛 AiError('epub-extract-failed') 引导用户转 TXT。
- */
-async function extractEpubText(data: ArrayBuffer): Promise<EpubExtractResult> {
-  const { default: ePub } = await import('epubjs');
-  const instance = ePub(data, { allowScriptedContent: false, allowPopups: false });
-  const parts: string[] = [];
-  let failedSections = 0;
-  try {
-    await instance.ready;
-    const sections = instance.spine.spine;
-    for (const section of sections) {
-      try {
-        await section.load(instance);
-        const text = section.document?.body ? blockText(section.document.body) : '';
-        if (text.trim()) parts.push(text);
-      } catch {
-        failedSections += 1;
-      } finally {
-        try {
-          section.unload();
-        } catch {
-          // 释放失败不影响主流程
-        }
-      }
-    }
-  } finally {
-    instance.destroy();
-  }
-  if (parts.length === 0)
-    throw new AiError('epub-extract-failed', 'EPUB 解析失败', '这本书无法提取文字，可先转换为 TXT 再解读');
-  return { text: parts.join('\n\n'), failedSections };
-}
+// ---- EPUB 全文提取（统一在 books/extract.ts 实现，AI 与 TTS/搜索共用单一来源） ----
 
 // ---- 解读流程 ----
 
@@ -270,8 +214,12 @@ export async function prepareExplain(book: Book): Promise<PrepareResult> {
     text = extracted;
     if (failedSections > 0)
       warnings.push(`有 ${failedSections} 个章节解析失败，大纲可能不完整`);
+  } else if (book.format === 'pdf') {
+    text = await extractText(book);
+    if (!text.trim())
+      throw new AiError('book-missing', '这本书没有可解读的文字', '请换一本书，或检查文件是否正常');
   } else {
-    throw new AiError('book-missing', '暂不支持该格式', 'AI 解读目前仅支持 TXT 与 EPUB');
+    throw new AiError('book-missing', '暂不支持该格式', 'AI 解读目前仅支持 TXT / EPUB / PDF 等文本类格式');
   }
   if (!text.trim())
     throw new AiError('book-missing', '这本书没有可解读的文字', '请换一本书，或检查文件是否正常');

@@ -12,6 +12,8 @@ export {
   markFinished,
 } from './store';
 export { readBookContent, readBookBinary } from './service';
+export { extractText, extractEpubText } from './extract';
+export type { EpubExtractResult } from './extract';
 export type { ImportResult } from './store';
 export type { Book, BookStatus, BookContent, BookFormat } from './model';
 export { STATUS_LABEL, nextStatus, FORMAT_LABEL } from './model';

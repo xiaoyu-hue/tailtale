@@ -39,15 +39,19 @@ function normalizeText(raw: string): string {
 }
 
 function titleFromFilename(name: string): string {
-  const title = name.replace(/\.(txt|epub|pdf)$/i, '').trim();
+  const title = name.replace(/\.(txt|epub|pdf|cbz)$/i, '').trim();
   return title || '未命名书籍';
 }
+
+/** 二进制存储格式（不含 txt）。批次2 接入 MOBI/AZW3 时在此扩展。 */
+type BinaryFormat = 'epub' | 'pdf' | 'cbz';
 
 /** 按文件名后缀识别格式；无法识别返回 null（调用方计入 skipped）。 */
 export function formatFromFilename(name: string): BookFormat | null {
   if (/\.txt$/i.test(name)) return 'txt';
   if (/\.epub$/i.test(name)) return 'epub';
   if (/\.pdf$/i.test(name)) return 'pdf';
+  if (/\.cbz$/i.test(name)) return 'cbz';
   return null;
 }
 
@@ -88,22 +92,24 @@ export async function importTxtFile(file: File): Promise<Book> {
   return book;
 }
 
-/** 导入 EPUB / PDF：读取文件二进制入库；重复导入同一文件时保留原阅读进度。
- * onProgress 透传至内容指纹计算，用于大文件导入时的进度反馈。 */
-export async function importBinaryFile(
-  file: File,
-  format: 'epub' | 'pdf',
+/** 内部：把一份二进制内容落库为指定格式的书（含去重与进度保留）；供各二进制导入入口复用。 */
+async function storeBinaryBook(
+  data: ArrayBuffer,
+  format: BinaryFormat,
+  title: string,
+  size: number,
+  author?: string,
   onProgress?: (ratio: number) => void
 ): Promise<Book> {
-  const data = await file.arrayBuffer();
   const id = await hashBytes(data, onProgress);
   const existing = await getBook(id);
 
   if (existing) {
     const updated: Book = {
       ...existing,
-      title: titleFromFilename(file.name),
-      size: data.byteLength,
+      title,
+      size,
+      ...(author !== undefined ? { author } : {}),
     };
     await putContent({ id, kind: 'binary', data });
     await putBook(updated);
@@ -112,9 +118,10 @@ export async function importBinaryFile(
 
   const book: Book = {
     id,
-    title: titleFromFilename(file.name),
+    title,
     format,
-    size: data.byteLength,
+    size,
+    ...(author !== undefined ? { author } : {}),
     status: 'want',
     addedAt: Date.now(),
     lastReadAt: 0,
@@ -125,6 +132,30 @@ export async function importBinaryFile(
   await putContent({ id, kind: 'binary', data });
   await putBook(book);
   return book;
+}
+
+/** 导入 EPUB / PDF / CBZ：读取文件二进制入库；重复导入同一文件时保留原阅读进度。
+ * onProgress 透传至内容指纹计算，用于大文件导入时的进度反馈。 */
+export async function importBinaryFile(
+  file: File,
+  format: BinaryFormat,
+  onProgress?: (ratio: number) => void
+): Promise<Book> {
+  const data = await file.arrayBuffer();
+  return storeBinaryBook(data, format, titleFromFilename(file.name), data.byteLength, undefined, onProgress);
+}
+
+/** 导入 FB2：解析后转换为 EPUB 落库（format 实为 'epub'，复用 EpubReader 全部能力）。
+ * 转换确定性保证同文件内容指纹一致、重复导入去重、跨设备续读一致。 */
+export async function importFb2File(file: File): Promise<Book> {
+  const xml = await file.text();
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  if (doc.querySelector('parsererror')) {
+    throw new Error('FB2 解析失败：文件不是合法的 XML');
+  }
+  const { fb2ToEpub } = await import('./fb2');
+  const { epub, title, author } = await fb2ToEpub(doc);
+  return storeBinaryBook(epub, 'epub', title, epub.byteLength, author);
 }
 
 /** 内置公版书领取（M7）：与导入完全同一数据链路——内容指纹即 id，已领取过直接返回既有书。

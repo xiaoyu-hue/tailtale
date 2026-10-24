@@ -90,8 +90,17 @@ export function run<T>(
       new Promise<T>((resolve, reject) => {
         const transaction = db.transaction(store, mode);
         const request = action(transaction.objectStore(store));
-        request.onsuccess = () => resolve(request.result as T);
+        let result: T;
+        request.onsuccess = () => {
+          result = request.result as T;
+        };
         request.onerror = () => reject(request.error);
+        // 必须等待事务 oncomplete 而非单个请求 onsuccess：readwrite 事务在请求成功时
+        // 可能尚未提交，若此时立刻发起读取（如导入后 refreshBooks）会读不到刚写入的数据，
+        // 表现为「导入成功但书架不刷新」（reload 冷启动因事务早已提交反而正常）。
+        transaction.oncomplete = () => resolve(result);
+        transaction.onerror = () => reject(transaction.error);
+        transaction.onabort = () => reject(transaction.error ?? new Error('事务被中止'));
       })
   );
 }

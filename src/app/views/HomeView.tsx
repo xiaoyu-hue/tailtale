@@ -214,7 +214,7 @@ function WelcomeCard() {
       <div className="welcome-steps">
         <div className="welcome-step">
           <span className="welcome-step-num">1</span>
-          <span className="muted">导入一本 TXT / EPUB / PDF，或从公版书库领取经典</span>
+          <span className="muted">导入一本 TXT / EPUB / PDF / FB2 / CBZ，或从公版书库领取经典</span>
         </div>
         <div className="welcome-step">
           <span className="welcome-step-num">2</span>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Slider } from '../../../components';
 import { toast } from '../../../components';
-import { useRecentBook, readBookContent } from '../../books';
+import { useRecentBook, extractText } from '../../books';
 import type { ToolProps } from './ToolboxView';
 
 const MAX_CHARS = 20000;
@@ -84,7 +84,11 @@ export function TtsTool({ onClose: _onClose }: ToolProps) {
       return;
     }
     try {
-      const content = await readBookContent(recentBook.id);
+      const content = await extractText(recentBook);
+      if (!content.trim()) {
+        toast.info('这本是漫画类格式，没有可朗读的正文');
+        return;
+      }
       setText(content.slice(0, MAX_CHARS));
       toast.success(`已载入《${recentBook.title}》正文（前 ${MAX_CHARS / 1000} 千字）`);
     } catch (e) {
