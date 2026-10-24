@@ -51,7 +51,7 @@ export interface ImportResult {
   skipped: number;
 }
 
-/** 批量导入：按扩展名分发到 TXT / EPUB / PDF 对应处理器。
+/** 批量导入：按扩展名分发到 TXT / EPUB / PDF / FB2 / CBZ / MOBI / AZW3 对应处理器。
  * onProgress 透传至二进制指纹计算，用于大文件导入时的进度反馈。 */
 export async function importFiles(
   files: FileList | null,

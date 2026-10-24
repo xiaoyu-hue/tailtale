@@ -1,6 +1,6 @@
 # 书时 TailTale
 
-[![Version](https://img.shields.io/badge/version-v1.13.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.13.0)
+[![Version](https://img.shields.io/badge/version-v1.14.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.14.0)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](docs/LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.13.0 · M4 工具箱上线**）
+- 当前部署内容为 `main` 分支最新构建（**v1.14.0 · 电子书格式扩充至 7 种**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -265,11 +265,12 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
     ├── main.tsx              入口
     ├── vite-env.d.ts         Vite 客户端类型引用（?url 资源导入声明）
     ├── types/                第三方库最小类型声明（epubjs 等）
+    ├── vendor/               vendored 第三方单文件：foliate/mobi.js（MOBI / AZW3 解析，MIT，仅取单文件不替换 epubjs）
     ├── styles.css            设计变量（暖色主题 + 深色模式适配）
     ├── app/                  应用外壳：App.tsx（导航 + 装配）/ views/（路由级视图）
     ├── modules/              领域模块（自治，只经各自 index.ts 暴露公开 API）
-    │   ├── books/            书架：model（类型 + 状态机 + 多格式）/ store / service / ui
-    │   ├── reader/           阅读器：model（TXT 章节拆分）/ ui（TxtReader / EpubReader / PdfReader 按格式分流）
+    │   ├── books/            书架：model（类型 + 状态机 + 多格式）/ store / service / ui / mobi.ts（MOBI 集成唯一入口）/ fb2.ts / html-text.ts
+    │   ├── reader/           阅读器：model（TXT 章节拆分）/ ui（TxtReader / EpubReader / PdfReader / CbzReader / MobiReader 按格式分流）
     │   ├── gamification/     游戏化：model（经济数值 + 纯函数）/ service（计时 + 持久化）/ store / ui
     │   ├── pet/              宠物：model（属性/好感/成长/羁绊纯函数）/ service（计时队列）/ store / ui（像素猫 canvas）
 │   ├── settings/         全局偏好：model（字号档位 + 主题）/ service（localStorage）/ store / ui

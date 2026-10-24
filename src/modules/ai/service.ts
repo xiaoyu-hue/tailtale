@@ -224,7 +224,7 @@ export async function prepareExplain(book: Book): Promise<PrepareResult> {
     if (!text.trim())
       throw new AiError('book-missing', '这本书没有可解读的文字', '请换一本书，或检查文件是否正常');
   } else {
-    throw new AiError('book-missing', '暂不支持该格式', 'AI 解读目前仅支持 TXT / EPUB / PDF 等文本类格式');
+    throw new AiError('book-missing', '暂不支持该格式', 'AI 解读目前仅支持 TXT / EPUB / PDF / MOBI / AZW3 等文本类格式');
   }
   if (!text.trim())
     throw new AiError('book-missing', '这本书没有可解读的文字', '请换一本书，或检查文件是否正常');
