@@ -409,18 +409,18 @@ test('PET_RULES：关键数值与 PRD/决策一致', () => {
 });
 
 test('SNACKS：四件商品与 PRD §3.1.2 一致', () => {
-  assert.deepEqual(SNACKS.dried_fish, { name: '小鱼干', coins: 20, hunger: 30, affinity: 2 });
-  assert.deepEqual(SNACKS.cat_tube, { name: '猫条', coins: 50, hunger: 50, affinity: 8 });
+  assert.deepEqual(SNACKS.dried_fish, { name: '小鱼干', coins: 15, hunger: 30, affinity: 2 });
+  assert.deepEqual(SNACKS.cat_tube, { name: '猫条', coins: 35, hunger: 50, affinity: 8 });
   assert.deepEqual(SNACKS.catnip, {
     name: '猫薄荷',
-    coins: 80,
+    coins: 60,
     hunger: 20,
     mood: 20,
     energy: 20,
     affinity: 15,
   });
   assert.equal(SNACKS.cat_rod.name, '逗猫棒');
-  assert.equal(SNACKS.cat_rod.coins, 30);
+  assert.equal(SNACKS.cat_rod.coins, 20);
   assert.equal(SNACKS.cat_rod.mood, 40);
   assert.equal(SNACKS.cat_rod.energy, -15);
   assert.equal(SNACKS.cat_rod.affinity, 5);

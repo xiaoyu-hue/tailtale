@@ -88,17 +88,17 @@ export interface SnackEffect {
 }
 
 export const SNACKS: Record<SnackId, SnackEffect> = {
-  dried_fish: { name: '小鱼干', coins: 20, hunger: 30, affinity: 2 },
+  dried_fish: { name: '小鱼干', coins: 15, hunger: 30, affinity: 2 },
   cat_rod: {
     name: '逗猫棒',
-    coins: 30,
+    coins: 20,
     mood: 40,
     energy: -15,
     affinity: 5,
     cooldownMs: 4 * 60 * 60 * 1000,
   },
-  cat_tube: { name: '猫条', coins: 50, hunger: 50, affinity: 8 },
-  catnip: { name: '猫薄荷', coins: 80, hunger: 20, mood: 20, energy: 20, affinity: 15 },
+  cat_tube: { name: '猫条', coins: 35, hunger: 50, affinity: 8 },
+  catnip: { name: '猫薄荷', coins: 60, hunger: 20, mood: 20, energy: 20, affinity: 15 },
 };
 
 /** 宠物数值规则（PRD §5.2 + 已决策补充；三属性衰减速度为「天」级）。 */
