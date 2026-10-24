@@ -136,15 +136,22 @@ SOFTWARE.
 - 用途：宠物形象（32×32 二帧待机像素猫，JSON 帧数据 + 调色板；书时按调色板置换实现皮肤数据，未改动像素数据）
 - 备注：MIT 与 Apache-2.0 兼容；该资产不进入 npm 依赖树，构建时由 Vite 直接打包 JSON
 
+### MiniSearch（1.13.0 引入，全文搜索引擎）
+
+- 许可证：MIT（LICENSE.txt 为 MIT 全文，版权行 `Copyright 2022 Luca Ongaro`）
+- 项目地址：https://github.com/lucaong/minisearch
+- 用途：工具箱「全文搜索」——本地索引书名/作者/正文，字段加权 + 模糊搜索，ESM 零依赖（运行时依赖，进入构建）
+- 备注：MIT 与 Apache-2.0 兼容；运行时依赖、进入产物（gzip 约 18KB）；无子依赖（`package.json` `dependencies: {}`）
+
 ---
 
 ## 二、间接依赖（传递依赖）总览
 
-构建期共安装 443 个包（含平台专用二进制），许可证分布（按各包 package.json 声明字段扫描）：
+构建期共安装 444 个包（含平台专用二进制），许可证分布（按各包 package.json 声明字段扫描）：
 
 | 许可证 | 数量 |
 |---|---|
-| MIT | 338 |
+| MIT | 339 |
 | ISC | 22 |
 | BlueOak-1.0.0 | 7 |
 | Apache-2.0 | 7（typescript、ejs、jake、filelist、baseline-browser-mapping、@trickfilm400/rollup-plugin-off-main-thread、pdfjs-dist） |

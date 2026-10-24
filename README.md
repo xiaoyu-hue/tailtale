@@ -1,6 +1,6 @@
 # 书时 TailTale
 
-[![Version](https://img.shields.io/badge/version-v1.12.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.12.0)
+[![Version](https://img.shields.io/badge/version-v1.13.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.13.0)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](docs/LICENSE)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.12.0 · 测试体系上线**）
+- 当前部署内容为 `main` 分支最新构建（**v1.13.0 · M4 工具箱上线**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -83,9 +83,18 @@
 - **阅读统计**：累计阅读分钟、金币、读完本数、打卡天数、最长连续打卡、在读本数
 - **打卡日历**：当月热力图，可翻看历史月份
 
-### 工具箱（规划中）
+### 工具箱
 
-番茄钟 / 白噪音 / 文本统计 / 书摘导出 / 今日一书等，见[路线图](#路线图)。
+首页功能格「工具箱」进入，8 宫格每款工具经底部抽屉展开，全部本地优先、零上传：
+
+- **番茄钟**：25 / 50 / 15 三档专注预设 + 倒计时环，完成一轮专注 +5 金币
+- **白噪音**：雨声 / 海浪 / 森林 / 篝火，Web Audio 程序化合成，零音频文件、零联网
+- **文本统计**：CJK 按字计数，中英混排预计阅读时长
+- **今日一书**：从内置公版书库随机推荐，可一键领取入架
+- **阅读日历**：复用首页打卡热力图，翻看历史月份
+- **书摘导出**：EPUB 阅读器选中即收藏，按书分组、批量导出 Markdown
+- **朗读（TTS）**：浏览器内置语音合成离线朗读，可调语速 / 音调 / 音色
+- **全文搜索**：minisearch 本地索引，搜书名 / 作者 / 正文，零云端
 
 ---
 
@@ -124,7 +133,7 @@ npm run smoke      # 端到端冒烟（需先 build；真实浏览器跑加密�
 |---|---|---|---|
 | UI 框架 | React | 18.3.1 | 生态成熟，PWA 支持完善；函数组件 + Hooks |
 | 开发语言 | TypeScript | 5.9.3 | 全量类型覆盖，编译期拦截绝大多数错误 |
-| 构建工具 | Vite | 5.4.21 | 秒级冷启动的 dev server，产物体积小 |
+| 构建工具 | Vite | 6.4.5 | 秒级冷启动的 dev server，产物体积小；6.x 修复开发期依赖漏洞 |
 | React 支持 | @vitejs/plugin-react | 4.7.0 | JSX 转换 + Fast Refresh |
 | PWA | vite-plugin-pwa | 0.21.2 | 自动生成 Service Worker（底层 Workbox，MIT）与 Web Manifest |
 | EPUB 引擎 | epub.js（npm 包 epubjs） | 0.3.93 | EPUB 解析与流式分页，BSD-2-Clause；按需动态加载 |
@@ -142,7 +151,7 @@ npm run smoke      # 端到端冒烟（需先 build；真实浏览器跑加密�
 
 ```
 app/          应用外壳：App.tsx（导航 + 装配）/ views/（路由级视图）
-modules/      领域模块：books（书架）/ reader（阅读器）/ gamification（游戏化）/ settings（设置）
+modules/      领域模块：books（书架）/ reader（阅读器）/ gamification（游戏化）/ settings（设置）/ toolbox（工具箱）
 platform/     平台能力：db（IndexedDB + 迁移）/ store（状态工厂）/ events（事件总线）/ hash（内容指纹）/ update（PWA 更新检查）
 shared/       跨模块共享：ui（TopBar / BottomNav 等）
 public/       静态资源：library-books/（内置公版书文本，随应用分发）/ library-manifest.json（书单与指纹清单）
@@ -192,6 +201,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 | [TypeScript](https://github.com/microsoft/TypeScript) | Microsoft | Apache-2.0 | 类型检查（开发期依赖，不进入产物） |
 | [Workbox](https://github.com/GoogleChrome/workbox) | Google | MIT | vite-plugin-pwa 底层：Service Worker 预缓存与运行时缓存 |
 | [Desktop-Pixel-Pet](https://github.com/CanFlyhang/Desktop-Pixel-Pet)（pixel_cat.json） | CanFlyhang | MIT | 像素猫美术资产：32×32 二帧待机像素猫（非 npm 依赖，随源码分发；书时按调色板置换实现皮肤数据，未改动像素数据） |
+| [MiniSearch](https://github.com/lucaong/minisearch) | Luca Ongaro | MIT | 全文搜索：字段加权 + 模糊搜索，ESM 零依赖（gzip 约 18KB），进入构建（工具箱「全文搜索」使用） |
 
 ### 间接依赖
 
@@ -255,8 +265,9 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
     │   ├── reader/           阅读器：model（TXT 章节拆分）/ ui（TxtReader / EpubReader / PdfReader 按格式分流）
     │   ├── gamification/     游戏化：model（经济数值 + 纯函数）/ service（计时 + 持久化）/ store / ui
     │   ├── pet/              宠物：model（属性/好感/成长/羁绊纯函数）/ service（计时队列）/ store / ui（像素猫 canvas）
-    │   ├── settings/         全局偏好：model（字号档位 + 主题）/ service（localStorage）/ store / ui
-    │   └── ai/               AI 解读书：model（纯函数 + prompt）/ service（DeepSeek 直连）/ store / ui（设置 + 抽屉）
+│   ├── settings/         全局偏好：model（字号档位 + 主题）/ service（localStorage）/ store / ui
+│   ├── toolbox/          工具箱：model（文本统计与书摘纯函数）/ ui（8 款本地小工具）/ highlights.ts（书摘 CFI 存储）
+│   └── ai/               AI 解读书：model（纯函数 + prompt）/ service（DeepSeek 直连）/ store / ui（设置 + 抽屉）
     ├── platform/             平台能力：db（IndexedDB + 迁移）/ store（状态工厂）/ events（事件总线）/ hash（内容指纹）/ update（PWA 更新检查）
     └── shared/               跨模块共享：ui（TopBar / BottomNav 等）/ hooks（useSwipe 手势）/ utils（dates 日期工具 / interactions 涟漪委托 / useTicker 时钟）
 ```
@@ -265,7 +276,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 
 ## 版本与发布
 
-- **当前版本：v1.12.0**（2026-10-23 发布，测试体系一期：纯函数层补齐至 11 个模块 158 例单测、被测层行覆盖 99.47%；端到端冒烟入仓并进 CI（Playwright 真实浏览器跑加密备份全链路 14 项断言）；Node 22 内置覆盖率报告零新依赖；测试管线收敛为 tsconfig.test.json 清单驱动。v1.11.0 加密备份上线：导出备份三档——标准备份默认剔除 AI 密钥、加密备份整文件加密（PBKDF2-HMAC-SHA256 60 万次迭代 + AES-256-GCM，口令不落存储、无找回后门）、完整明文备份；导入自动识别加密包弹口令框，口令错误/文件篡改可识别且可重试）；更早版本演进见 [CHANGELOG](CHANGELOG.md)
+- **当前版本：v1.13.0**（2026-10-24 发布）：M4 工具箱上线——首页「工具箱」功能格正式接通，8 款本地小工具（番茄钟 / 白噪音 / 文本统计 / 今日一书 / 阅读日历 / 书摘导出 / TTS 朗读 / 全文搜索），全部本地优先、零依赖、零上传；minisearch 本地全文搜索。v1.12.0（2026-10-23）测试体系一期：纯函数层补齐至 11 个模块 158 例单测、被测层行覆盖 99.47%；端到端冒烟入仓并进 CI（Playwright 真实浏览器跑加密备份全链路 14 项断言）；Node 22 内置覆盖率报告零新依赖；测试管线收敛为 tsconfig.test.json 清单驱动。v1.11.0 加密备份上线：导出备份三档——标准备份默认剔除 AI 密钥、加密备份整文件加密（PBKDF2-HMAC-SHA256 60 万次迭代 + AES-256-GCM，口令不落存储、无找回后门）、完整明文备份；导入自动识别加密包弹口令框，口令错误/文件篡改可识别且可重试）。更早版本演进见 [CHANGELOG](CHANGELOG.md)
 - [Releases](https://github.com/xiaoyu-hue/tailtale/releases) · [CHANGELOG](CHANGELOG.md)
 - 版本号规则与发版流程：[docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
   - 主版本号（X.0.0）= 架构级变更；次版本号（1.X.0）= 新功能上线；修订号（1.1.X）= 优化、修复、文档同步
@@ -281,7 +292,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 | 多格式阅读 | EPUB / PDF 导入与渲染、格式角标、CFI 精确续读 | ✅ 已完成（v1.1.0） |
 | 阅读手势 | 滑动翻页：三个阅读器统一手势，左滑/上滑 = 下一页 | ✅ 已完成（v1.2.0） |
 | M3 宠物 | 喂食 / 玩耍 / 好感度 / 成长阶段、金币闭环 | ✅ 已完成（v1.3.0） |
-| M4 工具箱 | 番茄钟 / 白噪音 / 文本统计 / 书摘导出 / 今日一书 | ⬜ 计划中 |
+| M4 工具箱 | 番茄钟 / 白噪音 / 文本统计 / 今日一书 / 阅读日历 / 书摘导出 / TTS 朗读 / 全文搜索（PRD 6 款 + TTS + 全文搜索） | ✅ 已完成（v1.13.0） |
 | M5 AI 解读书 | BYOK 设置、DeepSeek 直连（TXT + EPUB） | ✅ 已完成（v1.4.0） |
 | M6 打磨 | 主题皮肤、商店、数据备份 | ✅ 已完成（v1.5.0 上线界面皮肤 + 数据备份，v1.5.1 首页入口接通；猫皮肤商店留待后续「商店」模块） |
 | M7 作品化 | README 完善、demo 优化、内置公版书库 | ✅ 已完成（内置公版书库 10 本上线，版权核查见 docs/书时-内置书库版权核查.md） |
