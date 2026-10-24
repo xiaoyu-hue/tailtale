@@ -109,6 +109,35 @@ def run_smoke(base):
             page.keyboard.press("Escape")
             page.wait_for_timeout(300)
 
+        # —— 棋盘对局（批次 2）：五子棋 225 格 / 井字棋 9 格，玩家落子后 AI 应手 ——
+        for name, cell_sel, cell_count in (("五子棋", ".gomoku-cell", 225), ("井字棋", ".tictactoe-cell", 9)):
+            page.get_by_role("button", name=name).click()
+            sheet = page.locator(".sheet.open")
+            sheet.wait_for()
+            check(
+                f"{name}对局展开（{cell_count} 格棋盘）",
+                sheet.locator(cell_sel).count() == cell_count,
+            )
+            # 玩家落中心格 → 等待 AI 应手（双方各至少一子）
+            sheet.locator(cell_sel).nth(4).click()
+            stone_sel = ".gomoku-stone" if name == "五子棋" else ".tictactoe-mark"
+            try:
+                sheet.locator(stone_sel).nth(1).wait_for(timeout=8000)
+                ai_ok = True
+            except Exception:
+                ai_ok = False
+            check(f"{name}落子后 AI 应手", ai_ok)
+            page.keyboard.press("Escape")
+            page.wait_for_timeout(300)
+
+        # —— 战绩入口：对局进行中离开不写库，此时应为空态 ——
+        page.get_by_role("button", name="战绩").click()
+        sheet = page.locator(".sheet.open")
+        sheet.wait_for()
+        check("战绩页可打开（对局未结束不写库 → 空态）", "还没有对局记录" in sheet.text_content())
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(300)
+
         page.get_by_role("button", name="返回首页").click()
         page.get_by_role("heading", name="书架").wait_for()
         check("术语统一：页面无「游戏币」字样", "游戏币" not in page.content())

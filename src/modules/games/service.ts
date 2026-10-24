@@ -1,4 +1,4 @@
-import { STORE_GAME_RECORDS, run } from '../../platform/db';
+import { STORE_GAME_MATCHES, STORE_GAME_RECORDS, run } from '../../platform/db';
 import { todayKey } from '../../shared/dates';
 import { awardCoins } from '../gamification';
 import { chatOnce } from '../ai';
@@ -9,6 +9,7 @@ import {
   rolloverGameRecord,
   settleGameReward,
   type GameId,
+  type GameMatch,
   type GameRecord,
   type GameSettlement,
   type HostContext,
@@ -28,6 +29,17 @@ async function loadAllRecords(): Promise<GameRecord[]> {
 
 async function saveRecord(record: GameRecord): Promise<void> {
   await run(STORE_GAME_RECORDS, 'readwrite', (store) => store.put(record));
+}
+
+// ---- 对局流水（战绩查询：v5 迁移新增 game_matches） ----
+
+async function loadMatches(limit = 50): Promise<GameMatch[]> {
+  const all = await run<GameMatch[]>(STORE_GAME_MATCHES, 'readonly', (store) => store.getAll());
+  return all.sort((a, b) => b.playedAt - a.playedAt).slice(0, limit);
+}
+
+async function saveMatch(match: GameMatch): Promise<void> {
+  await run(STORE_GAME_MATCHES, 'readwrite', (store) => store.put(match));
 }
 
 // ---- 串行队列：对局记录读写全部排队执行，避免并发结算竞态 ----
@@ -51,8 +63,8 @@ export interface SettleResult {
 }
 
 /**
- * 对局结算入口：读-改-写记录 → 一次发放算好的总额（钱包只记账，
- * 每日上限逻辑完全在 games 侧，不改造 gamification）。
+ * 对局结算入口：读-改-写记录 → 写一条对局流水（战绩）→ 一次发放算好的
+ * 总额（钱包只记账，每日上限逻辑完全在 games 侧，不改造 gamification）。
  * awardCoins 失败返回 0，而加币后余额必 ≥ gained，故「gained>0 而返回 0」
  * 可判定为 IO 失败。
  */
@@ -69,12 +81,25 @@ export async function settleGame(gameId: GameId, won: boolean): Promise<SettleRe
       now
     );
     await saveRecord(settlement.record);
+    await saveMatch({ gameId, result: won ? 'won' : 'lost', coins: settlement.gained, playedAt: now });
     if (settlement.gained > 0) {
       const balance = await awardCoins(settlement.gained);
       return { settlement, awarded: balance > 0 };
     }
     return { settlement, awarded: true };
   });
+}
+
+/** 记录一局平局流水（不奖不罚不写对局记录；平局仍要在战绩可见）。 */
+export async function recordDrawMatch(gameId: GameId): Promise<void> {
+  await serialize(async () => {
+    await saveMatch({ gameId, result: 'draw', coins: 0, playedAt: Date.now() });
+  });
+}
+
+/** 战绩查询：最近 limit 条对局流水（按时间倒序；启动与开Sheet 时刷新）。 */
+export async function fetchMatches(limit = 50): Promise<GameMatch[]> {
+  return serialize(() => loadMatches(limit));
 }
 
 /**

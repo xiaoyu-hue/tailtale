@@ -45,6 +45,19 @@ export const GAME_ECONOMY: Record<GameId, GameEconomyRule> = {
 /** 任意游戏首玩一次性奖励（不占每日上限）。 */
 export const FIRST_PLAY_COINS = 3;
 
+/** 对局流水行（db 'tailtale' 的 game_matches store，自增 id；战绩查询用）。 */
+export interface GameMatch {
+  /** 自增 id（db 分配） */
+  id?: number;
+  gameId: GameId;
+  /** 对局结果：胜 / 负 / 平（平局不奖不罚但计入流水） */
+  result: 'won' | 'lost' | 'draw';
+  /** 本局实发金币（平局为 0） */
+  coins: number;
+  /** 对局结束时间戳 */
+  playedAt: number;
+}
+
 /** 对局记录行（db 'tailtale' 的 game_records store，keyPath 为 gameId）。 */
 export interface GameRecord {
   gameId: GameId;
@@ -218,7 +231,7 @@ export type HostMode = 'local' | 'ai';
  * 主持人事件（仅这 5 类走主持人；普通「大了/小了」提示是本地文案，
  * 不走 AI——这是控费关键：平均每局仅 2~3 次 AI 调用）。
  */
-export type HostEvent = 'start' | 'near' | 'win' | 'lose' | 'giveUp';
+export type HostEvent = 'start' | 'near' | 'win' | 'lose' | 'giveUp' | 'draw';
 
 /** 主持人上下文（seed 驱动本地台词确定性轮换；detail 为现场事实一句话）。 */
 export interface HostContext {
@@ -260,6 +273,11 @@ export const HOST_LINES: Record<HostEvent, string[]> = {
     '收到，这局收工。{detail}，金币明天还能接着赚',
     '没问题，休息一下。{detail}，我随时待命',
   ],
+  draw: [
+    '平局！{detail}，棋逢对手，将遇良才',
+    '不分胜负！{detail}，下次一定分个高下',
+    '和棋！{detail}，下次再来一决雌雄',
+  ],
 };
 
 function fillTemplate(template: string, vars: Record<string, string | number>): string {
@@ -290,6 +308,7 @@ const HOST_EVENT_DESC: Record<HostEvent, string> = {
   win: '玩家猜中了',
   lose: '玩家用完了机会没猜中',
   giveUp: '玩家主动放弃了本局',
+  draw: '对局以平局收场（棋盘下满，无人成五）',
 };
 
 /**

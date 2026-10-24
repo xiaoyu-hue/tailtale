@@ -1,5 +1,5 @@
 const DB_NAME = 'tailtale';
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 
 /**
  * 存储 schema：store 名集中登记在平台层。
@@ -12,15 +12,21 @@ export const STORE_CHECKINS = 'checkins';
 export const STORE_READING_SESSION = 'reading_session';
 export const STORE_PET = 'pet';
 export const STORE_GAME_RECORDS = 'game_records';
+export const STORE_GAME_MATCHES = 'game_matches';
 
 interface Migration {
   version: number;
   upgrade: (db: IDBDatabase) => void;
 }
 
-function createStoreIfMissing(db: IDBDatabase, name: string, keyPath = 'id'): void {
+function createStoreIfMissing(
+  db: IDBDatabase,
+  name: string,
+  keyPath = 'id',
+  autoIncrement = false
+): void {
   if (!db.objectStoreNames.contains(name)) {
-    db.createObjectStore(name, { keyPath });
+    db.createObjectStore(name, { keyPath, autoIncrement });
   }
 }
 
@@ -48,6 +54,13 @@ const MIGRATIONS: Migration[] = [
     version: 4,
     upgrade: (db) => {
       createStoreIfMissing(db, STORE_GAME_RECORDS, 'gameId');
+    },
+  },
+  {
+    // v5：游戏模块（批次 2）——对局流水（战绩查询；自增 id，按时间倒序取最近 N 条）
+    version: 5,
+    upgrade: (db) => {
+      createStoreIfMissing(db, STORE_GAME_MATCHES, 'id', true);
     },
   },
 ];

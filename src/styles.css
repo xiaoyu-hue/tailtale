@@ -3333,6 +3333,162 @@ button {
   color: #c0453c;
 }
 
+/* 棋盘对局（五子棋 / 井字棋共用 meta 行） */
+.gomoku-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+  font-size: 12px;
+}
+
+.gomoku-difficulty {
+  display: flex;
+  gap: 6px;
+}
+
+/* 五子棋棋盘：15×15 网格（vendored sen-ltd/gomoku-ai） */
+.gomoku-board {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 10px);
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.gomoku-cell {
+  aspect-ratio: 1;
+  background: var(--surface);
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.gomoku-cell:disabled {
+  cursor: default;
+}
+
+.gomoku-stone {
+  width: 76%;
+  height: 76%;
+  border-radius: 50%;
+}
+
+.gomoku-stone--black {
+  background: #2a2a2e;
+}
+
+.gomoku-stone--white {
+  background: #f5f2ec;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+
+.gomoku-cell--win {
+  background: color-mix(in srgb, #3d8a5a 38%, var(--surface));
+}
+
+/* 井字棋棋盘：3×3 网格（自研 minimax） */
+.tictactoe-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.tictactoe-cell {
+  aspect-ratio: 1;
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.tictactoe-cell:disabled {
+  cursor: default;
+}
+
+.tictactoe-mark--x {
+  color: var(--accent, #c86b3c);
+}
+
+.tictactoe-mark--o {
+  color: #4a6fa5;
+}
+
+.tictactoe-cell--win {
+  border-color: #3d8a5a;
+  background: color-mix(in srgb, #3d8a5a 20%, var(--surface-soft));
+}
+
+/* 对局流水（战绩） */
+.matches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.match-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md, 10px);
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.match-result {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.match-result--won {
+  background: #3d8a5a;
+}
+
+.match-result--lost {
+  background: #c0453c;
+}
+
+.match-result--draw {
+  background: #8a8f98;
+}
+
+.match-game {
+  font-weight: 600;
+}
+
+.match-coins {
+  margin-left: auto;
+}
+
+.match-time {
+  flex-shrink: 0;
+  font-size: 12px;
+}
+
 /* 主持人台词气泡：打字机 + 来源徽标（速查表「等得住 / 信得过」本地化） */
 .host-bubble {
   display: flex;

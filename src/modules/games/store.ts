@@ -1,6 +1,6 @@
 import { createStore, useStore } from '../../platform/store';
-import { loadSettledRecords, settleGame, type SettleResult } from './service';
-import type { GameId, GameRecord, HostMode } from './model';
+import { fetchMatches, loadSettledRecords, recordDrawMatch, settleGame, type SettleResult } from './service';
+import type { GameId, GameMatch, GameRecord, HostMode } from './model';
 
 const HOST_MODE_KEY = 'tailtale:host-mode';
 
@@ -15,12 +15,14 @@ function loadHostMode(): HostMode {
 
 interface GamesState {
   records: Partial<Record<GameId, GameRecord>>;
+  matches: GameMatch[];
   loaded: boolean;
   hostMode: HostMode;
 }
 
 const store = createStore<GamesState>({
   records: {},
+  matches: [],
   loaded: false,
   hostMode: loadHostMode(),
 });
@@ -37,6 +39,10 @@ export function useGamesLoaded(): boolean {
 
 export function useHostMode(): HostMode {
   return useStore(store, (s) => s.hostMode);
+}
+
+export function useMatchHistory(): GameMatch[] {
+  return useStore(store, (s) => s.matches);
 }
 
 // ---- 状态动作 ----
@@ -71,4 +77,24 @@ export function settleGameRound(gameId: GameId, won: boolean): Promise<SettleRes
     }));
     return result;
   });
+}
+
+/** 刷新战绩流水（开「战绩」Sheet 时调用；结算后也会异步刷新）。 */
+export async function refreshMatches(): Promise<void> {
+  try {
+    const matches = await fetchMatches();
+    store.setState((s) => ({ ...s, matches }));
+  } catch (error) {
+    console.error('加载对局流水失败', error);
+  }
+}
+
+/** 记录一局平局（不奖不罚；流水可见）。 */
+export async function recordDraw(gameId: GameId): Promise<void> {
+  try {
+    await recordDrawMatch(gameId);
+  } catch (error) {
+    console.error('记录平局流水失败', error);
+  }
+  void refreshMatches();
 }

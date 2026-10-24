@@ -3,18 +3,24 @@ import { Sheet, toast } from '../../../components';
 import { GAME_LABELS, type GameId } from '../model';
 import { GuessNumberGame } from './GuessNumberGame';
 import { QuizGame } from './QuizGame';
+import { GomokuGame } from './GomokuGame';
+import { TictactoeGame } from './TictactoeGame';
+import { MatchHistory } from './MatchHistory';
 
 /**
- * 游戏目录（批次 2 起：猜数字 + 猜成语 / 猜歇后语 / 脑筋急转弯可玩；
- * 五子棋 / 井字棋为批次 3——把 planned 去掉、ui/ 加一个对局组件即可）。
+ * 游戏目录（批次 2 起六个游戏全部可玩；「战绩」为对局流水入口）。
+ * 后续新增游戏：GAMES 加一行 + ui/ 加一个对局组件 + GAME_ECONOMY 加一条目。
  */
-const GAMES: Array<{ id: GameId; planned?: boolean }> = [
+type CellId = GameId | 'matches';
+
+const GAMES: Array<{ id: CellId; planned?: boolean }> = [
   { id: 'guess_number' },
   { id: 'guess_idiom' },
   { id: 'guess_riddle' },
   { id: 'brain_teaser' },
-  { id: 'gomoku', planned: true },
-  { id: 'tictactoe', planned: true },
+  { id: 'gomoku' },
+  { id: 'tictactoe' },
+  { id: 'matches' },
 ];
 
 /** 四选一猜词游戏（共用 QuizGame 组件）。 */
@@ -59,30 +65,62 @@ function QuestionIcon() {
   );
 }
 
-function GamepadIcon() {
+function GridIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="2.5" y="7" width="19" height="10.5" rx="4" />
-      <path d="M7 10.5v3M5.5 12h3M15.5 11.5h.01M18 13.5h.01" />
+      <circle cx="6" cy="6" r="2.2" />
+      <circle cx="12" cy="6" r="2.2" />
+      <circle cx="18" cy="6" r="2.2" />
+      <circle cx="6" cy="12" r="2.2" />
+      <circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="12" r="2.2" />
+      <circle cx="6" cy="18" r="2.2" />
+      <circle cx="12" cy="18" r="2.2" />
+      <circle cx="18" cy="18" r="2.2" />
     </svg>
   );
 }
 
-const ICONS: Record<GameId, JSX.Element> = {
+function CrossIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 6l12 12M18 6L6 18" />
+      <circle cx="12" cy="12" r="9.5" strokeDasharray="3 2.5" />
+    </svg>
+  );
+}
+
+function HistoryIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-7.6 4.2" />
+      <path d="M3 4v4h4" />
+      <path d="M12 8v4l3 2" />
+    </svg>
+  );
+}
+
+const ICONS: Record<CellId, JSX.Element> = {
   guess_number: <DiceIcon />,
   guess_idiom: <BookIcon />,
   guess_riddle: <QuoteIcon />,
   brain_teaser: <QuestionIcon />,
-  gomoku: <GamepadIcon />,
-  tictactoe: <GamepadIcon />,
+  gomoku: <GridIcon />,
+  tictactoe: <CrossIcon />,
+  matches: <HistoryIcon />,
+};
+
+const LABELS: Record<CellId, string> = {
+  ...GAME_LABELS,
+  matches: '战绩',
 };
 
 /** 游戏主页：宫格入口 + 底部抽屉展开对局（复刻工具箱容器模式）。 */
 export function GamesView({ onBack }: { onBack: () => void }) {
-  const [active, setActive] = useState<GameId | null>(null);
+  const [active, setActive] = useState<CellId | null>(null);
   const [open, setOpen] = useState(false);
 
-  const openGame = (id: GameId, planned?: boolean) => {
+  const openGame = (id: CellId, planned?: boolean) => {
     if (planned) {
       toast.info('规划中（后续批次上线），敬请期待');
       return;
@@ -117,17 +155,20 @@ export function GamesView({ onBack }: { onBack: () => void }) {
             onClick={() => openGame(id, planned)}
           >
             <span className="feature-icon">{ICONS[id]}</span>
-            <span className="feature-label">{GAME_LABELS[id]}</span>
+            <span className="feature-label">{LABELS[id]}</span>
             {planned && <span className="feature-badge">后续批次</span>}
           </button>
         ))}
       </div>
 
-      <Sheet open={open} onClose={closeGame} title={active ? GAME_LABELS[active] : undefined}>
+      <Sheet open={open} onClose={closeGame} title={active ? LABELS[active] : undefined}>
         {active === 'guess_number' && <GuessNumberGame />}
-        {active !== null && QUIZ_IDS.has(active) && (
+        {active !== null && QUIZ_IDS.has(active as GameId) && (
           <QuizGame gameId={active as 'guess_idiom' | 'guess_riddle' | 'brain_teaser'} />
         )}
+        {active === 'gomoku' && <GomokuGame />}
+        {active === 'tictactoe' && <TictactoeGame />}
+        {active === 'matches' && <MatchHistory />}
       </Sheet>
     </>
   );
