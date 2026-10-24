@@ -1,6 +1,13 @@
 import { createStore, useStore } from '../../platform/store';
 import { loadSettings, saveSettings } from './service';
-import { clampFontSizeIndex, type Settings, type ThemeChoice, type UiSkin } from './model';
+import {
+  clampFontSizeIndex,
+  clampLineHeightIndex,
+  clampMarginIndex,
+  type Settings,
+  type ThemeChoice,
+  type UiSkin,
+} from './model';
 
 const store = createStore<Settings>(loadSettings());
 
@@ -52,6 +59,14 @@ export function useReduceMotion(): boolean {
   return useStore(store, (s) => s.reduceMotion);
 }
 
+export function useLineHeightIndex(): number {
+  return useStore(store, (s) => s.lineHeightIndex);
+}
+
+export function useMarginIndex(): number {
+  return useStore(store, (s) => s.marginIndex);
+}
+
 // ---- 状态动作 ----
 
 function patch(next: Partial<Settings>): void {
@@ -65,6 +80,14 @@ function patch(next: Partial<Settings>): void {
 
 export function setFontSizeIndex(index: number): void {
   patch({ fontSizeIndex: clampFontSizeIndex(index) });
+}
+
+export function setLineHeightIndex(index: number): void {
+  patch({ lineHeightIndex: clampLineHeightIndex(index) });
+}
+
+export function setMarginIndex(index: number): void {
+  patch({ marginIndex: clampMarginIndex(index) });
 }
 
 export function setTheme(theme: ThemeChoice): void {

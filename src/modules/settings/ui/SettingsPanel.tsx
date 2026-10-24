@@ -1,20 +1,28 @@
-import { FONT_SIZES, THEME_CHOICES, THEME_SKINS } from '../model';
+import { FONT_SIZES, LINE_HEIGHTS, MARGINS, THEME_CHOICES, THEME_SKINS } from '../model';
 import {
   setFontSizeIndex,
+  setLineHeightIndex,
+  setMarginIndex,
   setReduceMotion,
   setSkin,
   setTheme,
   useFontSizeIndex,
+  useLineHeightIndex,
+  useMarginIndex,
   useReduceMotion,
   useSkin,
   useTheme,
 } from '../store';
 
 const FONT_LABELS = ['小', '标准', '大', '特大'];
+const LINE_HEIGHT_LABELS = ['紧凑', '标准', '宽松', '特松'];
+const MARGIN_LABELS = ['窄', '标准', '宽', '特宽'];
 
-/** 设置面板：正文字号 + 主题 + 界面皮肤 + 减少动画（我的页入口，全站生效）。 */
+/** 设置面板：正文字号 + 行距 + 页边距 + 主题 + 界面皮肤 + 减少动画（我的页入口，全站生效）。 */
 export function SettingsPanel() {
   const fontSizeIndex = useFontSizeIndex();
+  const lineHeightIndex = useLineHeightIndex();
+  const marginIndex = useMarginIndex();
   const theme = useTheme();
   const skin = useSkin();
   const reduceMotion = useReduceMotion();
@@ -35,6 +43,40 @@ export function SettingsPanel() {
               onClick={() => setFontSizeIndex(index)}
             >
               {FONT_LABELS[index]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="settings-row">
+        <span className="settings-label">行距</span>
+        <div className="segmented" role="group" aria-label="行距">
+          {LINE_HEIGHTS.map((lh, index) => (
+            <button
+              key={lh}
+              type="button"
+              className={`segmented-item${index === lineHeightIndex ? ' active' : ''}`}
+              aria-pressed={index === lineHeightIndex}
+              onClick={() => setLineHeightIndex(index)}
+            >
+              {LINE_HEIGHT_LABELS[index]}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="settings-row">
+        <span className="settings-label">页边距</span>
+        <div className="segmented" role="group" aria-label="页边距">
+          {MARGINS.map((m, index) => (
+            <button
+              key={m}
+              type="button"
+              className={`segmented-item${index === marginIndex ? ' active' : ''}`}
+              aria-pressed={index === marginIndex}
+              onClick={() => setMarginIndex(index)}
+            >
+              {MARGIN_LABELS[index]}
             </button>
           ))}
         </div>

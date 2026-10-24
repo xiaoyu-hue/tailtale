@@ -22,6 +22,31 @@
 
   --topbar-h: 48px;
   --nav-h: 56px;
+
+  /* —— 设计令牌：间距 / 圆角 / 字阶 / 动效（系统化地基） —— */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 26px;
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* 显式深色：与系统深色同值，属性选择器特异性高于媒体查询内的 :root */
@@ -40,7 +65,23 @@
   --danger: #d9705e;
 }
 
-/* auto（无 data-theme 或值为 auto）时跟随系统；显式 light/dark 时不匹配本条 */
+/* 显式护眼：暖纸张琥珀色，低蓝光，区别于默认米白与深色，长读更舒适 */
+:root[data-theme='sepia'] {
+  --bg: #e9dcb8;
+  --surface: #f3e9cf;
+  --surface-soft: #e0d2ad;
+  --text: #4a3f2c;
+  --text-secondary: #7a6c4e;
+  --primary: #b5732e;
+  --primary-strong: #9a5f23;
+  --primary-soft: #ecdcb8;
+  --border: #d2c096;
+  --shadow: 0 2px 12px rgba(74, 63, 44, 0.1);
+  --shadow-float: 0 6px 24px rgba(74, 63, 44, 0.18);
+  --danger: #b04a3a;
+}
+
+/* auto（无 data-theme 或值为 auto）时跟随系统；显式 light/dark/sepia 时不匹配本条 */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']):not([data-theme='dark']) {
     --bg: #1b1613;
@@ -407,7 +448,7 @@ button {
   gap: 2px;
   padding: 3px;
   background: var(--surface-soft);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
 }
 
 .segmented-item {
@@ -781,7 +822,7 @@ button {
   align-items: center;
   gap: 6px;
   padding: 12px 4px 10px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   background: var(--surface);
   border: 1px solid var(--border);
   font-size: 12px;
@@ -845,6 +886,92 @@ button {
   line-height: 1.9;
   border: 2px dashed var(--border);
   border-radius: 16px;
+}
+
+/* ========== 新手引导（首用价值前置） ========== */
+.welcome-steps {
+  margin-top: 8px;
+}
+
+.welcome-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 0;
+}
+
+.welcome-step .muted {
+  line-height: 1.6;
+}
+
+.welcome-step-num {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  background: var(--primary-soft);
+  color: var(--primary-strong);
+  font-size: 12px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.welcome-dismiss {
+  margin-top: 10px;
+}
+
+/* ========== 骨架屏（加载态：几何对齐真实内容的 shimmer） ========== */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-soft);
+  border-radius: var(--radius-md);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: skeleton-shimmer 1.4s ease infinite;
+}
+
+:root[data-theme='dark'] .skeleton::after,
+:root[data-theme='sepia'] .skeleton::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not([data-theme='dark']):not([data-theme='sepia'])
+    .skeleton::after {
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  }
+}
+
+@keyframes skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+:root[data-reduce-motion='on'] .skeleton::after {
+  animation: none;
+}
+
+.skeleton-card {
+  height: 84px;
+  margin-top: 12px;
+}
+
+.skeleton-line {
+  height: 12px;
+  margin-top: 10px;
+}
+
+.skeleton-line--w60 {
+  width: 60%;
 }
 
 /* ========== 底部导航 ========== */
@@ -1023,7 +1150,7 @@ button {
   background: none;
   color: var(--text);
   padding: 8px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   display: grid;
   place-items: center;
   font-size: 13px;
@@ -1103,7 +1230,7 @@ button {
   width: 72px;
   height: 72px;
   margin: 0 auto 14px;
-  border-radius: 22px;
+  border-radius: var(--radius-xl);
   background: var(--primary-soft);
   color: var(--primary-strong);
   display: grid;
@@ -1707,7 +1834,7 @@ button {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 9px 12px;
   font-size: 14px;
   font-family: var(--font-ui);
@@ -1766,7 +1893,7 @@ button {
   border: none;
   background: var(--surface-soft);
   color: var(--text-secondary);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   padding: 7px 18px;
   font-size: 13px;
   font-weight: 600;

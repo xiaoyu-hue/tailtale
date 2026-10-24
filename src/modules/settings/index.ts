@@ -5,10 +5,14 @@ export {
   useTheme,
   useSkin,
   useReduceMotion,
+  useLineHeightIndex,
+  useMarginIndex,
   setFontSizeIndex,
   setTheme,
   setSkin,
   setReduceMotion,
+  setLineHeightIndex,
+  setMarginIndex,
 } from './store';
 export {
   FONT_SIZES,
@@ -17,6 +21,14 @@ export {
   DEFAULT_FONT_SIZE_INDEX,
   MAX_FONT_SIZE_INDEX,
   fontSizeAt,
+  LINE_HEIGHTS,
+  DEFAULT_LINE_HEIGHT_INDEX,
+  MAX_LINE_HEIGHT_INDEX,
+  lineHeightAt,
+  MARGINS,
+  DEFAULT_MARGIN_INDEX,
+  MAX_MARGIN_INDEX,
+  marginAt,
 } from './model';
 export type { Settings, ThemeChoice, UiSkin } from './model';
 export { SettingsPanel } from './ui/SettingsPanel';

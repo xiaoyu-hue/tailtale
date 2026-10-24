@@ -33,6 +33,8 @@ declare module 'epubjs' {
     themes: {
       fontSize(size: string): void;
       font(font: string): void;
+      /** 覆盖正文样式：写入 body 内联样式（priority=true 加 !important）。无 selector 参数。 */
+      override(name: string, value: string, priority?: boolean): void;
     };
     on(event: 'relocated', cb: (location: EpubLocation) => void): void;
     on(event: 'rendered', cb: (section: unknown, view: unknown) => void): void;

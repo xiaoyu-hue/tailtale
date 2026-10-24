@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import type { JSX } from 'react';
 import type { TabKey } from '../../shared/ui/BottomNav';
-import { ImportZone, ContinueReading, BookList, LibrarySection, useRecentBook } from '../../modules/books';
+import { ImportZone, ContinueReading, BookList, LibrarySection, useBooksLoaded, useRecentBook } from '../../modules/books';
 import { TodayCard } from '../../modules/gamification';
 import { useAiConfigured } from '../../modules/ai';
 import { greetingForHour } from '../../shared/dates';
@@ -185,12 +185,71 @@ function PetStrip({ onOpen }: { onOpen: () => void }) {
   );
 }
 
+const ONBOARD_KEY = 'tailtale:onboarded';
+
+/** 新手引导卡：首用价值前置（导入 → 赚金币 → 养宠物），确认后 localStorage 记住不再显示。 */
+function WelcomeCard() {
+  const [visible, setVisible] = useState(() => {
+    try {
+      return !window.localStorage.getItem(ONBOARD_KEY);
+    } catch {
+      return false;
+    }
+  });
+  if (!visible) return null;
+  const dismiss = () => {
+    try {
+      window.localStorage.setItem(ONBOARD_KEY, '1');
+    } catch {
+      /* 存储不可用时仅在本次会话隐藏 */
+    }
+    setVisible(false);
+  };
+  return (
+    <section className="card welcome-card" aria-label="新手引导">
+      <h2 style={{ margin: '0 0 6px', fontSize: 17 }}>欢迎使用书时</h2>
+      <p className="muted" style={{ margin: '0 0 4px' }}>
+        读书记时长换金币，金币养宠物——你的阅读时光，值得被看见。
+      </p>
+      <div className="welcome-steps">
+        <div className="welcome-step">
+          <span className="welcome-step-num">1</span>
+          <span className="muted">导入一本 TXT / EPUB / PDF，或从公版书库领取经典</span>
+        </div>
+        <div className="welcome-step">
+          <span className="welcome-step-num">2</span>
+          <span className="muted">阅读自动计时，攒金币、续打卡</span>
+        </div>
+        <div className="welcome-step">
+          <span className="welcome-step-num">3</span>
+          <span className="muted">用金币在商店买零食，喂你的小猫</span>
+        </div>
+      </div>
+      <button type="button" className="btn btn-primary btn-block welcome-dismiss" onClick={dismiss}>
+        开始阅读
+      </button>
+    </section>
+  );
+}
+
+/** 书籍加载骨架屏：几何对齐真实卡片，加载完成即消失（避免 spinner 整屏等待感）。 */
+function LoadingSkeleton() {
+  return (
+    <div aria-hidden="true">
+      <div className="skeleton skeleton-card" />
+      <div className="skeleton skeleton-card" />
+      <div className="skeleton skeleton-line skeleton-line--w60" />
+    </div>
+  );
+}
+
 /** 首页视图：导入 → 继续阅读 → 宠物预览 → 功能网格 → 全部书籍。书籍相关 UI 全部来自 books 模块。 */
 export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
   const toastTimerRef = useRef<number>(0);
   const [toast, setToast] = useState<string | null>(null);
   const recentBook = useRecentBook();
   const aiConfigured = useAiConfigured();
+  const booksLoaded = useBooksLoaded();
   // 分钟级刷新即可覆盖时段（问候语按小时切换），无需秒级
   const now = useTicker(30_000);
   const greeting = greetingForHour(new Date(now).getHours());
@@ -262,7 +321,9 @@ export default function HomeView({ onOpenBook, onNavigateTab }: HomeViewProps) {
         </span>
       </h1>
 
+      <WelcomeCard />
       <ImportZone onToast={showToast} />
+      {!booksLoaded && <LoadingSkeleton />}
       <ContinueReading onOpenBook={onOpenBook} />
       <TodayCard onToast={showToast} />
       <PetStrip onOpen={() => onNavigateTab('pet')} />

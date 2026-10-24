@@ -12,12 +12,31 @@ export const DEFAULT_FONT_SIZE_INDEX = 1;
 /** 最大档位索引（供 UI 判断能否继续增大）。 */
 export const MAX_FONT_SIZE_INDEX = FONT_SIZES.length - 1;
 
-export type ThemeChoice = 'auto' | 'light' | 'dark';
+/** 行距四档（相对倍数），作用于阅读正文 line-height。 */
+export const LINE_HEIGHTS: readonly number[] = [1.5, 1.7, 1.9, 2.2];
+
+/** 默认档位索引：1.7（标准阅读行距）。 */
+export const DEFAULT_LINE_HEIGHT_INDEX = 1;
+
+/** 最大档位索引（供 UI 判断能否继续增大）。 */
+export const MAX_LINE_HEIGHT_INDEX = LINE_HEIGHTS.length - 1;
+
+/** 页边距四档（阅读正文内边距 px，左右/上下同值），控制留白。 */
+export const MARGINS: readonly number[] = [24, 48, 72, 96];
+
+/** 默认档位索引：48px（标准留白）。 */
+export const DEFAULT_MARGIN_INDEX = 1;
+
+/** 最大档位索引（供 UI 判断能否继续增大）。 */
+export const MAX_MARGIN_INDEX = MARGINS.length - 1;
+
+export type ThemeChoice = 'auto' | 'light' | 'dark' | 'sepia';
 
 export const THEME_CHOICES: ReadonlyArray<{ value: ThemeChoice; label: string }> = [
   { value: 'auto', label: '跟随系统' },
   { value: 'light', label: '浅色' },
   { value: 'dark', label: '深色' },
+  { value: 'sepia', label: '护眼' },
 ];
 
 /** 界面皮肤（M6 主题皮肤）：default = 当前暖色主题；glass = 液态玻璃；pixel = 像素风。 */
@@ -39,10 +58,21 @@ export interface Settings {
   skin: UiSkin;
   /** 减少动画（v1.7.0 总开关）：true = 全局关闭动画与过渡，等效系统「减少动态效果」 */
   reduceMotion: boolean;
+  /** 行距档位索引（0..LINE_HEIGHTS.length-1），作用于阅读正文 line-height */
+  lineHeightIndex: number;
+  /** 页边距档位索引（0..MARGINS.length-1），作用于阅读正文留白 */
+  marginIndex: number;
 }
 
 export function defaultSettings(): Settings {
-  return { fontSizeIndex: DEFAULT_FONT_SIZE_INDEX, theme: 'auto', skin: 'default', reduceMotion: false };
+  return {
+    fontSizeIndex: DEFAULT_FONT_SIZE_INDEX,
+    theme: 'auto',
+    skin: 'default',
+    reduceMotion: false,
+    lineHeightIndex: DEFAULT_LINE_HEIGHT_INDEX,
+    marginIndex: DEFAULT_MARGIN_INDEX,
+  };
 }
 
 export function clampFontSizeIndex(index: number): number {
@@ -56,8 +86,30 @@ export function fontSizeAt(index: number): number {
   return FONT_SIZES[clamped] ?? FONT_SIZES[DEFAULT_FONT_SIZE_INDEX];
 }
 
+export function clampLineHeightIndex(index: number): number {
+  if (!Number.isFinite(index)) return DEFAULT_LINE_HEIGHT_INDEX;
+  return Math.min(Math.max(Math.round(index), 0), LINE_HEIGHTS.length - 1);
+}
+
+/** 档位索引 → 行距倍数（越界自动钳制，兜底默认档）。 */
+export function lineHeightAt(index: number): number {
+  const clamped = clampLineHeightIndex(index);
+  return LINE_HEIGHTS[clamped] ?? LINE_HEIGHTS[DEFAULT_LINE_HEIGHT_INDEX];
+}
+
+export function clampMarginIndex(index: number): number {
+  if (!Number.isFinite(index)) return DEFAULT_MARGIN_INDEX;
+  return Math.min(Math.max(Math.round(index), 0), MARGINS.length - 1);
+}
+
+/** 档位索引 → 页边距 px（越界自动钳制，兜底默认档）。 */
+export function marginAt(index: number): number {
+  const clamped = clampMarginIndex(index);
+  return MARGINS[clamped] ?? MARGINS[DEFAULT_MARGIN_INDEX];
+}
+
 export function isThemeChoice(value: unknown): value is ThemeChoice {
-  return value === 'auto' || value === 'light' || value === 'dark';
+  return value === 'auto' || value === 'light' || value === 'dark' || value === 'sepia';
 }
 
 export function isUiSkin(value: unknown): value is UiSkin {

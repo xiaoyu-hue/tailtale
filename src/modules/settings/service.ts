@@ -2,9 +2,13 @@ import {
   AI_CONFIG_KEY,
   BACKUP_VERSION,
   DEFAULT_FONT_SIZE_INDEX,
+  DEFAULT_LINE_HEIGHT_INDEX,
+  DEFAULT_MARGIN_INDEX,
   FONT_SIZES,
   builtinBookIds,
   clampFontSizeIndex,
+  clampLineHeightIndex,
+  clampMarginIndex,
   defaultSettings,
   envelopePayload,
   filterBooksForRestore,
@@ -59,6 +63,9 @@ export function loadSettings(): Settings {
         skin: isUiSkin(parsed.skin) ? parsed.skin : defaultSettings().skin,
         // v1.7.0 新增字段：旧设置无此键 → 默认 false（保持动画开启）
         reduceMotion: parsed.reduceMotion === true,
+        // 阅读排版档位：旧设置无此键 → 默认标准档（保持原排版观感）
+        lineHeightIndex: clampLineHeightIndex(parsed.lineHeightIndex ?? DEFAULT_LINE_HEIGHT_INDEX),
+        marginIndex: clampMarginIndex(parsed.marginIndex ?? DEFAULT_MARGIN_INDEX),
       };
     }
     const base = defaultSettings();

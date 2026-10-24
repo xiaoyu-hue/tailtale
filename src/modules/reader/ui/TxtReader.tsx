@@ -1,7 +1,16 @@
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import type { Book } from '../../books';
 import { markFinished, readBookContent, reportProgress } from '../../books';
-import { MAX_FONT_SIZE_INDEX, fontSizeAt, setFontSizeIndex, useFontSizeIndex } from '../../settings';
+import {
+  MAX_FONT_SIZE_INDEX,
+  fontSizeAt,
+  lineHeightAt,
+  marginAt,
+  setFontSizeIndex,
+  useFontSizeIndex,
+  useLineHeightIndex,
+  useMarginIndex,
+} from '../../settings';
 import { AiDrawer } from '../../ai';
 import { useSwipe } from '../../../shared/hooks/useSwipe';
 import { splitChapters } from '../model';
@@ -18,13 +27,17 @@ const FINISH_THRESHOLD = 0.98;
 const ChapterBody = memo(function ChapterBody({
   lines,
   fontSize,
+  lineHeight,
+  margin,
 }: {
   lines: string[];
   fontSize: number;
+  lineHeight: number;
+  margin: number;
 }) {
   return (
-    <div className="reader-inner" style={{ fontSize: `${fontSize}px` }}>
-      <div className="reader-text">
+    <div className="reader-inner" style={{ fontSize: `${fontSize}px`, padding: `${margin}px` }}>
+      <div className="reader-text" style={{ lineHeight }}>
         {lines.map((line, index) => (
           <p className="reader-line" key={index}>
             {line || '\u00A0'}
@@ -44,9 +57,13 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
   const [chromeVisible, setChromeVisible] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
-  // 正文字号为全局偏好（settings 模块），跨书籍记忆、在我的页亦可调
+  // 正文字号 / 行距 / 页边距为全局偏好（settings 模块），跨书籍记忆、在我的页亦可调
   const fontSizeIndex = useFontSizeIndex();
   const fontSize = fontSizeAt(fontSizeIndex);
+  const lineHeightIndex = useLineHeightIndex();
+  const marginIndex = useMarginIndex();
+  const lineHeight = lineHeightAt(lineHeightIndex);
+  const margin = marginAt(marginIndex);
 
   const stageRef = useRef<HTMLDivElement>(null);
   const saveTimerRef = useRef<number>(0);
@@ -211,7 +228,7 @@ export function TxtReader({ book, onBack }: ReaderPageProps) {
         }}
       >
         <h2 className="reader-chapter-title">{chapter.title}</h2>
-        <ChapterBody lines={chapterBody} fontSize={fontSize} />
+        <ChapterBody lines={chapterBody} fontSize={fontSize} lineHeight={lineHeight} margin={margin} />
       </div>
 
       <div className="reader-bar reader-bar-bottom" hidden={!chromeVisible}>

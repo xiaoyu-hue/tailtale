@@ -2,7 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import type { NavItem, Rendition, EpubBook } from 'epubjs';
 import type { Book } from '../../books';
 import { markFinished, readBookBinary, reportProgress } from '../../books';
-import { MAX_FONT_SIZE_INDEX, fontSizeAt, setFontSizeIndex, useFontSizeIndex } from '../../settings';
+import {
+  MAX_FONT_SIZE_INDEX,
+  fontSizeAt,
+  lineHeightAt,
+  marginAt,
+  setFontSizeIndex,
+  useFontSizeIndex,
+  useLineHeightIndex,
+  useMarginIndex,
+} from '../../settings';
 import { AiDrawer } from '../../ai';
 import { useSwipe } from '../../../shared/hooks/useSwipe';
 
@@ -36,9 +45,13 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
   // 已绑过手势的 iframe 文档（epub.js 视图复用，rendered 会重复触发，防监听器叠加双翻页）
   const swipeBoundDocsRef = useRef(new WeakSet<Document>());
 
-  // 正文字号为全局偏好（settings 模块）
+  // 正文字号 / 行距 / 页边距为全局偏好（settings 模块）
   const fontSizeIndex = useFontSizeIndex();
   const fontSize = fontSizeAt(fontSizeIndex);
+  const lineHeightIndex = useLineHeightIndex();
+  const marginIndex = useMarginIndex();
+  const lineHeight = lineHeightAt(lineHeightIndex);
+  const margin = marginAt(marginIndex);
 
   // 横向 / 竖向滑动翻页：左滑、上滑 = 下一页；右滑、下滑 = 上一页
   const { bind: bindSwipe, consumeSwipe } = useSwipe({
@@ -78,6 +91,8 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
         });
         renditionRef.current = rendition;
         rendition.themes.fontSize(`${fontSize}px`);
+        rendition.themes.override('line-height', String(lineHeight));
+        rendition.themes.override('padding', `${margin}px`);
         // 有 CFI 精确恢复，否则从头开始。epubjs 的 display 在类型上声明返回 void，但运行时会
         // 返回 Promise；用 Promise.resolve 兜底捕获其 rejection（如跨设备/旧版备份导致的非法 CFI），
         // 失败时回首页，避免 unhandled rejection 卡死阅读页。
@@ -156,6 +171,14 @@ export function EpubReader({ book, onBack }: EpubReaderProps) {
   useEffect(() => {
     renditionRef.current?.themes.fontSize(`${fontSize}px`);
   }, [fontSize]);
+
+  // ---- 行距 / 页边距变化同步到 rendition ----
+  useEffect(() => {
+    const rendition = renditionRef.current;
+    if (!rendition) return;
+    rendition.themes.override('line-height', String(lineHeight));
+    rendition.themes.override('padding', `${margin}px`);
+  }, [lineHeight, margin]);
 
   const goTo = (href: string) => {
     renditionRef.current?.display(href);
