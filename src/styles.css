@@ -3599,3 +3599,46 @@ button {
   gap: 8px;
   margin-top: 12px;
 }
+
+/* 结束面板 AI 点评区（批次 3：点评 / 推荐追问 / 自由追问；全部用户主动触发） */
+.game-over-ai {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.game-over-ai .guess-chips {
+  margin-top: 0;
+  align-items: center;
+}
+
+.game-over-ai-hint {
+  font-size: 11px;
+}
+
+.game-over-suggests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.game-over-qa {
+  margin: 10px 0 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.game-over-q,
+.game-over-a {
+  margin: 0 0 4px;
+  white-space: pre-wrap;
+}
+
+.game-over-q {
+  color: var(--text-secondary);
+}
+
+.game-over-a {
+  color: var(--text);
+}

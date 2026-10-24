@@ -5,6 +5,7 @@ import { fetchHostLine, type HostLine } from '../service';
 import { GAME_ECONOMY, GAME_LABELS, buildQuizRound, type HostContext, type HostEvent, type QuizGameId } from '../model';
 import { HostBubble } from './HostBubble';
 import { HostModeSwitch } from './HostModeSwitch';
+import { GameOverPanel } from './GameOverPanel';
 
 /** 每局题数与及格线（PRD 配套玩法：10 题答对 6 题即胜）。 */
 const ROUNDS = 10;
@@ -126,31 +127,22 @@ export function QuizGame({ gameId }: { gameId: QuizGameId }) {
 
   if (over) {
     const won = correct >= PASS;
+    const coins = settled?.gained ?? 0;
     return (
       <div className="guess-game">
         <HostBubble text={line?.text ?? null} source={line?.source ?? null} pending={pending} />
-        <div className="guess-over">
-          <p className="guess-over-title">{won ? '过关！' : '差一点儿'}</p>
-          <p className="muted">
-            本局 {ROUNDS} 题答对 {correct} 题
-            {settled && settled.gained > 0 ? `，获得 ${settled.gained} 金币` : '，再接再厉'}
-          </p>
-          {settled && settled.gained > 0 && !settled.awarded && (
-            <p className="muted">金币发放失败，战绩已记录</p>
-          )}
-          <div className="guess-chips">
-            <button type="button" className="chip" onClick={restart}>
-              再来一局
-            </button>
-            <button
-              type="button"
-              className="chip"
-              onClick={() => toast.info('更多游戏（猜数字 / 五子棋等）在游戏目录里')}
-            >
-              换个游戏
-            </button>
-          </div>
-        </div>
+        <GameOverPanel
+          summary={{
+            gameId,
+            outcome: won ? 'won' : 'lost',
+            detail: `${ROUNDS} 题答对 ${correct} 题`,
+            coins,
+          }}
+          title={won ? '过关！' : '差一点儿'}
+          detail={`本局 ${ROUNDS} 题答对 ${correct} 题${coins > 0 ? `，获得 ${coins} 金币` : '，再接再厉'}`}
+          awardFailed={settled ? coins > 0 && !settled.awarded : false}
+          onRestart={restart}
+        />
       </div>
     );
   }

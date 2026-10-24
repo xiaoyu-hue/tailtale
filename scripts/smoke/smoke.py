@@ -138,6 +138,30 @@ def run_smoke(base):
         page.keyboard.press("Escape")
         page.wait_for_timeout(300)
 
+        # —— 局后 AI 点评（批次 3）：放弃本局 → 共享结束面板 → 未开启 AI 时引导（不发请求）——
+        page.get_by_role("button", name="猜数字").click()
+        sheet = page.locator(".sheet.open")
+        sheet.wait_for()
+        sheet.get_by_role("button", name="放弃本局").click()
+        sheet.get_by_role("button", name="AI 点评").wait_for()
+        check(
+            "结束面板统一（再来一局 + AI 点评入口）",
+            sheet.get_by_role("button", name="再来一局").is_visible()
+            and sheet.get_by_role("button", name="AI 点评").is_visible(),
+        )
+        page.wait_for_timeout(300)  # 等结算 toast（获币/失败）先弹出，再点点评
+        sheet.get_by_role("button", name="AI 点评").click()
+        page.wait_for_timeout(150)
+        toast_msg = page.locator(".toast-message")
+        toast_text = toast_msg.last.text_content() if toast_msg.count() else ""
+        check(
+            "AI 未开启时点评引导开启（local 模式不发请求）",
+            "AI 主持人" in toast_text,
+            toast_text,
+        )
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(300)
+
         page.get_by_role("button", name="返回首页").click()
         page.get_by_role("heading", name="书架").wait_for()
         check("术语统一：页面无「游戏币」字样", "游戏币" not in page.content())

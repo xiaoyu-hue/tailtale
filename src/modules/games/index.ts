@@ -15,7 +15,7 @@ export {
 } from './store';
 
 // 副作用边界（主持人台词降级链）
-export { fetchHostLine } from './service';
+export { fetchHostLine, fetchAiText } from './service';
 export type { SettleResult, HostLine } from './service';
 
 // UI（游戏主页；对局经 Sheet 展开）

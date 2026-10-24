@@ -5,6 +5,7 @@ import { fetchHostLine, type HostLine } from '../service';
 import { GAME_ECONOMY, type HostContext, type HostEvent } from '../model';
 import { HostBubble } from './HostBubble';
 import { HostModeSwitch } from './HostModeSwitch';
+import { GameOverPanel } from './GameOverPanel';
 
 /** 猜数字规则（PRD §3.1.1 配套玩法；log₂100≈6.64，7 次保证可必胜）。 */
 const RANGE_MIN = 1;
@@ -37,6 +38,8 @@ export function GuessNumberGame() {
   const [line, setLine] = useState<HostLine | null>(null);
   const [pending, setPending] = useState(false);
   const [settled, setSettled] = useState<{ gained: number; awarded: boolean } | null>(null);
+  /** 本局实际猜的次数（结束面板与 AI 点评的事实来源） */
+  const [used, setUsed] = useState(0);
   /** 开局台词守卫：StrictMode 双挂载只请求一次，避免 AI 模式重复付费 */
   const startedRef = useRef(false);
 
@@ -107,8 +110,9 @@ export function GuessNumberGame() {
   };
 
   /** 结算并播对应台词（金币先落库发放，台词引用结算后的连胜数）。 */
-  const finish = async (result: Outcome, used: number) => {
+  const finish = async (result: Outcome, usedCount: number) => {
     setOutcome(result);
+    setUsed(usedCount);
     const won = result === 'won';
     const settleResult = await settleGameRound('guess_number', won);
     setSettled({ gained: settleResult.settlement.gained, awarded: settleResult.awarded });
@@ -118,7 +122,7 @@ export function GuessNumberGame() {
     }
     const streak = settleResult.settlement.record.streak;
     const detail = won
-      ? `用了 ${used} 次猜中${streak >= 3 ? `，${streak} 连胜！` : ''}`
+      ? `用了 ${usedCount} 次猜中${streak >= 3 ? `，${streak} 连胜！` : ''}`
       : `答案是 ${answer}`;
     await speak(won ? 'win' : result === 'lost' ? 'lose' : 'giveUp', {
       gameId: 'guess_number',
@@ -136,6 +140,7 @@ export function GuessNumberGame() {
     setInput('');
     setNotice('');
     setSettled(null);
+    setUsed(0);
     setLine(null);
     void speak('start', {
       gameId: 'guess_number',
@@ -209,26 +214,20 @@ export function GuessNumberGame() {
           <HostModeSwitch />
         </div>
       ) : (
-        <div className="guess-over">
-          <p className="guess-over-title">
-            {outcome === 'won' ? '猜中啦！' : outcome === 'lost' ? '机会用完了' : '已放弃本局'}
-          </p>
-          {settled && settled.gained > 0 && !settled.awarded && (
-            <p className="muted">金币发放失败，战绩已记录</p>
-          )}
-          <div className="guess-chips">
-            <button type="button" className="chip" onClick={restart}>
-              再来一局
-            </button>
-            <button
-              type="button"
-              className="chip"
-              onClick={() => toast.info('更多游戏（猜成语 / 五子棋等）在后续批次上线')}
-            >
-              换个游戏
-            </button>
-          </div>
-        </div>
+        <GameOverPanel
+          summary={{
+            gameId: 'guess_number',
+            outcome: outcome === 'won' ? 'won' : 'lost',
+            detail: outcome === 'won' ? `用了 ${used} 次猜中` : `答案是 ${answer}`,
+            coins: settled?.gained ?? 0,
+          }}
+          title={outcome === 'won' ? '猜中啦！' : outcome === 'lost' ? '机会用完了' : '已放弃本局'}
+          detail={`${outcome === 'won' ? `用了 ${used} 次猜中` : `答案是 ${answer}`}${
+            settled && settled.gained > 0 ? `，获得 ${settled.gained} 金币` : ''
+          }`}
+          awardFailed={settled ? settled.gained > 0 && !settled.awarded : false}
+          onRestart={restart}
+        />
       )}
     </div>
   );

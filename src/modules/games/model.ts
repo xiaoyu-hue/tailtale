@@ -334,3 +334,98 @@ export function buildHostPrompt(
     .join('\n');
   return { system, user };
 }
+
+// ---- 局后 AI 点评与追问（结束面板「问下去」；全部用户主动触发） ----
+
+/** 对局结果（平局也点评；与结算口径一致）。 */
+export type GameOutcome = 'won' | 'lost' | 'draw';
+
+/**
+ * 对局小结（喂给 AI 点评的现场事实；与结算结果同源，UI 在结束面板构造）。
+ * detail 为纯事实一句话（不含评价），coins 为本局实发金币（0=未发放）。
+ */
+export interface GameSummary {
+  gameId: GameId;
+  outcome: GameOutcome;
+  /** 现场事实一句话（如「用了 4 次猜中」「10 题答对 7 题」「AI 先成五」） */
+  detail: string;
+  /** 本局实发金币 */
+  coins: number;
+}
+
+/** 一轮对话（追问历史以拼接方式传入 chatOnce，无会话缓存——每次调用都产生费用）。 */
+export interface FollowUpTurn {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+/** 结果的事实描述（喂给 AI 的 user prompt 用；与 GameSummary.outcome 一一对应）。 */
+const OUTCOME_DESC: Record<GameOutcome, string> = {
+  won: '玩家获胜',
+  lost: '玩家落败',
+  draw: '平局',
+};
+
+/**
+ * 构造局后点评 prompt（纯函数）：system 复用主人口径（简体中文 / 「你」称呼 /
+ * 不编造），点评上限 100 字（复盘性质比台词长，仍守「宁短勿长」）；
+ * user 给对局事实，要求一句话点评 + 一个可操作建议。
+ */
+export function buildReviewPrompt(summary: GameSummary): { system: string; user: string } {
+  const system = [
+    `你是阅读 App「书时」里小游戏「${GAME_LABELS[summary.gameId]}」的主持人。`,
+    '对局刚结束，玩家请你点评这一局。',
+    '要求：简体中文；用「你」称呼玩家；不超过 100 字；最多 1 个 emoji；只基于提供的对局事实评价，不得编造未提供的信息；语气轻松，落败不嘲讽。',
+  ].join('\n');
+  const user = [
+    `对局结果：${OUTCOME_DESC[summary.outcome]}。`,
+    `现场情况：${summary.detail}`,
+    summary.coins > 0 ? `本局获得 ${summary.coins} 金币。` : '本局没有获得金币。',
+    '请点评这一局的表现，并给一个下次能用得上的建议。',
+  ].join('\n');
+  return { system, user };
+}
+
+/**
+ * 构造追问 prompt（纯函数）：把对局事实 + 历史对话 + 当前问题拼进单轮 user
+ * （chatOnce 无会话缓存，历史由调用方拼接传入）；system 约束同点评口径，
+ * 回答上限 150 字；历史缺省时只带对局事实。
+ */
+export function buildFollowUpPrompt(
+  summary: GameSummary,
+  history: FollowUpTurn[],
+  question: string
+): { system: string; user: string } {
+  const system = [
+    `你是阅读 App「书时」里小游戏「${GAME_LABELS[summary.gameId]}」的主持人。`,
+    '玩家在看完这局点评后继续向你提问，请基于对局事实和对话历史回答。',
+    '要求：简体中文；用「你」称呼玩家；不超过 150 字；最多 1 个 emoji；不得编造未提供的信息；与游戏无关的问题礼貌说明你只聊这局对局。',
+  ].join('\n');
+  const lines = [
+    `对局结果：${OUTCOME_DESC[summary.outcome]}。`,
+    `现场情况：${summary.detail}`,
+  ];
+  if (history.length > 0) {
+    lines.push('对话历史：');
+    for (const turn of history) {
+      lines.push(`${turn.role === 'user' ? '玩家' : '主持人'}：${turn.content}`);
+    }
+  }
+  lines.push(`当前问题：${question}`, '请回答。');
+  return { system, user: lines.join('\n') };
+}
+
+/** 推荐追问（结束面板 chips；纯本地常量，不花 AI 费用——点击才发起追问）。 */
+const FOLLOW_UP_SUGGESTIONS: Record<GameOutcome, string[]> = {
+  won: ['这局我哪里做得好？', '有没有更快赢下的方法？', '下次怎么保持连胜？'],
+  lost: ['这局我输在哪一步？', '换你会怎么走？', '下次怎么提高胜率？'],
+  draw: ['平局算下得不错吗？', '哪一步改变了局势？', '怎么才能赢下来？'],
+};
+
+/**
+ * 推荐追问列表（纯函数）：按对局结果给 3 条口语化问题；
+ * 返回新数组（调用方改不坏常量池），内容互异且非空。
+ */
+export function suggestFollowUps(summary: GameSummary): string[] {
+  return [...FOLLOW_UP_SUGGESTIONS[summary.outcome]];
+}

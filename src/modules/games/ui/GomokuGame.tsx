@@ -19,6 +19,7 @@ import {
 import { getAIMove, type Difficulty } from '../../../vendor/gomoku/ai.js';
 import { HostBubble } from './HostBubble';
 import { HostModeSwitch } from './HostModeSwitch';
+import { GameOverPanel } from './GameOverPanel';
 
 /** AI 应手延迟（毫秒）：让出主线程渲染「思考中」，也避免落子瞬间响应显得机械。 */
 const AI_DELAY_MS = 350;
@@ -45,6 +46,8 @@ export function GomokuGame() {
   const [winLine, setWinLine] = useState<Move[] | null>(null);
   const [aiThinking, setAiThinking] = useState(false);
   const [over, setOver] = useState<RoundResult | null>(null);
+  /** 结束时的现场事实（结束面板与 AI 点评的事实来源） */
+  const [overDetail, setOverDetail] = useState('');
   const [line, setLine] = useState<HostLine | null>(null);
   const [pending, setPending] = useState(false);
   const [settled, setSettled] = useState<{ gained: number; awarded: boolean } | null>(null);
@@ -80,6 +83,7 @@ export function GomokuGame() {
   /** 结算并播台词（金币先落库发放；平局不结算——不奖不罚不写库）。 */
   const finish = async (result: RoundResult, winCells: Move[] | null, detail: string) => {
     setOver(result);
+    setOverDetail(detail);
     setWinLine(winCells);
     if (result === 'draw') {
       void recordDraw('gomoku');
@@ -147,6 +151,7 @@ export function GomokuGame() {
     setPlayerTurn(true);
     setWinLine(null);
     setOver(null);
+    setOverDetail('');
     setSettled(null);
     setLine(null);
     void speak('start', {
@@ -221,25 +226,22 @@ export function GomokuGame() {
           <HostModeSwitch />
         </div>
       ) : (
-        <div className="guess-over">
-          <p className="guess-over-title">
-            {over === 'won' ? '你赢了！' : over === 'lost' ? 'AI 赢了' : '平局'}
-          </p>
-          {over === 'draw' && <p className="muted">平局不奖不罚，战绩照常计入对局数</p>}
-          {settled && settled.gained > 0 && !settled.awarded && <p className="muted">金币发放失败，战绩已记录</p>}
-          <div className="guess-chips">
-            <button type="button" className="chip" onClick={restart}>
-              再来一局
-            </button>
-            <button
-              type="button"
-              className="chip"
-              onClick={() => toast.info('更多游戏（井字棋 / 猜成语等）在游戏目录里')}
-            >
-              换个游戏
-            </button>
-          </div>
-        </div>
+        <GameOverPanel
+          summary={{
+            gameId: 'gomoku',
+            outcome: over,
+            detail: overDetail,
+            coins: settled?.gained ?? 0,
+          }}
+          title={over === 'won' ? '你赢了！' : over === 'lost' ? 'AI 赢了' : '平局'}
+          detail={
+            over === 'draw'
+              ? '平局不奖不罚，战绩照常计入对局数'
+              : `${overDetail}${settled && settled.gained > 0 ? `，获得 ${settled.gained} 金币` : ''}`
+          }
+          awardFailed={settled ? settled.gained > 0 && !settled.awarded : false}
+          onRestart={restart}
+        />
       )}
     </div>
   );

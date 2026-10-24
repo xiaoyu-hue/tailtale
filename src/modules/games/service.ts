@@ -148,3 +148,23 @@ export async function fetchHostLine(
     return { text: localHostLine(event, ctx), source: 'local' };
   }
 }
+
+// ---- 局后 AI 点评与追问（结束面板「问下去」；调用方已做过模式与配置校验） ----
+
+/**
+ * 通用 AI 文本生成（点评 / 追问共用）：chatOnce 薄封装，失败返回 null
+ * （不抛不 toast——降级文案由 UI 按场景给，调用前须确认 hostMode=ai
+ * 且密钥已配置，否则不必调用）。
+ */
+export async function fetchAiText(
+  system: string,
+  user: string,
+  signal?: AbortSignal
+): Promise<string | null> {
+  try {
+    return await chatOnce(system, user, signal);
+  } catch (error) {
+    console.warn('AI 点评/追问生成失败', error);
+    return null;
+  }
+}
