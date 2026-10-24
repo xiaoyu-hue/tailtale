@@ -1,15 +1,16 @@
 export type BookStatus = 'want' | 'reading' | 'finished';
 
-/** 支持的书籍格式：TXT 全文阅读；EPUB / PDF / CBZ 存二进制，由对应引擎渲染。
- * 注意：FB2 在导入期转换为 EPUB 落库（见 importFb2File），因此不在此枚举；
- * MOBI / AZW3 在批次2 经 foliate-js 接入时再补入。 */
-export type BookFormat = 'txt' | 'epub' | 'pdf' | 'cbz';
+/** 支持的书籍格式：TXT 全文阅读；EPUB / PDF / CBZ / MOBI / AZW3 存二进制，由对应引擎渲染。
+ * 注意：FB2 在导入期转换为 EPUB 落库（见 importFb2File），因此不在此枚举。 */
+export type BookFormat = 'txt' | 'epub' | 'pdf' | 'cbz' | 'mobi' | 'azw3';
 
 export const FORMAT_LABEL: Record<BookFormat, string> = {
   txt: 'TXT',
   epub: 'EPUB',
   pdf: 'PDF',
   cbz: 'CBZ',
+  mobi: 'MOBI',
+  azw3: 'AZW3',
 };
 
 export interface Book {

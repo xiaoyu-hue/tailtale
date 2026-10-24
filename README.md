@@ -49,7 +49,7 @@
 
 ### 书架
 
-- 本地导入 **TXT / EPUB / PDF** 电子书（点击导入或拖拽到书架区域）
+- 本地导入 **TXT / EPUB / PDF / FB2 / CBZ / MOBI / AZW3** 电子书（点击导入或拖拽到书架区域）
 - 三种阅读状态：想读 / 在读 / 读完，一键切换
 - 删除与续读：按**文件内容指纹**记忆进度，同一文件换设备可续读
 
@@ -65,8 +65,11 @@
 - TXT：章节自动拆分与章节导航，滚动阅读，左右横滑快速切章
 - EPUB：流式分页渲染（epub.js），目录跳转，CFI 精确位置续读，横竖滑翻页
 - PDF：按页渲染（pdf.js），大文件懒加载不卡顿，横竖滑翻页
-- **滑动翻页**：三个阅读器统一手势——左滑 / 上滑 = 下一页，右滑 / 下滑 = 上一页；TXT 竖滑保持原生滚动，横滑切章；iOS Safari 与安卓均已适配（真机验证）
-- 正文字号四档调节（小 / 默认 / 大 / 特大），全局记忆（TXT / EPUB 生效）
+- FB2：导入期转换为 EPUB 落库，复用 EPUB 全部能力（书摘 / TTS / 搜索 / AI 解读）；转换确定性保证同文件指纹一致、重复导入自动去重
+- CBZ：JSZip 解包 + 图片自然排序翻页，懒加载当前页（漫画无文本，书摘 / TTS / 搜索 / AI 自动降级不可用）
+- MOBI / AZW3：vendored foliate-js（mobi.js 单文件）解析 + 净化 HTML 自渲染，章节导航、目录、全局字号 / 行距 / 页边距；TTS / 搜索 / AI 解读可用，DRM 保护文件明确提示不支持
+- **滑动翻页**：各阅读器统一手势——左滑 / 上滑 = 下一页，右滑 / 下滑 = 上一页；TXT 竖滑保持原生滚动，横滑切章；iOS Safari 与安卓均已适配（真机验证）
+- 正文字号四档调节（小 / 默认 / 大 / 特大），全局记忆（TXT / EPUB / MOBI / AZW3 生效）
 - 进度记忆：切到后台、刷新页面都不丢
 
 ### 游戏化
@@ -123,7 +126,7 @@ npm run smoke      # 端到端冒烟（需先 build；真实浏览器跑加密�
 | `npm run test:coverage` | 单元测试 + 覆盖率报告（终端摘要 + `coverage/lcov.info`） |
 | `npm run smoke` | 端到端冒烟（Playwright 真实浏览器；先 `npm run build`，依赖安装见 `scripts/smoke/README.md`） |
 
-导入书籍：首页点击「导入 TXT 书籍」或把 .txt / .epub / .pdf 文件拖入书架区域。
+导入书籍：首页点击「导入书籍」或把 .txt / .epub / .pdf / .fb2 / .cbz / .mobi / .azw3 文件拖入书架区域。
 
 ---
 
@@ -138,10 +141,13 @@ npm run smoke      # 端到端冒烟（需先 build；真实浏览器跑加密�
 | PWA | vite-plugin-pwa | 0.21.2 | 自动生成 Service Worker（底层 Workbox，MIT）与 Web Manifest |
 | EPUB 引擎 | epub.js（npm 包 epubjs） | 0.3.93 | EPUB 解析与流式分页，BSD-2-Clause；按需动态加载 |
 | PDF 引擎 | pdf.js（npm 包 pdfjs-dist） | 4.10.38 | PDF 解析与 canvas 按页渲染，Apache-2.0；按需动态加载 |
+| MOBI/AZW3 解析 | foliate-js（vendored 单文件 mobi.js） | master | MOBI / AZW3 记录解压与 HTML 切片，MIT；仅取单文件、不替换 epubjs，按需动态加载 |
+| 压缩/解压 | JSZip | 3.10.2 | FB2→EPUB 打包（确定性 ZIP）与 CBZ 图片解包，MIT（双许可选 MIT 分支）；按需动态加载 |
+| 压缩/解压 | fflate | 0.8.3 | MOBI 记录解压（注入 vendored mobi.js），MIT；仅内嵌字体场景按需下载 |
 | 状态管理 | 自研零依赖 store | — | 基于 `useSyncExternalStore`，无 Redux/MobX 类依赖，包体与认知负担双低 |
 | 本地存储 | IndexedDB + localStorage | — | 结构化数据用 IndexedDB（含版本迁移），偏好设置用 localStorage |
 
-设计原则：**能自己写的绝不引依赖**。运行时核心依赖仅 React / React DOM；EPUB / PDF 渲染引擎（epubjs / pdfjs-dist）按格式动态加载，TXT 用户不会下载它们。
+设计原则：**能自己写的绝不引依赖**。运行时核心依赖仅 React / React DOM；EPUB / PDF / MOBI 渲染引擎与压缩库按格式动态加载——TXT 用户不会下载它们，MOBI 用户不碰 fflate（仅内嵌字体时才加载）。
 
 ---
 
@@ -202,6 +208,9 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 | [Workbox](https://github.com/GoogleChrome/workbox) | Google | MIT | vite-plugin-pwa 底层：Service Worker 预缓存与运行时缓存 |
 | [Desktop-Pixel-Pet](https://github.com/CanFlyhang/Desktop-Pixel-Pet)（pixel_cat.json） | CanFlyhang | MIT | 像素猫美术资产：32×32 二帧待机像素猫（非 npm 依赖，随源码分发；书时按调色板置换实现皮肤数据，未改动像素数据） |
 | [MiniSearch](https://github.com/lucaong/minisearch) | Luca Ongaro | MIT | 全文搜索：字段加权 + 模糊搜索，ESM 零依赖（gzip 约 18KB），进入构建（工具箱「全文搜索」使用） |
+| [JSZip](https://github.com/Stuk/jszip) | Stuart Knightley 等 | MIT 或 GPLv3 双许可（选 MIT 分支） | FB2→EPUB 导入期打包（确定性 ZIP）与 CBZ 图片解包；按需动态加载 |
+| [fflate](https://github.com/101arrowz/fflate) | Arjun Barrett | MIT | MOBI / AZW3 记录解压（构造时注入 vendored mobi.js）；仅内嵌字体场景按需下载 |
+| [foliate-js](https://github.com/johnfactotum/foliate-js)（vendored 单文件 mobi.js） | John Factotum / foliate-js contributors | MIT | MOBI / AZW3 解析（PDB 容器 + PalmDOC 记录 + KF8 HTML 切片）；仅 vendored `src/vendor/foliate/mobi.js` 单文件，不引入其余部分、不替换 epubjs；按需动态加载 |
 
 ### 间接依赖
 
@@ -209,9 +218,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 
 ### 计划引入（已核实许可证，尚未进入构建）
 
-| 组件 | 作者 / 组织 | 许可证 | 用途 | 计划接入 |
-|---|---|---|---|---|
-| [foliate-js](https://github.com/johnfactotum/foliate-js) | johnfactotum | MIT | 备选渲染引擎（MOBI / AWZ3 / FB2 / CBZ） | 备用 |
+（暂无。原备选的 foliate-js 已于 v1.14.0 以 vendored 单文件形式接入 MOBI / AZW3 解析，见上方直接依赖表。）
 
 ### 设计参考（不集成代码，仅参考思路）
 
@@ -276,7 +283,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 
 ## 版本与发布
 
-- **当前版本：v1.13.0**（2026-10-24 发布）：M4 工具箱上线——首页「工具箱」功能格正式接通，8 款本地小工具（番茄钟 / 白噪音 / 文本统计 / 今日一书 / 阅读日历 / 书摘导出 / TTS 朗读 / 全文搜索），全部本地优先、零依赖、零上传；minisearch 本地全文搜索。v1.12.0（2026-10-23）测试体系一期：纯函数层补齐至 11 个模块 158 例单测、被测层行覆盖 99.47%；端到端冒烟入仓并进 CI（Playwright 真实浏览器跑加密备份全链路 14 项断言）；Node 22 内置覆盖率报告零新依赖；测试管线收敛为 tsconfig.test.json 清单驱动。v1.11.0 加密备份上线：导出备份三档——标准备份默认剔除 AI 密钥、加密备份整文件加密（PBKDF2-HMAC-SHA256 60 万次迭代 + AES-256-GCM，口令不落存储、无找回后门）、完整明文备份；导入自动识别加密包弹口令框，口令错误/文件篡改可识别且可重试）。更早版本演进见 [CHANGELOG](CHANGELOG.md)
+- **当前版本：v1.14.0**（2026-10-25 发布）：电子书格式扩充至 7 种——新增 FB2（导入期转 EPUB，复用 EPUB 全部能力）、CBZ（JSZip 解包 + 图片翻页，漫画场景书摘/TTS/搜索/AI 自动降级）、MOBI / AZW3（vendored foliate-js mobi.js 单文件解析 + 净化 HTML 自渲染，DRM 文件明确提示不支持；fflate 按需解压）；顺带修复三个真实缺陷（CBZ 格式识别遗漏、导入后书架不刷新的事务竞态、CBZ 图片首屏不渲染的闭包陷阱）；统一 extractText 让 TTS / 全文搜索 / AI 解读覆盖全部文本类格式。v1.13.0（2026-10-24）：M4 工具箱上线——首页「工具箱」功能格正式接通，8 款本地小工具（番茄钟 / 白噪音 / 文本统计 / 今日一书 / 阅读日历 / 书摘导出 / TTS 朗读 / 全文搜索），全部本地优先、零依赖、零上传；minisearch 本地全文搜索。v1.12.0（2026-10-23）测试体系一期：纯函数层补齐至 11 个模块 158 例单测、被测层行覆盖 99.47%；端到端冒烟入仓并进 CI（Playwright 真实浏览器跑加密备份全链路 14 项断言）；Node 22 内置覆盖率报告零新依赖；测试管线收敛为 tsconfig.test.json 清单驱动。v1.11.0 加密备份上线：导出备份三档——标准备份默认剔除 AI 密钥、加密备份整文件加密（PBKDF2-HMAC-SHA256 60 万次迭代 + AES-256-GCM，口令不落存储、无找回后门）、完整明文备份；导入自动识别加密包弹口令框，口令错误/文件篡改可识别且可重试）。更早版本演进见 [CHANGELOG](CHANGELOG.md)
 - [Releases](https://github.com/xiaoyu-hue/tailtale/releases) · [CHANGELOG](CHANGELOG.md)
 - 版本号规则与发版流程：[docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
   - 主版本号（X.0.0）= 架构级变更；次版本号（1.X.0）= 新功能上线；修订号（1.1.X）= 优化、修复、文档同步
@@ -289,7 +296,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 |---|---|---|
 | M1 地基 | 脚手架、书架、TXT 阅读器 | ✅ 已完成 |
 | M2 阅读核心 | 四层架构迁移、阅读计时、金币 / XP / 打卡 / 读完奖励、设置、统计与日历 | ✅ 已完成（v1.0.0） |
-| 多格式阅读 | EPUB / PDF 导入与渲染、格式角标、CFI 精确续读 | ✅ 已完成（v1.1.0） |
+| 多格式阅读 | TXT / EPUB / PDF / FB2 / CBZ / MOBI / AZW3 导入与渲染、格式角标、CFI 精确续读 | ✅ 已完成（v1.1.0 起，v1.14.0 扩充至 7 种格式） |
 | 阅读手势 | 滑动翻页：三个阅读器统一手势，左滑/上滑 = 下一页 | ✅ 已完成（v1.2.0） |
 | M3 宠物 | 喂食 / 玩耍 / 好感度 / 成长阶段、金币闭环 | ✅ 已完成（v1.3.0） |
 | M4 工具箱 | 番茄钟 / 白噪音 / 文本统计 / 今日一书 / 阅读日历 / 书摘导出 / TTS 朗读 / 全文搜索（PRD 6 款 + TTS + 全文搜索） | ✅ 已完成（v1.13.0） |

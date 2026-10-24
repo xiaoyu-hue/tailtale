@@ -218,6 +218,11 @@ export async function prepareExplain(book: Book): Promise<PrepareResult> {
     text = await extractText(book);
     if (!text.trim())
       throw new AiError('book-missing', '这本书没有可解读的文字', '请换一本书，或检查文件是否正常');
+  } else if (book.format === 'mobi' || book.format === 'azw3') {
+    // MOBI / AZW3 经 vendored foliate-js 提取文本（与阅读器、TTS、搜索同一来源）
+    text = await extractText(book);
+    if (!text.trim())
+      throw new AiError('book-missing', '这本书没有可解读的文字', '请换一本书，或检查文件是否正常');
   } else {
     throw new AiError('book-missing', '暂不支持该格式', 'AI 解读目前仅支持 TXT / EPUB / PDF 等文本类格式');
   }

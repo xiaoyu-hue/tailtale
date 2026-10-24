@@ -7,6 +7,28 @@
 
 （占位：下一版本内容写在这里，发版时搬进正式段）
 
+## [1.14.0] - 2026-10-25
+
+### 新增
+
+- **FB2 格式支持**：导入期将 FB2（XML）转换为 EPUB 落库，复用 EpubReader 全部能力——书摘收藏（CFI）、TTS 朗读、全文搜索、AI 解读一样不少；转换确定性（固定日期 ZIP + 内容指纹）保证同文件重复导入自动去重、跨设备续读一致；作者 / 标题 / 封面元数据一并提取
+- **CBZ 格式支持**：JSZip 解包 + 文件名自然排序（page2 < page10）逐页渲染，仅生成当前页 blobURL（导航即释放旧页，不持全部图片），支持双指缩放与横竖滑翻页；漫画无文本，书摘 / TTS / 全文搜索 / AI 解读在该格式下自动降级不可用
+- **MOBI / AZW3 格式支持**：vendored foliate-js（仅 `src/vendor/foliate/mobi.js` 单文件，保留 MIT 头，不替换 epubjs）解析 PDB 容器与 PalmDOC / KF8 记录，净化后 HTML 自渲染——章节导航、书籍目录（两类引擎目录形状归一化）、全局字号 / 行距 / 页边距、滑动切章；TTS / 全文搜索 / AI 解读经统一正文抽取获得文本；DRM 保护或损坏文件给出明确人话提示（书时不解密受保护内容）
+- 书架格式角标扩充至 7 种（TXT / EPUB / PDF / FB2 / CBZ / MOBI / AZW3），导入区与欢迎文案同步
+
+### 技术内部
+
+- 新增运行时依赖：`jszip`（FB2→EPUB 打包与 CBZ 解包，MIT 双许可选 MIT 分支）、`fflate`（MOBI 记录解压，MIT）；新增 `src/vendor/foliate/mobi.js` vendored 单文件与类型声明 `mobi.d.ts`
+- 新增 `src/modules/books/mobi.ts`（MOBI 集成唯一入口：打开 / 净化 / 目录归一化，一次解析同时产出渲染 HTML 与抽取文本）与 `html-text.ts`（EPUB 与 MOBI 共用的块级文本抽取）；extract.ts 的 `extractText` 新增 mobi / azw3 分支，TTS / 搜索 / AI 三个消费方零改动生效
+- 分包策略：mobi.js（gzip 约 10KB）与 fflate（gzip 约 3KB）均按需动态加载——非 MOBI 用户不下载，MOBI 用户也仅在解析内嵌字体时才拉 fflate；SW 预缓存随构建自动覆盖
+- 测试：node:test 增至 174 例（新增 MOBI 夹具构造 / 多节切分 / HTML 净化 / 目录归一化两类形状 / 损坏文件抛错 / 每章文本抽取等 8 例；MOBI6 最小样本手工构造，linkedom 垫 DOM）；tsconfig.test.json 开 allowJs 支持 vendor 文件进测试编译
+
+### 修复
+
+- `formatFromFilename` 遗漏 `.cbz` 后缀，导致 CBZ 文件被当未知格式跳过（导入无声失败）
+- `platform/db.ts` 的 `run` 未等事务 `oncomplete` 即 resolve，导入后立即刷新书架读不到刚写入的书（reload 冷启动才正常）——修 readwrite 事务竞态
+- `CbzReader.renderPage` 闭包读到旧 state（`total=0`）直接 return，图片永不渲染卡在「载入中」——改 ref + 参数传入本地数组
+
 ## [1.13.0] - 2026-10-24
 
 ### 新增

@@ -27,8 +27,15 @@ test('nextStatus 连续调用绕满一圈回到原值', () => {
   assert.equal(s, 'reading');
 });
 
-test('FORMAT_LABEL 四种格式齐全且文案正确（书架角标渲染来源）', () => {
-  assert.deepEqual(FORMAT_LABEL, { txt: 'TXT', epub: 'EPUB', pdf: 'PDF', cbz: 'CBZ' });
+test('FORMAT_LABEL 六种格式齐全且文案正确（书架角标渲染来源）', () => {
+  assert.deepEqual(FORMAT_LABEL, {
+    txt: 'TXT',
+    epub: 'EPUB',
+    pdf: 'PDF',
+    cbz: 'CBZ',
+    mobi: 'MOBI',
+    azw3: 'AZW3',
+  });
 });
 
 test('STATUS_LABEL 三种状态齐全且文案正确（状态筛选器渲染来源）', () => {

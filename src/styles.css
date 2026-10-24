@@ -1133,6 +1133,27 @@ button {
   word-break: break-word;
 }
 
+/* MOBI / AZW3 自渲染正文（mobi.js 解析出的 HTML）：归一化浏览器默认段落间距，
+ * 标题沿用阅读器字体与字号体系；字号/行距/边距由全局设置经 .reader-inner 注入 */
+.mobi-body p {
+  margin: 0 0 0.8em;
+}
+
+.mobi-body h1,
+.mobi-body h2,
+.mobi-body h3,
+.mobi-body h4 {
+  font-size: 1.1em;
+  font-weight: 700;
+  margin: 1.2em 0 0.6em;
+}
+
+.mobi-body blockquote {
+  margin: 0 0 0.8em;
+  padding-left: 1em;
+  border-left: 3px solid var(--border, #e5ded2);
+}
+
 .reader-bar {
   position: absolute;
   left: 0;

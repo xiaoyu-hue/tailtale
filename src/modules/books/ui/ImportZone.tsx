@@ -5,7 +5,7 @@ interface ImportZoneProps {
   onToast: (message: string) => void;
 }
 
-/** 导入区：点击或拖入 TXT / EPUB / PDF / FB2 / CBZ。书籍仅存本机浏览器。 */
+/** 导入区：点击或拖入 TXT / EPUB / PDF / FB2 / CBZ / MOBI / AZW3。书籍仅存本机浏览器。 */
 export function ImportZone({ onToast }: ImportZoneProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
@@ -27,7 +27,7 @@ export function ImportZone({ onToast }: ImportZoneProps) {
             : `${result.failed.length} 个文件导入失败`
         );
       } else if (result.skipped > 0) {
-        onToast('目前仅支持 TXT / EPUB / PDF / FB2 / CBZ');
+        onToast('目前仅支持 TXT / EPUB / PDF / FB2 / CBZ / MOBI / AZW3');
       }
     } finally {
       setBusy(false);
@@ -66,7 +66,7 @@ export function ImportZone({ onToast }: ImportZoneProps) {
           </>
         ) : (
           <>
-            点击此处或拖入 TXT / EPUB / PDF / FB2 / CBZ 文件
+            点击此处或拖入 TXT / EPUB / PDF / FB2 / CBZ / MOBI / AZW3 文件
             <br />
             书籍仅保存在本机浏览器，不会上传
           </>
@@ -75,7 +75,7 @@ export function ImportZone({ onToast }: ImportZoneProps) {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".txt,.epub,.pdf,.fb2,.cbz,text/plain,application/epub+zip,application/pdf"
+        accept=".txt,.epub,.pdf,.fb2,.cbz,.mobi,.azw3,text/plain,application/epub+zip,application/pdf,application/x-mobipocket-ebook"
         multiple
         hidden
         onChange={(event) => {

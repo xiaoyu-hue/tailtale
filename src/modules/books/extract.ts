@@ -1,18 +1,7 @@
 import type { Book } from './model';
 import { readBookContent, readBookBinary } from './service';
-
-const EPUB_BLOCK_SELECTOR = 'p, h1, h2, h3, h4, h5, h6, li, blockquote, pre, td, th';
-
-function blockText(root: HTMLElement): string {
-  const blocks = Array.from(root.querySelectorAll<HTMLElement>(EPUB_BLOCK_SELECTOR)).filter(
-    (el) => el.closest(EPUB_BLOCK_SELECTOR) === el
-  );
-  const source = blocks.length > 0 ? blocks : [root];
-  return source
-    .map((el) => (el.textContent ?? '').trim())
-    .filter((line) => line.length > 0)
-    .join('\n');
-}
+import { blockText } from './html-text';
+import { openMobiBook } from './mobi';
 
 export interface EpubExtractResult {
   text: string;
@@ -79,14 +68,29 @@ export async function extractPdfText(data: ArrayBuffer): Promise<string> {
 }
 
 /**
+ * MOBI / AZW3 全书文本提取：与阅读器共用同一解析入口 openMobiBook
+ * （vendored foliate-js mobi.js，按需动态加载），取每章 text 字段拼接。
+ * 全部章节无文本时抛错（调用方据此降级）。
+ */
+export async function extractMobiText(data: ArrayBuffer): Promise<string> {
+  const { sections } = await openMobiBook(data);
+  const parts = sections.map((s) => s.text).filter((t) => t.trim());
+  if (parts.length === 0) throw new Error('MOBI 解析失败：未提取到任何文本');
+  return parts.join('\n\n');
+}
+
+/**
  * 统一正文抽取：修复「二进制格式 readBookContent 返回空」的瓶颈，
- * 让 TTS / 全文搜索 / AI 解读对 EPUB / PDF 也能拿到文本。
+ * 让 TTS / 全文搜索 / AI 解读对 EPUB / PDF / MOBI / AZW3 也能拿到文本。
  * - txt 直读；epub（含 FB2 转换产物）经 epubjs 提取；pdf 经 pdfjs 提取；
- * - cbz 为图片漫画无文本，返回空；mobi/azw3 在批次2 接入后补充。
+ *   mobi/azw3 经 vendored foliate-js 提取；
+ * - cbz 为图片漫画无文本，返回空。
  */
 export async function extractText(book: Book): Promise<string> {
   if (book.format === 'txt') return readBookContent(book.id);
   if (book.format === 'epub') return (await extractEpubText(await readBookBinary(book.id))).text;
   if (book.format === 'pdf') return extractPdfText(await readBookBinary(book.id));
+  if (book.format === 'mobi' || book.format === 'azw3')
+    return extractMobiText(await readBookBinary(book.id));
   return '';
 }

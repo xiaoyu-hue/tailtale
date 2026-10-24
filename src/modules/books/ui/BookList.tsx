@@ -50,7 +50,7 @@ export function BookList({ onOpenBook, onToast }: BookListProps) {
         <div className="empty-state">
           书架空空如也
           <br />
-          导入一本 TXT / EPUB / PDF / FB2 / CBZ，开始你的第一段阅读时光
+          导入一本 TXT / EPUB / PDF / FB2 / CBZ / MOBI / AZW3，开始你的第一段阅读时光
         </div>
       ) : (
         books.map((book) => (

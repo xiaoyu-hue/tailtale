@@ -39,12 +39,12 @@ function normalizeText(raw: string): string {
 }
 
 function titleFromFilename(name: string): string {
-  const title = name.replace(/\.(txt|epub|pdf|cbz)$/i, '').trim();
+  const title = name.replace(/\.(txt|epub|pdf|cbz|mobi|azw3)$/i, '').trim();
   return title || '未命名书籍';
 }
 
-/** 二进制存储格式（不含 txt）。批次2 接入 MOBI/AZW3 时在此扩展。 */
-type BinaryFormat = 'epub' | 'pdf' | 'cbz';
+/** 二进制存储格式（不含 txt）。批次2 起含 MOBI / AZW3（vendored foliate-js 解析）。 */
+type BinaryFormat = 'epub' | 'pdf' | 'cbz' | 'mobi' | 'azw3';
 
 /** 按文件名后缀识别格式；无法识别返回 null（调用方计入 skipped）。 */
 export function formatFromFilename(name: string): BookFormat | null {
@@ -52,6 +52,8 @@ export function formatFromFilename(name: string): BookFormat | null {
   if (/\.epub$/i.test(name)) return 'epub';
   if (/\.pdf$/i.test(name)) return 'pdf';
   if (/\.cbz$/i.test(name)) return 'cbz';
+  if (/\.mobi$/i.test(name)) return 'mobi';
+  if (/\.azw3$/i.test(name)) return 'azw3';
   return null;
 }
 

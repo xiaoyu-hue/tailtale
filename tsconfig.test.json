@@ -2,8 +2,10 @@
   // 测试专用编译配置：把被测源文件编译到 .test-dist/ 供 node:test 直接 import。
   // 新增被测模块时只需在下方 include 加一行——替代原先 package.json 里
   // 4 条手写文件清单的 tsc 命令（白名单式，加一个模块要改四处）。
-  // 统一 rootDir=src：所有产物落在 .test-dist/modules|platform|shared|app/... 下，
-  // 与 src/ 目录结构一一对应，测试文件的 import 路径不再有例外。
+// 统一 rootDir=src：所有产物落在 .test-dist/modules|platform|shared|app/... 下，
+// 与 src/ 目录结构一一对应，测试文件的 import 路径不再有例外。
+// 注意：本配置 moduleResolution=NodeNext，被测源文件的相对 import 必须带 .js
+// 扩展名（主构建的 bundler 解析同样兼容）；纯叶子模块或无相对 import 的文件可直接加入。
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022", "DOM"],
@@ -12,6 +14,7 @@
     "rootDir": "src",
     "outDir": ".test-dist",
     "strict": true,
+    "allowJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noUnusedLocals": true,
@@ -27,12 +30,15 @@
     "src/modules/books/library-model.ts",
     "src/modules/books/model.ts",
     "src/modules/books/fb2.ts",
+    "src/modules/books/html-text.ts",
+    "src/modules/books/mobi.ts",
     "src/modules/gamification/model.ts",
     "src/modules/reader/model.ts",
     "src/modules/reader/cbz.ts",
     "src/platform/events.ts",
     "src/platform/hash.ts",
     "src/platform/crypto/backup-crypto.ts",
-    "src/shared/dates.ts"
+    "src/shared/dates.ts",
+    "src/vendor/foliate/mobi.js"
   ]
 }

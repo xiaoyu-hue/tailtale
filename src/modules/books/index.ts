@@ -12,8 +12,10 @@ export {
   markFinished,
 } from './store';
 export { readBookContent, readBookBinary } from './service';
-export { extractText, extractEpubText } from './extract';
+export { extractText, extractEpubText, extractMobiText } from './extract';
 export type { EpubExtractResult } from './extract';
+export { openMobiBook } from './mobi';
+export type { MobiBookContent, MobiTocEntry, MobiOpenSection } from './mobi';
 export type { ImportResult } from './store';
 export type { Book, BookStatus, BookContent, BookFormat } from './model';
 export { STATUS_LABEL, nextStatus, FORMAT_LABEL } from './model';
