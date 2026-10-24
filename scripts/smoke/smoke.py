@@ -119,8 +119,11 @@ def run_smoke(base):
             and enc["cipher"]["algorithm"] == "AES-GCM"
             and len(enc.get("ciphertext", "")) > 0,
         )
-        toast_text = page.locator(".toast").text_content() if page.locator(".toast").count() else ""
-        check("加密导出成功提示", toast_text.startswith("已导出加密备份"), toast_text)
+        # 注：toast 现在含装饰图标（.toast-icon，aria-hidden），文本断言须 targeting
+        # 真正的消息节点 .toast-message，否则图标会被拼进 text_content 导致误判。
+        toast_msg = page.locator(".toast-message")
+        toast_text = toast_msg.last.text_content() if toast_msg.count() else ""
+        check("加密导出成功提示", bool(toast_text) and toast_text.startswith("已导出加密备份"), toast_text)
 
         # —— 标准档导出（默认档，直接点导出）——
         page.get_by_role("button", name="导出备份").click()
