@@ -238,6 +238,36 @@ SOFTWARE.
 - 用途：MOBI / AZW3 解析（PDB 容器 → PalmDOC 记录 → KF8 HTML 切片），供书时自渲染
 - 备注：**仅 vendored 单文件** `src/vendor/foliate/mobi.js`（约 1200 行，文件头保留完整 MIT 版权声明），未引入 foliate-js 其余部分、不替换 epubjs（EPUB 仍走 epub.js）；依赖浏览器 DOM 与 fflate，按需动态加载（仅打开 MOBI/AZW3 时下载）
 
+### gomoku-ai（vendored gomoku.js + ai.js，1.15.0 引入，五子棋 AI 对手）
+
+```
+MIT License
+
+Copyright (c) 2026 SEN LLC (SEN 合同会社)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+- 项目地址：https://github.com/sen-ltd/gomoku-ai
+- 用途：五子棋 AI 对手（minimax + alpha-beta 剪枝，简单 / 中等 / 困难三档难度）
+- 备注：**仅 vendored 两文件** `src/vendor/gomoku/gomoku.js`（棋盘 / 落子校验 / 胜负判定，不可变操作）与 `src/vendor/gomoku/ai.js`（AI 搜索），LICENSE 原文同目录保存，文件头保留完整 MIT 版权声明；未引入 upstream 其余部分（示例与文档）；随游戏模块主包加载（无独立动态分包，两文件合计约 6KB）
+
 ### linkedom（开发期依赖，测试环境 DOM 垫片）
 
 - 许可证：ISC

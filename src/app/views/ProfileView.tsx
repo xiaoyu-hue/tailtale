@@ -34,6 +34,7 @@ const CREDIT_GROUPS: CreditGroup[] = [
       { name: 'JSZip', detail: 'MIT 或 GPLv3（选 MIT）· Stuart Knightley 等 · FB2 转 EPUB 打包与 CBZ 图片解包' },
       { name: 'fflate', detail: 'MIT · Arjun Barrett · MOBI / AZW3 记录解压（仅内嵌字体场景按需下载）' },
       { name: 'foliate-js', detail: 'MIT · John Factotum / foliate-js contributors · MOBI / AZW3 解析（vendored 单文件 mobi.js，不替换 epubjs，按需动态加载）' },
+      { name: 'gomoku-ai', detail: 'MIT · SEN LLC（SEN 合同会社）· 五子棋 AI 对手：minimax + alpha-beta 剪枝，三档难度（vendored gomoku.js + ai.js）' },
     ],
   },
   {
