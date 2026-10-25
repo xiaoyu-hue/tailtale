@@ -92,7 +92,7 @@
 首页功能格「工具箱」进入，8 宫格每款工具经底部抽屉展开，全部本地优先、零上传：
 
 - **番茄钟**：25 / 50 / 15 三档专注预设 + 倒计时环，完成一轮专注 +5 金币
-- **白噪音**：雨声 / 海浪 / 森林 / 篝火，Web Audio 程序化合成，零音频文件、零联网
+- **白噪音**：雨声 / 海浪 / 森林 / 篝火，CC0 公共领域循环录音（OpenGameArt / Freesound），随应用离线打包、断网可播
 - **文本统计**：CJK 按字计数，中英混排预计阅读时长
 - **今日一书**：从内置公版书库随机推荐，可一键领取入架
 - **阅读日历**：复用首页打卡热力图，翻看历史月份
@@ -213,6 +213,10 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 | [fflate](https://github.com/101arrowz/fflate) | Arjun Barrett | MIT | MOBI / AZW3 记录解压（构造时注入 vendored mobi.js）；仅内嵌字体场景按需下载 |
 | [foliate-js](https://github.com/johnfactotum/foliate-js)（vendored 单文件 mobi.js） | John Factotum / foliate-js contributors | MIT | MOBI / AZW3 解析（PDB 容器 + PalmDOC 记录 + KF8 HTML 切片）；仅 vendored `src/vendor/foliate/mobi.js` 单文件，不引入其余部分、不替换 epubjs；按需动态加载 |
 | [gomoku-ai](https://github.com/sen-ltd/gomoku-ai)（vendored gomoku.js + ai.js） | SEN LLC（SEN 合同会社） | MIT | 五子棋 AI 对手：minimax + alpha-beta 剪枝，简单 / 中等 / 困难三档；仅 vendored `src/vendor/gomoku/` 两文件 + LICENSE，不引入其余部分 |
+| [Rain (loopable)](https://opengameart.org/content/rain-loopable)（rain.mp3） | Ylmir | CC0 1.0 | 白噪音「雨声」循环：约 45 秒实拍雨声，转 64kbps MP3 随应用打包（`public/audio/`，随 SW 预缓存、离线可播） |
+| [Ocean waves at Point Reyes](https://freesound.org/people/Rmutt/sounds/145213/)（ocean.mp3） | Rmutt | CC0 1.0 | 白噪音「海浪」循环：约 55 秒实拍海涛（作者已编辑为循环），转 64kbps MP3 随应用打包 |
+| [Birds and Wind - Ambient](https://opengameart.org/content/birds-and-wind-ambient-birds-wind-and-synth)（forest.mp3） | Spring Spring | CC0 1.0 | 白噪音「森林」循环：约 44 秒鸟鸣 + 风声（纯环境版，截取活跃段交叉淡入成循环），转 64kbps MP3 随应用打包 |
+| [Fireplace Sound loop](https://opengameart.org/content/fireplace-sound-loop)（fire.mp3） | PagDev | CC0 1.0 | 白噪音「篝火」循环：约 25 秒柴火燃烧 + 噼啪（交叉淡入成循环），转 64kbps MP3 随应用打包 |
 
 ### 间接依赖
 

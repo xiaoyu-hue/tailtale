@@ -268,6 +268,38 @@ SOFTWARE.
 - 用途：五子棋 AI 对手（minimax + alpha-beta 剪枝，简单 / 中等 / 困难三档难度）
 - 备注：**仅 vendored 两文件** `src/vendor/gomoku/gomoku.js`（棋盘 / 落子校验 / 胜负判定，不可变操作）与 `src/vendor/gomoku/ai.js`（AI 搜索），LICENSE 原文同目录保存，文件头保留完整 MIT 版权声明；未引入 upstream 其余部分（示例与文档）；随游戏模块主包加载（无独立动态分包，两文件合计约 6KB）
 
+### 雨声环境音 rain.mp3（1.16.0 引入，工具箱「白噪音」）
+
+- 许可证：CC0 1.0 Universal（公共领域奉献，https://creativecommons.org/publicdomain/zero/1.0/ ）
+- 作者：Ylmir
+- 出处：https://opengameart.org/content/rain-loopable （OpenGameArt）
+- 用途：白噪音「雨声」循环（约 45 秒，`public/audio/rain.mp3`）
+- 备注：原作为四条 25-45 秒可循环雨声（MP3 192kbps 立体声），本项目选取其中一条，仅做响度归一（-18 LUFS）与边界淡入淡出后转码 64kbps 立体声 MP3（Safari 不支持 ogg），未改动声音内容；CC0 无需署名，本项目按惯例主动致谢；随 Service Worker 预缓存、离线可播
+
+### 海浪环境音 ocean.mp3（1.16.0 引入，工具箱「白噪音」）
+
+- 许可证：CC0 1.0 Universal（公共领域奉献，https://creativecommons.org/publicdomain/zero/1.0/ ）
+- 作者：Rmutt
+- 出处：https://freesound.org/people/Rmutt/sounds/145213/ （Freesound）
+- 用途：白噪音「海浪」循环（约 55 秒，`public/audio/ocean.mp3`）
+- 备注：原作「Ocean waves at Point Reyes」为作者编辑成循环的实拍立体声海涛（约 55 秒），本项目仅做响度归一与边界淡入淡出后转码 64kbps 立体声 MP3，保留作者循环编辑；CC0 无需署名，主动致谢；随 Service Worker 预缓存、离线可播
+
+### 森林环境音 forest.mp3（1.16.0 引入，工具箱「白噪音」）
+
+- 许可证：CC0 1.0 Universal（公共领域奉献，https://creativecommons.org/publicdomain/zero/1.0/ ）
+- 作者：Spring Spring
+- 出处：https://opengameart.org/content/birds-and-wind-ambient-birds-wind-and-synth （OpenGameArt）
+- 用途：白噪音「森林」循环（约 44 秒，`public/audio/forest.mp3`）
+- 备注：选自「Birds and Wind - Ambient」纯环境音版（鸟鸣 + 风声，无合成器声部；其中鸟叫素材本身亦为公共领域），截取鸟鸣活跃段并做自交叉淡入形成无缝循环、响度归一、边界淡入淡出，转码 64kbps 立体声 MP3；CC0 无需署名，主动致谢；随 Service Worker 预缓存、离线可播
+
+### 篝火环境音 fire.mp3（1.16.0 引入，工具箱「白噪音」）
+
+- 许可证：CC0 1.0 Universal（公共领域奉献，https://creativecommons.org/publicdomain/zero/1.0/ ）
+- 作者：PagDev
+- 出处：https://opengameart.org/content/fireplace-sound-loop （OpenGameArt）
+- 用途：白噪音「篝火」循环（约 25 秒，`public/audio/fire.mp3`）
+- 备注：原作「Fireplace Sound loop」为柴火燃烧 + 噼啪声（WAV 立体声），本项目做自交叉淡入形成无缝循环（原文件头尾存在跳变）、响度归一、边界淡入淡出，转码 64kbps 立体声 MP3；CC0 无需署名，主动致谢；随 Service Worker 预缓存、离线可播
+
 ### linkedom（开发期依赖，测试环境 DOM 垫片）
 
 - 许可证：ISC

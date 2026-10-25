@@ -1,121 +1,69 @@
 import { useEffect, useRef, useState } from 'react';
-import { Slider } from '../../../components';
+import { Slider, toast } from '../../../components';
+import { NOISE_PRESETS, type NoisePreset } from '../noise-model';
 
-interface NoisePreset {
-  key: string;
-  label: string;
-  filterType: BiquadFilterType;
-  freq: number;
-  q: number;
-  /** 可选：缓慢振荡频率（Hz），调制音量营造海浪/风声起伏 */
-  lfo?: number;
-}
-
-const PRESETS: NoisePreset[] = [
-  { key: 'rain', label: '雨声', filterType: 'lowpass', freq: 1200, q: 0.7 },
-  { key: 'waves', label: '海浪', filterType: 'lowpass', freq: 600, q: 0.9, lfo: 0.12 },
-  { key: 'forest', label: '森林', filterType: 'bandpass', freq: 1800, q: 0.5 },
-  { key: 'fire', label: '篝火', filterType: 'lowpass', freq: 760, q: 0.6 },
-];
-
-interface AudioGraph {
-  ctx: AudioContext;
-  source: AudioBufferSourceNode;
-  gain: GainNode;
-  lfo?: OscillatorNode;
-}
-
-/** 白噪音环境音：Web Audio 程序化合成，零音频文件、零依赖、零联网。 */
+/** 白噪音环境音：四段 CC0 公共领域循环录音（OpenGameArt / Freesound），
+ *  单 audio 元素循环播放，素材随 Service Worker 预缓存、完全离线可用。 */
 export function WhiteNoiseTool() {
-  const [preset, setPreset] = useState<NoisePreset>(PRESETS[0]);
+  const [preset, setPreset] = useState<NoisePreset>(NOISE_PRESETS[0]);
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.5);
-  const graphRef = useRef<AudioGraph | null>(null);
-
-  function buildGraph(p: NoisePreset, vol: number): AudioGraph {
-    const Ctx: typeof AudioContext =
-      window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    const ctx = new Ctx();
-
-    // 2 秒白噪声缓冲，循环播放
-    const bufferSize = 2 * ctx.sampleRate;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = true;
-
-    const filter = ctx.createBiquadFilter();
-    filter.type = p.filterType;
-    filter.frequency.value = p.freq;
-    filter.Q.value = p.q;
-
-    const gain = ctx.createGain();
-    gain.gain.value = vol;
-
-    source.connect(filter);
-    filter.connect(gain);
-    gain.connect(ctx.destination);
-
-    let lfo: OscillatorNode | undefined;
-    if (p.lfo) {
-      lfo = ctx.createOscillator();
-      lfo.frequency.value = p.lfo;
-      const lfoGain = ctx.createGain();
-      lfoGain.gain.value = vol * 0.4;
-      lfo.connect(lfoGain);
-      lfoGain.connect(gain.gain);
-      lfo.start();
-    }
-
-    source.start();
-    return { ctx, source, gain, lfo };
-  }
-
-  function stopGraph() {
-    const g = graphRef.current;
-    if (!g) return;
-    try {
-      g.source.stop();
-      g.lfo?.stop();
-      void g.ctx.close();
-    } catch {
-      /* 已停止 */
-    }
-    graphRef.current = null;
-  }
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const loadedSrcRef = useRef('');
 
   function play(p: NoisePreset, vol: number) {
-    stopGraph();
-    graphRef.current = buildGraph(p, vol);
-    setPlaying(true);
+    const a = audioRef.current;
+    if (!a) return;
+    const src = `${import.meta.env.BASE_URL}${p.src}`;
+    if (loadedSrcRef.current !== src) {
+      a.src = src;
+      loadedSrcRef.current = src;
+    }
+    a.volume = vol;
+    a.loop = true;
+    void a.play().then(
+      () => setPlaying(true),
+      (err: unknown) => {
+        // 用户快速点了停止会抛 AbortError，属正常交互，不当错误处理
+        if (err instanceof DOMException && err.name === 'AbortError') return;
+        setPlaying(false);
+        toast.error('环境音播放失败，请重试');
+      },
+    );
   }
 
   function stop() {
-    stopGraph();
+    audioRef.current?.pause();
     setPlaying(false);
   }
 
   function changePreset(p: NoisePreset) {
     setPreset(p);
-    if (playing) play(p, volume); // 实时切换音色
+    if (playing) play(p, volume); // 播放中切换音色，保持播放状态
   }
 
   function changeVolume(v: number) {
     setVolume(v);
-    const g = graphRef.current;
-    if (g) g.gain.gain.value = v;
+    if (audioRef.current) audioRef.current.volume = v;
   }
 
-  // 卸载时清理音频资源
-  useEffect(() => () => stopGraph(), []);
+  // 卸载时停止播放并释放音频资源
+  useEffect(
+    () => () => {
+      const a = audioRef.current;
+      if (a) {
+        a.pause();
+        a.removeAttribute('src');
+      }
+      loadedSrcRef.current = '';
+    },
+    [],
+  );
 
   return (
     <div className="noise">
       <div className="noise-presets">
-        {PRESETS.map((p) => (
+        {NOISE_PRESETS.map((p) => (
           <button
             key={p.key}
             type="button"
@@ -141,7 +89,11 @@ export function WhiteNoiseTool() {
         <Slider min={0} max={1} step={0.01} value={volume} onChange={changeVolume} ariaLabel="白噪音音量" />
       </div>
 
-      <p className="muted noise-tip">程序实时合成的环境音，不下载任何音频文件。</p>
+      <audio ref={audioRef} loop preload="none" hidden />
+
+      <p className="muted noise-tip">
+        四段环境音均为 CC0 公共领域素材（OpenGameArt / Freesound），已随应用离线打包，详情见「我的」页开源致谢。
+      </p>
     </div>
   );
 }

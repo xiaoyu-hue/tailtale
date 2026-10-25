@@ -36,6 +36,7 @@
     "src/modules/games/model.ts",
     "src/modules/games/data/quizBank.ts",
     "src/modules/games/tictactoe.ts",
+    "src/modules/toolbox/noise-model.ts",
     "src/vendor/gomoku/gomoku.js",
     "src/vendor/gomoku/ai.js",
     "src/modules/reader/model.ts",

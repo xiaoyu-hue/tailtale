@@ -166,6 +166,29 @@ def run_smoke(base):
         page.get_by_role("heading", name="书架").wait_for()
         check("术语统一：页面无「游戏币」字样", "游戏币" not in page.content())
 
+        # —— 工具箱·白噪音（1.16.0）：CC0 环境音，audio 循环播放预缓存素材 ——
+        page.get_by_role("button", name="工具箱").click()
+        page.get_by_role("button", name="白噪音").click()
+        sheet = page.locator(".sheet.open")
+        sheet.wait_for()
+        audio = sheet.locator("audio")
+        audio.wait_for(state="attached")  # audio 元素按设计隐藏，只需在 DOM 中就位
+        sheet.get_by_role("button", name="播放").click()
+        page.wait_for_timeout(600)
+        src = audio.evaluate("a => a.currentSrc || a.src")
+        check(
+            "白噪音：播放默认雨声（预缓存 CC0 素材，循环）",
+            src.endswith("/audio/rain.mp3") and audio.evaluate("a => a.loop") is True,
+            src,
+        )
+        sheet.get_by_role("button", name="海浪").click()
+        page.wait_for_timeout(400)
+        src2 = audio.evaluate("a => a.currentSrc || a.src")
+        check("白噪音：播放中切换海浪", src2.endswith("/audio/ocean.mp3"), src2)
+        sheet.get_by_role("button", name="停止").click()
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(300)
+
         page.get_by_role("button", name="我的").click()
         page.get_by_role("button", name="导出备份").wait_for()
 

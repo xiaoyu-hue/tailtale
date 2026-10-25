@@ -35,6 +35,10 @@ const CREDIT_GROUPS: CreditGroup[] = [
       { name: 'fflate', detail: 'MIT · Arjun Barrett · MOBI / AZW3 记录解压（仅内嵌字体场景按需下载）' },
       { name: 'foliate-js', detail: 'MIT · John Factotum / foliate-js contributors · MOBI / AZW3 解析（vendored 单文件 mobi.js，不替换 epubjs，按需动态加载）' },
       { name: 'gomoku-ai', detail: 'MIT · SEN LLC（SEN 合同会社）· 五子棋 AI 对手：minimax + alpha-beta 剪枝，三档难度（vendored gomoku.js + ai.js）' },
+      { name: 'rain.mp3（雨声）', detail: 'CC0 1.0 · Ylmir · 白噪音雨声循环：约 45 秒实拍雨声（OpenGameArt，转 64kbps MP3 随包）' },
+      { name: 'ocean.mp3（海浪）', detail: 'CC0 1.0 · Rmutt · 白噪音海浪循环：约 55 秒实拍海涛（Freesound，作者已编辑为循环）' },
+      { name: 'forest.mp3（森林）', detail: 'CC0 1.0 · Spring Spring · 白噪音森林循环：约 44 秒鸟鸣 + 风声（OpenGameArt，纯环境版）' },
+      { name: 'fire.mp3（篝火）', detail: 'CC0 1.0 · PagDev · 白噪音篝火循环：约 25 秒柴火燃烧 + 噼啪（OpenGameArt）' },
     ],
   },
   {

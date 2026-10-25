@@ -19,7 +19,8 @@ export default defineConfig({
       // 无需 SW 再缓存一份；否则 SW 首次安装要拉全量书库，安装体积与耗时失控。
       // 书单 library-manifest.json（约 2KB）仍随包，离线可见列表。
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        // mp3：白噪音四段 CC0 环境音（public/audio/，合计约 1.3MB）须离线可播
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,mp3}'],
         globIgnores: ['library-books/**'],
       },
       manifest: {
