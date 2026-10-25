@@ -33,7 +33,13 @@ export function WhiteNoiseTool() {
   }
 
   function stop() {
-    audioRef.current?.pause();
+    const a = audioRef.current;
+    if (a) {
+      a.pause();
+      // 归零播放进度：仅 pause 的话再点「播放」会从中断处续播（loadedSrcRef
+      // 守卫使相同 src 不重载、currentTime 保持），不符合「停止」的语义
+      a.currentTime = 0;
+    }
     setPlaying(false);
   }
 
