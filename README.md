@@ -2,7 +2,7 @@
 
 [![Version](https://img.shields.io/badge/version-v1.16.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.16.0)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
-[![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](docs/LICENSE)
+[![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](LICENSE-DOCS)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
 [![Data](https://img.shields.io/badge/data-100%25%20local-4c1)](#隐私与数据)
 
@@ -252,9 +252,10 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 ├── LICENSE                   Apache-2.0 全文（覆盖自有源代码）
 ├── THIRD_PARTY_NOTICES.md    第三方组件版权与许可证声明
 ├── README.md                 本文件（Apache-2.0）
+├── LICENSE-DOCS              文档与内容许可（CC BY-NC 4.0，含法律全文）
 ├── tsconfig.test.json        测试编译清单（新增被测模块在此加一行，见开发约定）
-├── docs/                     项目文档（CC BY-NC 4.0，全文见 docs/LICENSE）
-│   ├── LICENSE               CC BY-NC 4.0 官方法律文本（文档许可）
+├── docs/                     项目文档（许可见根目录 LICENSE-DOCS）
+│   ├── LICENSE               兼容指针（许可文本见根 LICENSE-DOCS）
 │   ├── 书时-PRD.md           产品需求文档
 │   ├── 书时-技术栈.md         技术选型与架构
 │   ├── 书时-架构设计.md       目标架构、模块边界与迁移路径
@@ -320,7 +321,7 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 | 对象 | 许可证 |
 |---|---|
 | 书时自有源代码（`src/`）与构建配置（`package.json`、`vite.config.ts`、`tsconfig*.json` 等） | [Apache-2.0](LICENSE)，Copyright © 2026 xiaoyu-hue |
-| 项目文档（`README.md`、`CHANGELOG.md`、`docs/` 下全部文档） | [CC BY-NC 4.0](docs/LICENSE)（署名 + 非商用），完整法律文本见 [docs/LICENSE](docs/LICENSE) |
+| 项目文档（`README.md`、`CHANGELOG.md`、`docs/` 下全部文档） | [CC BY-NC 4.0](LICENSE-DOCS)（署名 + 非商用），完整法律文本见 [LICENSE-DOCS](LICENSE-DOCS) |
 | 第三方组件 | 各自原许可证，见 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md) |
 
 ---
