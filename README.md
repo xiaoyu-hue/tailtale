@@ -319,9 +319,9 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 
 | 对象 | 许可证 |
 |---|---|
-| 书时自有源代码（`src/`、`README.md`、`CHANGELOG.md`） | [Apache-2.0](LICENSE)，Copyright © 2026 xiaoyu-hue |
+| 书时自有源代码（`src/`）与构建配置（`package.json`、`vite.config.ts`、`tsconfig*.json` 等） | [Apache-2.0](LICENSE)，Copyright © 2026 xiaoyu-hue |
+| 项目文档（`README.md`、`CHANGELOG.md`、`docs/` 下全部文档） | [CC BY-NC 4.0](docs/LICENSE)（署名 + 非商用），完整法律文本见 [docs/LICENSE](docs/LICENSE) |
 | 第三方组件 | 各自原许可证，见 [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES.md) |
-| docs/ 目录项目文档 | [CC BY-NC 4.0](docs/LICENSE)（署名 + 非商用），官方法律文本见 docs/LICENSE |
 
 ---
 
