@@ -1,6 +1,6 @@
 # 书时 TailTale
 
-[![Version](https://img.shields.io/badge/version-v1.16.0-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.16.0)
+[![Version](https://img.shields.io/badge/version-v1.16.1-orange)](https://github.com/xiaoyu-hue/tailtale/releases/tag/v1.16.0)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 [![Docs License](https://img.shields.io/badge/docs-CC--BY--NC--4.0-lightgrey)](LICENSE-DOCS)
 [![PWA](https://img.shields.io/badge/PWA-ready-brightgreen)](https://tailtale-520.pages.dev/)
@@ -36,7 +36,7 @@
 
 **主站地址：<https://tailtale-520.pages.dev/>**
 
-- 当前部署内容为 `main` 分支最新构建（**v1.16.0 · 白噪音 CC0 环境音上线**）
+- 当前部署内容为 `main` 分支最新构建（**v1.16.1 · 文档许可标准化**）
 - 数据全部存储在你自己浏览器的本地空间（IndexedDB / localStorage），清除浏览器数据前记得先体验、后清理
 - 建议用手机浏览器打开后「添加到主屏幕」，即可像原生 App 一样全屏离线使用
 - 推荐浏览器：Chrome / Edge / Safari 近两年版本（依赖 IndexedDB 与 Service Worker）
@@ -292,7 +292,8 @@ scripts/      构建期离线工具：clean_books.py（公版书源文本清洗�
 
 ## 版本与发布
 
-- **当前版本：v1.16.0**（2026-10-25 发布）：白噪音换用 CC0 真实环境音——雨声 / 海浪 / 森林 / 篝火四段循环录音（作者：Ylmir / Rmutt / Spring Spring / PagDev，来源 OpenGameArt / Freesound），替换此前的程序合成音（用户反馈「不太像」）；随应用离线打包（Service Worker 预缓存约 2.55MB），断网也能播；合规四处登记同步。另有番茄钟居中修复：时间数字不再沉在圆环下方（360/390/768/1280 四视口实测垂直偏差 0.00px）。v1.15.0（2026-10-25）：游戏模块上线——六个小游戏（猜数字 / 猜成语 / 猜歇后语 / 脑筋急转弯 / 五子棋 / 井字棋）+ 对局战绩 + AI 主持人双模式 + 局后 AI 点评与追问 + 游戏金币经济（每日上限防刷、任意游戏首玩 +3）；宠物零食同步调价（小鱼干 15 / 逗猫棒 20 / 猫条 35 / 猫薄荷 60）。v1.14.0（2026-10-25）：电子书格式扩充至 7 种——新增 FB2（导入期转 EPUB，复用 EPUB 全部能力）、CBZ（JSZip 解包 + 图片翻页，漫画场景书摘/TTS/搜索/AI 自动降级）、MOBI / AZW3（vendored foliate-js mobi.js 单文件解析 + 净化 HTML 自渲染，DRM 文件明确提示不支持；fflate 按需解压）；顺带修复三个真实缺陷（CBZ 格式识别遗漏、导入后书架不刷新的事务竞态、CBZ 图片首屏不渲染的闭包陷阱）；统一 extractText 让 TTS / 全文搜索 / AI 解读覆盖全部文本类格式。v1.13.0（2026-10-24）：M4 工具箱上线——首页「工具箱」功能格正式接通，8 款本地小工具（番茄钟 / 白噪音 / 文本统计 / 今日一书 / 阅读日历 / 书摘导出 / TTS 朗读 / 全文搜索），全部本地优先、零依赖、零上传；minisearch 本地全文搜索。v1.12.0（2026-10-23）测试体系一期：纯函数层补齐至 11 个模块 158 例单测、被测层行覆盖 99.47%；端到端冒烟入仓并进 CI（Playwright 真实浏览器跑加密备份全链路 14 项断言）；Node 22 内置覆盖率报告零新依赖；测试管线收敛为 tsconfig.test.json 清单驱动。v1.11.0 加密备份上线：导出备份三档——标准备份默认剔除 AI 密钥、加密备份整文件加密（PBKDF2-HMAC-SHA256 60 万次迭代 + AES-256-GCM，口令不落存储、无找回后门）、完整明文备份；导入自动识别加密包弹口令框，口令错误/文件篡改可识别且可重试）。更早版本演进见 [CHANGELOG](CHANGELOG.md)
+- **当前版本：v1.16.1**（2026-10-27 发布）：文档许可统一到根 `LICENSE-DOCS`（CC BY-NC 4.0 七要件：版权行 / SPDX / 范围 / 署名示例 / 第三方除外 / 官方全文），`docs/LICENSE` 改为指向根文件的说明页；README 许可表归属修正——README、CHANGELOG 归文档行，代码行只覆盖 `src/` 与构建配置。
+- **上一版：v1.16.0**（2026-10-25 发布）：白噪音换用 CC0 真实环境音——雨声 / 海浪 / 森林 / 篝火四段循环录音（作者：Ylmir / Rmutt / Spring Spring / PagDev，来源 OpenGameArt / Freesound），替换此前的程序合成音（用户反馈「不太像」）；随应用离线打包（Service Worker 预缓存约 2.55MB），断网也能播；合规四处登记同步。另有番茄钟居中修复：时间数字不再沉在圆环下方（360/390/768/1280 四视口实测垂直偏差 0.00px）。v1.15.0（2026-10-25）：游戏模块上线——六个小游戏（猜数字 / 猜成语 / 猜歇后语 / 脑筋急转弯 / 五子棋 / 井字棋）+ 对局战绩 + AI 主持人双模式 + 局后 AI 点评与追问 + 游戏金币经济（每日上限防刷、任意游戏首玩 +3）；宠物零食同步调价（小鱼干 15 / 逗猫棒 20 / 猫条 35 / 猫薄荷 60）。v1.14.0（2026-10-25）：电子书格式扩充至 7 种——新增 FB2（导入期转 EPUB，复用 EPUB 全部能力）、CBZ（JSZip 解包 + 图片翻页，漫画场景书摘/TTS/搜索/AI 自动降级）、MOBI / AZW3（vendored foliate-js mobi.js 单文件解析 + 净化 HTML 自渲染，DRM 文件明确提示不支持；fflate 按需解压）；顺带修复三个真实缺陷（CBZ 格式识别遗漏、导入后书架不刷新的事务竞态、CBZ 图片首屏不渲染的闭包陷阱）；统一 extractText 让 TTS / 全文搜索 / AI 解读覆盖全部文本类格式。v1.13.0（2026-10-24）：M4 工具箱上线——首页「工具箱」功能格正式接通，8 款本地小工具（番茄钟 / 白噪音 / 文本统计 / 今日一书 / 阅读日历 / 书摘导出 / TTS 朗读 / 全文搜索），全部本地优先、零依赖、零上传；minisearch 本地全文搜索。v1.12.0（2026-10-23）测试体系一期：纯函数层补齐至 11 个模块 158 例单测、被测层行覆盖 99.47%；端到端冒烟入仓并进 CI（Playwright 真实浏览器跑加密备份全链路 14 项断言）；Node 22 内置覆盖率报告零新依赖；测试管线收敛为 tsconfig.test.json 清单驱动。v1.11.0 加密备份上线：导出备份三档——标准备份默认剔除 AI 密钥、加密备份整文件加密（PBKDF2-HMAC-SHA256 60 万次迭代 + AES-256-GCM，口令不落存储、无找回后门）、完整明文备份；导入自动识别加密包弹口令框，口令错误/文件篡改可识别且可重试）。更早版本演进见 [CHANGELOG](CHANGELOG.md)
 - [Releases](https://github.com/xiaoyu-hue/tailtale/releases) · [CHANGELOG](CHANGELOG.md)
 - 版本号规则与发版流程：[docs/书时-版本管理规范.md](docs/书时-版本管理规范.md)
   - 主版本号（X.0.0）= 架构级变更；次版本号（1.X.0）= 新功能上线；修订号（1.1.X）= 优化、修复、文档同步

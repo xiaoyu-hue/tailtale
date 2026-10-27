@@ -7,6 +7,14 @@
 
 （暂无。）
 
+## [1.16.1] - 2026-10-27
+
+### 文档
+
+- **文档许可统一到根 `LICENSE-DOCS`**：此前文档许可是裸的 CC BY-NC 4.0 法条放在 `docs/LICENSE`，既没有版权行、也没有说清「哪些文件算文档」，还和其余 8 个仓库的 `LICENSE-DOCS` 命名不一致。现改为根目录 `LICENSE-DOCS`，按七要件写全（版权行 / `SPDX-License-Identifier: CC-BY-NC-4.0` / 覆盖范围 / 授权与条件 / 署名示例 / 第三方除外 / 官方全文）；`docs/LICENSE` 保留为指向根文件的说明页，避免旧链接 404。
+- **README 许可表归属修正**：`README.md`、`CHANGELOG.md` 原先被划进 Apache-2.0 那一行，与顶部 `docs-CC-BY-NC-4.0` 徽章自相矛盾。现代码行只写 `src/` 与构建配置，文档行覆盖 README、CHANGELOG 与 `docs/` 下全部文档。
+- **第三方素材**：`src/vendor/` 下的 vendored 代码（含五子棋、宠物像素图）各自保留原许可证与版权行，不并入本项目许可。
+
 ## [1.16.0] - 2026-10-25
 
 ### 新增
